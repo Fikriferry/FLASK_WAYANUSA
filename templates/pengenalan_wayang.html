@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengenalan Wayang - ANUSA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-logo">
+                    <a href="{{ url_for('home') }}" class="logo-link">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ANUSA Logo" class="logo-image">
+                    </a>
+                </div>
+                <div class="navbar-menu">
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('quiz') }}">Quiz</a></li>
+                        <li><a href="{{ url_for('mencari_dalang') }}">Mencari Dalang</a></li>
+                        <li><a href="{{ url_for('pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                    </ul>
+                </div>
+                <div class="navbar-actions">
+                    <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <p class="hero-tag">🤖 AI Image Recognition</p>
+                    <h1 class="hero-title">
+                        Pengenalan <span class="highlight">Wayang</span> dengan Teknologi AI
+                    </h1>
+                    <p class="hero-description">
+                        Gunakan kamera atau unggah foto untuk mengenali tokoh wayang secara instan. Pelajari nama, sifat, dan kisah di balik setiap karakter wayang dengan bantuan kecerdasan buatan.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#" class="btn btn-primary">Mulai Scan Wayang</a>
+                        <a href="#" class="btn btn-secondary">Pelajari Lebih Lanjut →</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://via.placeholder.com/500x400/2a2a2a/ffd700?text=AI+Wayang+Recognition" alt="AI Wayang Recognition" class="wayang-image">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section class="features">
+        <div class="container">
+            <div class="features-content">
+                <p class="features-tag">CARA KERJA</p>
+                <h2 class="features-title">Bagaimana <span class="highlight">AI</span> Mengidentifikasi Wayang</h2>
+                <p class="features-description">
+                    Teknologi machine learning kami dapat mengenali lebih dari 100 tokoh wayang dengan akurasi tinggi melalui analisis visual dan pola karakteristik.
+                </p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Upload+Photo" alt="Upload Photo">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Upload Foto</h3>
+                            <p class="feature-description">
+                                Unggah foto tokoh wayang dari galeri atau ambil langsung dengan kamera.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=AI+Analysis" alt="AI Analysis">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Analisis AI</h3>
+                            <p class="feature-description">
+                                Sistem AI menganalisis bentuk wajah, atribut, dan ciri khas tokoh wayang.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Get+Results" alt="Get Results">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Hasil Identifikasi</h3>
+                            <p class="feature-description">
+                                Dapatkan informasi lengkap tentang tokoh wayang yang dikenali.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

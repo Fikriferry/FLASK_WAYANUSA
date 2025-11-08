@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - WAYANUSA</title>
+    <title>Daftar - WAYANUSA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +21,13 @@
         </div>
         <form class="login-form" action="#" method="post">
             <div class="form-group">
-                <label for="email" class="form-label">  
+                <label for="name" class="form-label">
+                    <i class="fas fa-user"></i> Nama Lengkap
+                </label>
+                <input type="text" id="name" name="name" class="form-input" placeholder="Masukkan nama lengkap Anda" required>
+            </div>
+            <div class="form-group">
+                <label for="email" class="form-label">
                     <i class="fas fa-envelope"></i> Email
                 </label>
                 <input type="email" id="email" name="email" class="form-input" placeholder="Masukkan email Anda" required>
@@ -37,25 +43,33 @@
                     </button>
                 </div>
             </div>
-            <div class="form-options">
-                <a href="#" class="forgot-password">Lupa Password?</a>
+            <div class="form-group">
+                <label for="confirm-password" class="form-label">
+                    <i class="fas fa-lock"></i> Konfirmasi Password
+                </label>
+                <div class="password-input-container">
+                    <input type="password" id="confirm-password" name="confirm-password" class="form-input" placeholder="Konfirmasi password Anda" required>
+                    <button type="button" class="password-toggle" id="confirm-password-toggle">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
             </div>
             <button type="submit" class="btn-login">
-                <i class="fas fa-sign-in-alt"></i> Masuk
+                <i class="fas fa-user-plus"></i> Daftar
             </button>
             <div class="register-link">
-                <p>Belum punya akun? <a href="/register" class="register-text">Daftar</a></p>
+                <p>Sudah punya akun? <a href="/login" class="register-text">Masuk</a></p>
             </div>
         </form>
         <div class="social-login">
             <div class="divider">
-                <span>Login Menggunakan</span>
+                <span>Daftar Menggunakan</span>
             </div>
             <div class="social-buttons">
-                <button class="social-btn google-btn" title="Login dengan Google">
+                <button class="social-btn google-btn" title="Daftar dengan Google">
                     <i class="fab fa-google"></i>
                 </button>
-                <button class="social-btn facebook-btn" title="Login dengan Facebook">
+                <button class="social-btn facebook-btn" title="Daftar dengan Facebook">
                     <i class="fab fa-facebook-f"></i>
                 </button>
             </div>
@@ -63,7 +77,7 @@
     </div>
 
     <script>
-        // Password toggle functionality
+        // Password toggle functionality for password field
         document.getElementById('password-toggle').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const icon = this.querySelector('i');
@@ -79,12 +93,30 @@
             }
         });
 
+        // Password toggle functionality for confirm password field
+        document.getElementById('confirm-password-toggle').addEventListener('click', function() {
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const icon = this.querySelector('i');
+
+            if (confirmPasswordInput.type === 'password') {
+                confirmPasswordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                confirmPasswordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
         // Form validation feedback
         document.querySelector('.login-form').addEventListener('submit', function(e) {
+            const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
 
-            if (!email || !password) {
+            if (!name || !email || !password || !confirmPassword) {
                 e.preventDefault();
                 alert('Mohon lengkapi semua field yang diperlukan.');
                 return;
@@ -98,13 +130,27 @@
                 return;
             }
 
+            // Password confirmation validation
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Password dan konfirmasi password tidak cocok.');
+                return;
+            }
+
+            // Password strength validation
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('Password harus memiliki minimal 6 karakter.');
+                return;
+            }
+
             // Show loading state
             const submitBtn = document.querySelector('.btn-login');
             const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Masuk...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mendaftar...';
             submitBtn.disabled = true;
 
-            // Simulate login process (remove this in production)
+            // Simulate registration process (remove this in production)
             setTimeout(() => {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;

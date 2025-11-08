@@ -12,24 +12,65 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 db.init_app(app)
 
-# Ensure upload folder exists
+# Pastikan folder upload ada
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Login required decorator
+# ============================================================
+# DECORATOR UNTUK LOGIN ADMIN
+# ============================================================
 def login_required(f):
     def wrapper(*args, **kwargs):
         if 'admin_logged_in' not in session:
-            return redirect(url_for('login'))
+            return redirect(url_for('login_admin'))
         return f(*args, **kwargs)
     wrapper.__name__ = f.__name__
     return wrapper
 
-@app.route('/')
-def index():
-    return redirect(url_for('login'))
+# ============================================================
+# ROUTE UNTUK PENGGUNA (USER SIDE)
+# ============================================================
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/login')
+def login_user():
+    return render_template('login.html')
+
+@app.route('/register')
+def register_user():
+    return render_template('register.html')
+
+@app.route('/pengenalan-wayang')
+def pengenalan_wayang():
+    return render_template('pengenalan_wayang.html')
+
+@app.route('/quiz')
+def quiz():
+    return render_template('quiz.html')
+
+@app.route('/mencari-dalang')
+def mencari_dalang():
+    return render_template('mencari_dalang.html')
+
+@app.route('/pertunjukan-wayang')
+def pertunjukan_wayang():
+    return render_template('pertunjukan_wayang.html')
+
+# ============================================================
+# ROUTE UNTUK ADMIN LOGIN & DASHBOARD
+# ============================================================
+
+@app.route('/admin')
+def index_admin():
+    # redirect ke halaman login admin kalau belum login
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('login_admin'))
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def login_admin():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -39,21 +80,25 @@ def login():
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Username atau password salah!', 'error')
-    return render_template('login.html')
+    return render_template('admin/login.html')
 
-@app.route('/logout')
+@app.route('/admin/logout')
 @login_required
-def logout():
+def logout_admin():
     session.pop('admin_logged_in', None)
     flash('Logout berhasil!', 'success')
-    return redirect(url_for('login'))
+    return redirect(url_for('login_admin'))
 
-@app.route('/admin')
+@app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
     dalang_count = Dalang.query.count()
     dalangs = Dalang.query.all()
     return render_template('admin/index.html', dalang_count=dalang_count, dalangs=dalangs)
+
+# ============================================================
+# CRUD DALANG (ADMIN)
+# ============================================================
 
 @app.route('/admin/dalang')
 @login_required
@@ -82,7 +127,8 @@ def dalang_add():
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 foto = filename
 
-        new_dalang = Dalang(nama=nama, alamat=alamat, foto=foto, latitude=latitude, longitude=longitude)
+        new_dalang = Dalang(nama=nama, alamat=alamat, foto=foto,
+                            latitude=latitude, longitude=longitude)
         db.session.add(new_dalang)
         db.session.commit()
         flash('Dalang berhasil ditambahkan!', 'success')
@@ -126,7 +172,9 @@ def dalang_edit(id):
 def dalang_delete(id):
     dalang = Dalang.query.get_or_404(id)
     if dalang.foto:
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], dalang.foto))
+        foto_path = os.path.join(app.config['UPLOAD_FOLDER'], dalang.foto)
+        if os.path.exists(foto_path):
+            os.remove(foto_path)
     db.session.delete(dalang)
     db.session.commit()
     flash('Dalang berhasil dihapus!', 'success')
@@ -136,6 +184,10 @@ def dalang_delete(id):
 @login_required
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+# ============================================================
+# MAIN APP RUN
+# ============================================================
 
 if __name__ == '__main__':
     with app.app_context():

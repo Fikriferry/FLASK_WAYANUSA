@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mengenal Budaya Wayang Kulit Bersama ANUSA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-logo">
+                    <a href="/" class="logo-link">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ANUSA Logo" class="logo-image">
+                    </a>
+                </div>
+                <div class="navbar-menu">
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('quiz') }}">Quiz</a></li>
+                        <li><a href="{{ url_for('mencari_dalang') }}">Mencari Dalang</a></li>
+                        <li><a href="{{ url_for('pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                    </ul>
+                </div>
+                <div class="navbar-actions">
+                    <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <p class="hero-tag">✨ Melestarikan Budaya Nusantara</p>
+                    <h1 class="hero-title">
+                        Mengenal Budaya <span class="highlight">Wayang Kulit</span> Bersama <span class="highlight">ANUSA</span>
+                    </h1>
+                    <p class="hero-description">
+                        Belajar, bermain, dan melestarikan budaya Indonesia melalui pengalaman digital interaktif yang menawan dan penuh makna.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#" class="btn btn-primary">⬇ Unduh Sekarang</a>
+                        <a href="#" class="btn btn-secondary">Pelajari Lebih Lanjut →</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Siluet Wayang Kulit" class="wayang-image">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="container">
+            <div class="about-content">
+                <p class="about-tag">TENTANG ANUSA</p>
+                <h2 class="about-title">Cara Baru Mengenal <span class="highlight">Budaya Wayang</span></h2>
+                <p class="about-description">
+                    ANUSA adalah aplikasi edukatif berbasis mobile yang menghadirkan cara baru untuk mengenal budaya wayang kulit. Melalui fitur pengenalan wayang, kuis interaktif, pencarian dalang, hingga simulasi menjadi dalang, ANUSA berkomitmen melestarikan budaya nusantara di era digital.
+                </p>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">6+</div>
+                        <div class="stat-label">Fitur Interaktif</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100+</div>
+                        <div class="stat-label">Tokoh Wayang</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Video Edukatif</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="features-content">
+                <p class="features-tag">FITUR UTAMA</p>
+                <h2 class="features-title">Eksplorasi Budaya Wayang dengan <span class="highlight">Teknologi Modern</span></h2>
+                <p class="features-description">
+                    Setiap fitur dirancang dengan tujuan edukatif untuk melestarikan dan mempertemukan kekayaan budaya Indonesia.
+                </p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Pengenalan+Wayang" alt="Pengenalan Wayang">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Pengenalan Wayang</h3>
+                            <div class="feature-badge">🤖 AI Image Recognition</div>
+                            <p class="feature-description">
+                                Menggunakan teknologi AI untuk mengenali tokoh wayang dari foto atau kamera pengguna.
+                            </p>
+                            <div class="feature-details">
+                                <p><strong>Tujuan:</strong> Mempermudah pengguna mempelajari nama, sifat, dan kisah di balik setiap karakter wayang.</p>
+                                <p><strong>Nilai Edukatif:</strong> Menumbuhkan rasa ingin tahu dan apresiasi terhadap seni dan filsafat wayang.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Kuis+Edukatif" alt="Kuis Edukatif">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Kuis Edukatif</h3>
+                            <div class="feature-badge">🎮 Gamifikasi Pembelajaran</div>
+                            <p class="feature-description">
+                                Mini game berbentuk kuis tentang cerita, filsafat, dan karakter wayang dengan sistem poin dan badge.
+                            </p>
+                            <div class="feature-details">
+                                <p><strong>Tujuan:</strong> Membuat proses belajar budaya menjadi seru dan kompetitif.</p>
+                                <p><strong>Nilai Edukatif:</strong> Mengasah ingatan dan menambah wawasan budaya Jawa dengan cara menyenangkan.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Mencari+Dalang" alt="Mencari Dalang">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Mencari Dalang</h3>
+                            <div class="feature-badge">📍 Lokasi Berbasis Komunitas</div>
+                            <p class="feature-description">
+                                Menampilkan daftar dalang atau sanggar wayang terdekat, lengkap dengan profil dan jadwal pementasan.
+                            </p>
+                            <div class="feature-details">
+                                <p><strong>Tujuan:</strong> Menghubungkan masyarakat dengan pelaku seni tradisional.</p>
+                                <p><strong>Nilai Edukatif:</strong> Mendorong interaksi langsung antara pengguna dan komunitas budaya lokal.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Simulasi+Dalang" alt="Simulasi Dalang">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Simulasi Dalang</h3>
+                            <div class="feature-badge">🎭 Mode Interaktif</div>
+                            <p class="feature-description">
+                                Memberikan pengalaman pengguna menjadi dalang virtual dengan gerak, suara, dan narasi.
+                            </p>
+                            <div class="feature-details">
+                                <p><strong>Tujuan:</strong> Memberikan pengalaman digital yang imersif.</p>
+                                <p><strong>Nilai Edukatif:</strong> Menanamkan kecintaan terhadap seni pertunjukan tradisional.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

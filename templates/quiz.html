@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Edukatif - ANUSA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-logo">
+                    <a href="{{ url_for('home') }}" class="logo-link">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ANUSA Logo" class="logo-image">
+                    </a>
+                </div>
+                <div class="navbar-menu">
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('quiz') }}">Quiz</a></li>
+                        <li><a href="{{ url_for('mencari_dalang') }}">Mencari Dalang</a></li>
+                        <li><a href="{{ url_for('pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                    </ul>
+                </div>
+                <div class="navbar-actions">
+                    <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <p class="hero-tag">🎮 Gamifikasi Pembelajaran</p>
+                    <h1 class="hero-title">
+                        Quiz Edukatif <span class="highlight">Wayang Kulit</span>
+                    </h1>
+                    <p class="hero-description">
+                        Uji pengetahuan Anda tentang cerita, filsafat, dan karakter wayang melalui kuis interaktif yang menyenangkan. Raih poin dan badge untuk setiap pencapaian!
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#" class="btn btn-primary">Mulai Quiz</a>
+                        <a href="#" class="btn btn-secondary">Lihat Leaderboard →</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://via.placeholder.com/500x400/2a2a2a/ffd700?text=Quiz+Game" alt="Quiz Game" class="wayang-image">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section class="features">
+        <div class="container">
+            <div class="features-content">
+                <p class="features-tag">KATEGORI QUIZ</p>
+                <h2 class="features-title">Beragam <span class="highlight">Topik</span> Pembelajaran</h2>
+                <p class="features-description">
+                    Pilih kategori quiz sesuai minat dan tingkat pengetahuan Anda tentang budaya wayang.
+                </p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Tokoh+Wayang" alt="Tokoh Wayang">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Tokoh Wayang</h3>
+                            <p class="feature-description">
+                                Kenali nama, sifat, dan peran berbagai tokoh dalam cerita wayang.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Cerita+Mahabharata" alt="Cerita Mahabharata">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Cerita Mahabharata</h3>
+                            <p class="feature-description">
+                                Pelajari alur cerita dan nilai-nilai dalam epos Mahabharata.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Filsafat+Wayang" alt="Filsafat Wayang">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Filsafat Wayang</h3>
+                            <p class="feature-description">
+                                Eksplorasi makna filosofis dan ajaran moral dalam wayang kulit.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
