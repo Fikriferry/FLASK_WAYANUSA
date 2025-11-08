@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Data Dalang{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Daftar Dalang</h3>
+                <div class="card-tools">
+                    <a href="{{ url_for('dalang_add') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Tambah Dalang
+                    </a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama</th>
+                            <th>Alamat</th>
+                            <th>Foto</th>
+                            <th>Latitude</th>
+                            <th>Longitude</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dalang in dalangs %}
+                        <tr>
+                            <td>{{ dalang.id }}</td>
+                            <td>{{ dalang.nama }}</td>
+                            <td>{{ dalang.alamat }}</td>
+                            <td>
+                                {% if dalang.foto %}
+                                    <img src="{{ url_for('uploaded_file', filename=dalang.foto) }}" alt="Foto" width="50">
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ dalang.latitude or '-' }}</td>
+                            <td>{{ dalang.longitude or '-' }}</td>
+                            <td>
+                                <a href="{{ url_for('dalang_edit', id=dalang.id) }}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="{{ url_for('dalang_delete', id=dalang.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

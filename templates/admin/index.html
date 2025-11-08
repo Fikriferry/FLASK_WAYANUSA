@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ dalang_count }}</h3>
+                <p>Jumlah Dalang</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <a href="{{ url_for('dalang_add') }}" class="small-box-footer">
+                Tambah Dalang <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Peta Lokasi Dalang</h3>
+            </div>
+            <div class="card-body">
+                <div id="map" style="height: 400px; width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Inisialisasi peta
+    var map = L.map('map').setView([-6.2, 106.816666], 10); // Default: Jakarta
+
+    // Layer dasar
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Array marker
+    var markers = [];
+
+    {% for dalang in dalangs %}
+        {% if dalang.latitude and dalang.longitude %}
+            var marker = L.marker([{{ dalang.latitude }}, {{ dalang.longitude }}]).addTo(map)
+                .bindPopup('<b>{{ dalang.nama|escape }}</b><br>{{ dalang.alamat|escape }}');
+            markers.push(marker);
+        {% endif %}
+    {% endfor %}
+
+
+    // Auto fit ke semua marker jika ada
+    if (markers.length > 0) {
+        var group = L.featureGroup(markers);
+        map.fitBounds(group.getBounds());
+    }
+</script>
+{% endblock %}
