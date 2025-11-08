@@ -19,7 +19,9 @@
                 </div>
             </div>
         </div>
-        <form class="login-form" action="#" method="post">
+
+        <!-- Ubah action ke route Flask -->
+        <form class="login-form" action="{{ url_for('login_user') }}" method="post">
             <div class="form-group">
                 <label for="email" class="form-label">  
                     <i class="fas fa-envelope"></i> Email
@@ -37,16 +39,22 @@
                     </button>
                 </div>
             </div>
+
             <div class="form-options">
                 <a href="#" class="forgot-password">Lupa Password?</a>
             </div>
+
             <button type="submit" class="btn-login">
                 <i class="fas fa-sign-in-alt"></i> Masuk
             </button>
+
             <div class="register-link">
-                <p>Belum punya akun? <a href="/register" class="register-text">Daftar</a></p>
+                <p>Belum punya akun? 
+                    <a href="{{ url_for('register_user') }}" class="register-text">Daftar</a>
+                </p>
             </div>
         </form>
+
         <div class="social-login">
             <div class="divider">
                 <span>Login Menggunakan</span>
@@ -63,63 +71,17 @@
     </div>
 
     <script>
-        // Password toggle functionality
+        // Password toggle
         document.getElementById('password-toggle').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const icon = this.querySelector('i');
-
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
             } else {
                 passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
-        });
-
-        // Form validation feedback
-        document.querySelector('.login-form').addEventListener('submit', function(e) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (!email || !password) {
-                e.preventDefault();
-                alert('Mohon lengkapi semua field yang diperlukan.');
-                return;
-            }
-
-            // Basic email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                e.preventDefault();
-                alert('Mohon masukkan alamat email yang valid.');
-                return;
-            }
-
-            // Show loading state
-            const submitBtn = document.querySelector('.btn-login');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Masuk...';
-            submitBtn.disabled = true;
-
-            // Simulate login process (remove this in production)
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }, 2000);
-        });
-
-        // Input focus effects
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('focused');
-            });
-
-            input.addEventListener('blur', function() {
-                this.parentElement.classList.remove('focused');
-            });
         });
     </script>
 </body>

@@ -64,7 +64,7 @@ def pertunjukan_wayang():
 
 @app.route('/admin')
 def index_admin():
-    # redirect ke halaman login admin kalau belum login
+    # Redirect ke dashboard jika sudah login, kalau belum arahkan ke login admin
     if 'admin_logged_in' not in session:
         return redirect(url_for('login_admin'))
     return redirect(url_for('admin_dashboard'))
@@ -127,8 +127,13 @@ def dalang_add():
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 foto = filename
 
-        new_dalang = Dalang(nama=nama, alamat=alamat, foto=foto,
-                            latitude=latitude, longitude=longitude)
+        new_dalang = Dalang(
+            nama=nama,
+            alamat=alamat,
+            foto=foto,
+            latitude=latitude,
+            longitude=longitude
+        )
         db.session.add(new_dalang)
         db.session.commit()
         flash('Dalang berhasil ditambahkan!', 'success')
