@@ -1,13 +1,11 @@
-# TODO List for Flask Admin Panel Project
+# TODO: Menampilkan Data Dalang di Halaman Home
 
-- [x] Create models.py with Dalang model
-- [x] Create app.py with Flask app setup and all routes
-- [x] Create templates/base.html (AdminLTE layout)
-- [x] Create templates/login.html
-- [x] Create templates/admin/index.html (dashboard)
-- [x] Create templates/admin/dalang_list.html
-- [x] Create templates/admin/dalang_form.html
-- [x] Create static/uploads/ folder
-- [x] Install dependencies (flask, flask-sqlalchemy, pymysql)
-- [x] Create MySQL database 'flask_admin' (assuming MySQL is installed and running)
-- [x] Test run python app.py
+## Langkah-langkah:
+1. Edit app.py: Tambahkan query dalang di route home() dan kirim ke template index.html.
+2. Edit templates/index.html: Tambahkan daftar dalang di bagian features untuk kartu "Mencari Dalang".
+3. Test: Jalankan aplikasi dan periksa apakah data dalang muncul di halaman home.
+
+## Status:
+- [x] Edit app.py
+- [x] Edit index.html
+- [x] Test aplikasi (Aplikasi berjalan di localhost:5000)

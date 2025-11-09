@@ -27,7 +27,7 @@
                     </ul>
                 </div>
                 <div class="navbar-actions">
-                    <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+                    <a href="{{ url_for('login_user') }}" class="btn-login">Login</a>
                 </div>
             </div>
         </div>
@@ -64,6 +64,31 @@
                 <p class="features-description">
                     Jelajahi jaringan dalang dan sanggar wayang di seluruh Indonesia dengan informasi lengkap dan terpercaya.
                 </p>
+                <div class="dalang-list-section">
+                    <h3>Daftar Dalang Tersedia</h3>
+                    {% if dalangs %}
+                        <div class="dalang-grid">
+                            {% for dalang in dalangs %}
+                            <div class="dalang-card">
+                                {% if dalang.foto %}
+                                    <img src="{{ url_for('static', filename='uploads/' + dalang.foto) }}" alt="Foto {{ dalang.nama }}" class="dalang-photo">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo" alt="No Photo" class="dalang-photo">
+                                {% endif %}
+                                <div class="dalang-info">
+                                    <h4>{{ dalang.nama }}</h4>
+                                    <p><strong>Alamat:</strong> {{ dalang.alamat }}</p>
+                                    {% if dalang.latitude and dalang.longitude %}
+                                        <p><strong>Koordinat:</strong> {{ dalang.latitude }}, {{ dalang.longitude }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Belum ada dalang yang terdaftar.</p>
+                    {% endif %}
+                </div>
                 <div class="features-grid">
                     <div class="feature-card">
                         <div class="feature-image">

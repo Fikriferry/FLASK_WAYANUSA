@@ -38,7 +38,7 @@
                 <div class="hero-text">
                     <p class="hero-tag">✨ Melestarikan Budaya Nusantara</p>
                     <h1 class="hero-title">
-                        Mengenal Budaya <span class="highlight">Wayang Kulit</span> Bersama <span class="highlight">ANUSA</span>
+                        Mengenal Budaya <span class="highlight">Wayang Kulit</span> Mahabarata <span class="highlight"></span>
                     </h1>
                     <p class="hero-description">
                         Belajar, bermain, dan melestarikan budaya Indonesia melalui pengalaman digital interaktif yang menawan dan penuh makna.
@@ -137,6 +137,19 @@
                             <div class="feature-details">
                                 <p><strong>Tujuan:</strong> Menghubungkan masyarakat dengan pelaku seni tradisional.</p>
                                 <p><strong>Nilai Edukatif:</strong> Mendorong interaksi langsung antara pengguna dan komunitas budaya lokal.</p>
+                                <div class="dalang-list">
+                                    <h4>Dalang Tersedia:</h4>
+                                    <ul>
+                                        {% for dalang in dalangs %}
+                                        <li>
+                                            <strong>{{ dalang.nama }}</strong> - {{ dalang.alamat }}
+                                            {% if dalang.foto %}
+                                                <img src="{{ url_for('static', filename='uploads/' + dalang.foto) }}" alt="Foto {{ dalang.nama }}" width="50" style="margin-left: 10px;">
+                                            {% endif %}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>

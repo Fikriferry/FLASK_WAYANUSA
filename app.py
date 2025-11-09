@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, send_from_directory
+# (IMPOR BARU DITAMBAHKAN DI SINI)
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
 import os
 from models import db, Dalang
@@ -27,7 +28,7 @@ def login_required(f):
     return wrapper
 
 # ============================================================
-# ROUTE UNTUK PENGGUNA (USER SIDE)
+# ROUTE UNTUK PENGGUNA (USER SIDE) - (WAJAH 1: WEBSITE)
 # ============================================================
 
 @app.route('/')
@@ -52,19 +53,21 @@ def quiz():
 
 @app.route('/mencari-dalang')
 def mencari_dalang():
-    return render_template('mencari_dalang.html')
+    # Mengambil data dari database
+    dalangs = Dalang.query.all()
+    # Menampilkan halaman HTML dengan data
+    return render_template('mencari_dalang.html', dalangs=dalangs)
 
 @app.route('/pertunjukan-wayang')
 def pertunjukan_wayang():
     return render_template('pertunjukan_wayang.html')
 
 # ============================================================
-# ROUTE UNTUK ADMIN LOGIN & DASHBOARD
+# ROUTE UNTUK ADMIN (WAJAH 1: WEBSITE)
 # ============================================================
 
 @app.route('/admin')
 def index_admin():
-    # Redirect ke dashboard jika sudah login, kalau belum arahkan ke login admin
     if 'admin_logged_in' not in session:
         return redirect(url_for('login_admin'))
     return redirect(url_for('admin_dashboard'))
@@ -97,7 +100,7 @@ def admin_dashboard():
     return render_template('admin/index.html', dalang_count=dalang_count, dalangs=dalangs)
 
 # ============================================================
-# CRUD DALANG (ADMIN)
+# CRUD DALANG (WAJAH 1: WEBSITE ADMIN)
 # ============================================================
 
 @app.route('/admin/dalang')
@@ -186,9 +189,58 @@ def dalang_delete(id):
     return redirect(url_for('dalang_list'))
 
 @app.route('/uploads/<filename>')
-@login_required
 def uploaded_file(filename):
+    # Dihapus @login_required agar API bisa ambil gambar
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+# ============================================================
+# (BARU) WAJAH 2: WEB SERVICE (API UNTUK FLUTTER / 40 POIN)
+# ============================================================
+
+# Helper untuk mengubah URL foto menjadi URL lengkap
+# Sangat penting untuk aplikasi mobile
+def get_foto_url(filename):
+    if filename:
+        # url_for akan membuat URL lengkap seperti 'http://.../uploads/namafile.jpg'
+        return url_for('uploaded_file', filename=filename, _external=True)
+    return None
+
+# API (R)EAD: Mendapatkan SEMUA data dalang
+@app.route('/api/dalang', methods=['GET'])
+def api_get_all_dalang():
+    dalangs = Dalang.query.all()
+    
+    # Ubah list object Dalang menjadi list dictionary
+    dalang_list = []
+    for d in dalangs:
+        dalang_list.append({
+            'id': d.id,
+            'nama': d.nama,
+            'alamat': d.alamat,
+            'foto_url': get_foto_url(d.foto),
+            'latitude': d.latitude,
+            'longitude': d.longitude
+        })
+    
+    # Kembalikan sebagai JSON
+    return jsonify(dalang_list)
+
+# API (R)EAD: Mendapatkan SATU data dalang berdasarkan ID
+@app.route('/api/dalang/<int:id>', methods=['GET'])
+def api_get_one_dalang(id):
+    dalang = Dalang.query.get_or_404(id)
+    
+    # Kembalikan sebagai JSON
+    return jsonify({
+        'id': dalang.id,
+        'nama': dalang.nama,
+        'alamat': dalang.alamat,
+        'foto_url': get_foto_url(dalang.foto),
+        'latitude': dalang.latitude,
+        'longitude': dalang.longitude
+    })
+
+# (Anda bisa tambahkan @app.route('/api/login') di sini untuk Flutter)
 
 # ============================================================
 # MAIN APP RUN
@@ -197,4 +249,5 @@ def uploaded_file(filename):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    # Dijalankan di port 8000 agar tidak bentrok dengan API Wayanusa
+    app.run(host='0.0.0.0', port=8000, debug=True)
