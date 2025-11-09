@@ -15,7 +15,7 @@
             <div class="navbar-content">
                 <div class="navbar-logo">
                     <a href="/" class="logo-link">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ANUSA Logo" class="logo-image">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
                     </a>
                 </div>
                 <div class="navbar-menu">
@@ -59,10 +59,10 @@
     <section class="about">
         <div class="container">
             <div class="about-content">
-                <p class="about-tag">TENTANG ANUSA</p>
+                <p class="about-tag">TENTANG WAYANUSA</p>
                 <h2 class="about-title">Cara Baru Mengenal <span class="highlight">Budaya Wayang</span></h2>
                 <p class="about-description">
-                    ANUSA adalah aplikasi edukatif berbasis mobile yang menghadirkan cara baru untuk mengenal budaya wayang kulit. Melalui fitur pengenalan wayang, kuis interaktif, pencarian dalang, hingga simulasi menjadi dalang, ANUSA berkomitmen melestarikan budaya nusantara di era digital.
+                    WAYANUSA adalah aplikasi edukatif berbasis mobile yang menghadirkan cara baru untuk mengenal budaya wayang kulit. Melalui fitur pengenalan wayang, kuis interaktif, pencarian dalang, hingga simulasi menjadi dalang, WAYANUSA berkomitmen melestarikan budaya nusantara di era digital.
                 </p>
                 <div class="stats">
                     <div class="stat-card">
@@ -193,7 +193,7 @@
                 <p class="dalang-showcase-tag">DALANG TERSEDIA</p>
                 <h2 class="dalang-showcase-title">Temukan <span class="highlight">Dalang</span> Terdekat</h2>
                 <p class="dalang-showcase-description">
-                    Jelajahi daftar lengkap dalang dan sanggar wayang yang telah terdaftar di platform ANUSA. Temukan profil lengkap, lokasi, dan informasi kontak untuk pengalaman budaya yang autentik.
+                    Jelajahi daftar lengkap dalang dan sanggar wayang yang telah terdaftar di platform WAYANUSA. Temukan profil lengkap, lokasi, dan informasi kontak untuk pengalaman budaya yang autentik.
                 </p>
                 <div class="dalang-list-section">
                     {% if dalangs %}
@@ -222,5 +222,97 @@
             </div>
         </div>
     </section>
+
+    <!-- Chatbot Button -->
+    <div class="chatbot-button" id="chatbotButton">
+        <img src="{{ url_for('static', filename='images/icon_robot.png') }}" alt="Chatbot" class="chatbot-icon">
+    </div>
+
+    <!-- Chat Popup -->
+    <div class="chat-popup" id="chatPopup">
+        <div class="chat-popup-header">
+            <h3>Chatbot WAYANUSA</h3>
+            <button class="chat-close" id="chatClose">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <p>👋 Halo! Ada yang bisa saya bantu?</p>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Ketik pesan Anda..." maxlength="500">
+            <button id="sendButton">Kirim</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatbotButton = document.getElementById('chatbotButton');
+            const chatPopup = document.getElementById('chatPopup');
+            const chatClose = document.getElementById('chatClose');
+            const chatInput = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            const chatMessages = document.getElementById('chatMessages');
+
+            // Toggle popup saat klik tombol
+            chatbotButton.addEventListener('click', function() {
+                chatPopup.classList.toggle('show');
+                if (chatPopup.classList.contains('show')) {
+                    chatInput.focus();
+                }
+            });
+
+            // Tutup popup saat klik tombol close
+            chatClose.addEventListener('click', function() {
+                chatPopup.classList.remove('show');
+            });
+
+            // Tutup popup saat klik di luar popup
+            document.addEventListener('click', function(event) {
+                if (!chatbotButton.contains(event.target) && !chatPopup.contains(event.target)) {
+                    chatPopup.classList.remove('show');
+                }
+            });
+
+            // Fungsi untuk mengirim pesan
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (message === '') return;
+
+                // Tambah pesan user
+                const userMessageDiv = document.createElement('div');
+                userMessageDiv.className = 'message user-message';
+                userMessageDiv.innerHTML = `<p>${message}</p>`;
+                chatMessages.appendChild(userMessageDiv);
+
+                // Clear input
+                chatInput.value = '';
+
+                // Auto scroll ke bawah
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // Placeholder response bot (karena belum ada dataset)
+                setTimeout(function() {
+                    const botMessageDiv = document.createElement('div');
+                    botMessageDiv.className = 'message bot-message';
+                    botMessageDiv.innerHTML = `<p>Terima kasih atas pesannya! Fitur chatbot sedang dalam pengembangan. 😊</p>`;
+                    chatMessages.appendChild(botMessageDiv);
+
+                    // Auto scroll ke bawah
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+            }
+
+            // Event listener untuk tombol kirim
+            sendButton.addEventListener('click', sendMessage);
+
+            // Event listener untuk enter key
+            chatInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
