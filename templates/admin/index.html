@@ -1,37 +1,138 @@
-{% extends "base.html" %}
+{% extends "admin/layout_admin.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard Admin - WAYANUSA{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
-            <div class="inner">
-                <h3>{{ dalang_count }}</h3>
-                <p>Jumlah Dalang</p>
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Dashboard</h1>
             </div>
-            <div class="icon">
-                <i class="fas fa-users"></i>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
             </div>
-            <a href="{{ url_for('dalang_add') }}" class="small-box-footer">
-                Tambah Dalang <i class="fas fa-arrow-circle-right"></i>
-            </a>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Peta Lokasi Dalang</h3>
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <!-- Info boxes -->
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Dalang</span>
+                        <span class="info-box-number">{{ dalang_count }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div id="map" style="height: 400px; width: 100%;"></div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box mb-3">
+                    <span class="info-box-icon bg-success elevation-1"><i class="fas fa-map-marker-alt"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Lokasi Terdaftar</span>
+                        <span class="info-box-number">{{ dalang_count }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box mb-3">
+                    <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-theater-masks"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Pertunjukan Wayang</span>
+                        <span class="info-box-number">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box mb-3">
+                    <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-users-cog"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Admin Aktif</span>
+                        <span class="info-box-number">1</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-bolt mr-2"></i>
+                            Quick Actions
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <a href="{{ url_for('dalang_add') }}" class="btn btn-primary btn-block mb-2">
+                                    <i class="fas fa-plus"></i> Tambah Dalang
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="{{ url_for('dalang_list') }}" class="btn btn-info btn-block mb-2">
+                                    <i class="fas fa-list"></i> Lihat Semua
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line mr-2"></i>
+                            Statistik Platform
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress-group">
+                            <span class="float-right"><b>{{ dalang_count }}</b>/100</span>
+                            <div class="progress progress-sm">
+                                <div class="progress-bar bg-primary" style="width: {{ (dalang_count / 100) * 100 }}%"></div>
+                            </div>
+                            <p class="text-sm">Persentase Dalang Terdaftar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-map-marked-alt mr-2"></i>
+                            Peta Lokasi Dalang WAYANUSA
+                        </h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="map" style="height: 500px; width: 100%; border-radius: 8px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block scripts %}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mengenal Budaya Wayang Kulit Bersama ANUSA</title>
+    <title>Mengenal Budaya Wayang Kulit Mahabarata</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
@@ -137,18 +137,30 @@
                             <div class="feature-details">
                                 <p><strong>Tujuan:</strong> Menghubungkan masyarakat dengan pelaku seni tradisional.</p>
                                 <p><strong>Nilai Edukatif:</strong> Mendorong interaksi langsung antara pengguna dan komunitas budaya lokal.</p>
-                                <div class="dalang-list">
+                                <div class="dalang-list-section">
                                     <h4>Dalang Tersedia:</h4>
-                                    <ul>
-                                        {% for dalang in dalangs %}
-                                        <li>
-                                            <strong>{{ dalang.nama }}</strong> - {{ dalang.alamat }}
-                                            {% if dalang.foto %}
-                                                <img src="{{ url_for('static', filename='uploads/' + dalang.foto) }}" alt="Foto {{ dalang.nama }}" width="50" style="margin-left: 10px;">
-                                            {% endif %}
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
+                                    {% if dalangs %}
+                                        <div class="dalang-grid">
+                                            {% for dalang in dalangs %}
+                                            <div class="dalang-card">
+                                                {% if dalang.foto %}
+                                                    <img src="{{ url_for('static', filename='uploads/' + dalang.foto) }}" alt="Foto {{ dalang.nama }}" class="dalang-photo">
+                                                {% else %}
+                                                    <img src="https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo" alt="No Photo" class="dalang-photo">
+                                                {% endif %}
+                                                <div class="dalang-info">
+                                                    <h4>{{ dalang.nama }}</h4>
+                                                    <p><strong>Alamat:</strong> {{ dalang.alamat }}</p>
+                                                    {% if dalang.latitude and dalang.longitude %}
+                                                        <p><strong>Koordinat:</strong> {{ dalang.latitude }}, {{ dalang.longitude }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <p>Belum ada dalang yang terdaftar.</p>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -169,6 +181,43 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dalang List Section -->
+    <section class="dalang-showcase">
+        <div class="container">
+            <div class="dalang-showcase-content">
+                <p class="dalang-showcase-tag">DALANG TERSEDIA</p>
+                <h2 class="dalang-showcase-title">Temukan <span class="highlight">Dalang</span> Terdekat</h2>
+                <p class="dalang-showcase-description">
+                    Jelajahi daftar lengkap dalang dan sanggar wayang yang telah terdaftar di platform ANUSA. Temukan profil lengkap, lokasi, dan informasi kontak untuk pengalaman budaya yang autentik.
+                </p>
+                <div class="dalang-list-section">
+                    {% if dalangs %}
+                        <div class="dalang-grid">
+                            {% for dalang in dalangs %}
+                            <div class="dalang-card">
+                                {% if dalang.foto %}
+                                    <img src="{{ url_for('static', filename='uploads/' + dalang.foto) }}" alt="Foto {{ dalang.nama }}" class="dalang-photo">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo" alt="No Photo" class="dalang-photo">
+                                {% endif %}
+                                <div class="dalang-info">
+                                    <h4>{{ dalang.nama }}</h4>
+                                    <p><strong>Alamat:</strong> {{ dalang.alamat }}</p>
+                                    {% if dalang.latitude and dalang.longitude %}
+                                        <p><strong>Koordinat:</strong> {{ dalang.latitude }}, {{ dalang.longitude }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Belum ada dalang yang terdaftar.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

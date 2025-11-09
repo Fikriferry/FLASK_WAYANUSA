@@ -1,61 +1,123 @@
-{% extends "base.html" %}
+{% extends "admin/layout_admin.html" %}
 
-{% block title %}Data Dalang{% endblock %}
+{% block title %}Data Dalang - WAYANUSA Admin{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Daftar Dalang</h3>
-                <div class="card-tools">
-                    <a href="{{ url_for('dalang_add') }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus"></i> Tambah Dalang
-                    </a>
-                </div>
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">
+                    <i class="fas fa-users mr-2"></i>
+                    Data Dalang
+                </h1>
             </div>
-            <div class="card-body table-responsive p-0">
-                <table class="table table-hover text-nowrap">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nama</th>
-                            <th>Alamat</th>
-                            <th>Foto</th>
-                            <th>Latitude</th>
-                            <th>Longitude</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for dalang in dalangs %}
-                        <tr>
-                            <td>{{ dalang.id }}</td>
-                            <td>{{ dalang.nama }}</td>
-                            <td>{{ dalang.alamat }}</td>
-                            <td>
-                                {% if dalang.foto %}
-                                    <img src="{{ url_for('uploaded_file', filename=dalang.foto) }}" alt="Foto" width="50">
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>{{ dalang.latitude or '-' }}</td>
-                            <td>{{ dalang.longitude or '-' }}</td>
-                            <td>
-                                <a href="{{ url_for('dalang_edit', id=dalang.id) }}" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <a href="{{ url_for('dalang_delete', id=dalang.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">
-                                    <i class="fas fa-trash"></i> Hapus
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Data Dalang</li>
+                </ol>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list mr-2"></i>
+                            Daftar Dalang Terdaftar
+                        </h3>
+                        <div class="card-tools">
+                            <a href="{{ url_for('dalang_add') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Tambah Dalang Baru
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th style="width: 80px;">Foto</th>
+                                    <th>Nama Dalang</th>
+                                    <th>Alamat</th>
+                                    <th style="width: 120px;">Koordinat</th>
+                                    <th style="width: 150px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dalang in dalangs %}
+                                <tr>
+                                    <td>{{ dalang.id }}</td>
+                                    <td>
+                                        {% if dalang.foto %}
+                                            <img src="{{ url_for('uploaded_file', filename=dalang.foto) }}" alt="Foto {{ dalang.nama }}" class="img-circle elevation-2" width="40" height="40" style="object-fit: cover;">
+                                        {% else %}
+                                            <div class="text-center">
+                                                <i class="fas fa-user-circle text-secondary" style="font-size: 40px;"></i>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ dalang.nama }}</strong>
+                                    </td>
+                                    <td>{{ dalang.alamat }}</td>
+                                    <td>
+                                        {% if dalang.latitude and dalang.longitude %}
+                                            <small class="text-muted">
+                                                {{ "%.4f"|format(dalang.latitude) }}, {{ "%.4f"|format(dalang.longitude) }}
+                                            </small>
+                                        {% else %}
+                                            <span class="badge badge-warning">Belum ada</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('dalang_edit', id=dalang.id) }}" class="btn btn-warning btn-sm" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('dalang_delete', id=dalang.id) }}" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Yakin ingin menghapus dalang {{ dalang.nama }}?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not dalangs %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <i class="fas fa-users text-muted" style="font-size: 48px;"></i>
+                                        <p class="mt-2 text-muted">Belum ada dalang yang terdaftar</p>
+                                        <a href="{{ url_for('dalang_add') }}" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Tambah Dalang Pertama
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if dalangs %}
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-5">
+                                <div class="dataTables_info" role="status" aria-live="polite">
+                                    Menampilkan {{ dalangs|length }} dalang terdaftar
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
