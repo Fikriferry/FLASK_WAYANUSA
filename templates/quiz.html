@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 </head>
 <body>
     <nav class="navbar">
@@ -27,80 +29,81 @@
                     </ul>
                 </div>
                 <div class="navbar-actions">
-                    <a href="{{ url_for('login_user') }}" class="btn-login">Login</a>
+                    {% if session.get('user_logged_in') %}
+                        <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
+                        <a href="{{ url_for('logout_user') }}" class="btn-login">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('login_user') }}" class="btn-login">Login</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="hero">
+    <section class="quiz-section">
         <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <p class="hero-tag">🎮 Gamifikasi Pembelajaran</p>
-                    <h1 class="hero-title">
-                        Quiz Edukatif <span class="highlight">Wayang Kulit</span>
-                    </h1>
-                    <p class="hero-description">
-                        Uji pengetahuan Anda tentang cerita, filsafat, dan karakter wayang melalui kuis interaktif yang menyenangkan. Raih poin dan badge untuk setiap pencapaian!
-                    </p>
-                    <div class="hero-buttons">
-                        <a href="#" class="btn btn-primary">Mulai Quiz</a>
-                        <a href="#" class="btn btn-secondary">Lihat Leaderboard →</a>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <img src="https://via.placeholder.com/500x400/2a2a2a/ffd700?text=Quiz+Game" alt="Quiz Game" class="wayang-image">
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <section class="features">
-        <div class="container">
-            <div class="features-content">
-                <p class="features-tag">KATEGORI QUIZ</p>
-                <h2 class="features-title">Beragam <span class="highlight">Topik</span> Pembelajaran</h2>
-                <p class="features-description">
-                    Pilih kategori quiz sesuai minat dan tingkat pengetahuan Anda tentang budaya wayang.
+            <div class="quiz-content">
+                <p class="quiz-tag">🎮 QUIZ EDUKATIF</p>
+                <h2 class="quiz-title">Pilih <span class="highlight">Level</span> Quiz</h2>
+                <p class="quiz-description">
+                    Tantang diri Anda dengan berbagai level quiz wayang kulit. Mulai dari pemula hingga ahli, setiap level menawarkan pengalaman belajar yang unik.
                 </p>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-image">
-                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Tokoh+Wayang" alt="Tokoh Wayang">
+                <div class="quiz-cards">
+                    <div class="quiz-card" data-aos="fade-up">
+                        <div class="quiz-card-content">
+                            <h3 class="quiz-level">Beginner</h3>
+                            <p class="quiz-name">Pengenalan Tokoh Wayang</p>
+                            <p class="quiz-desc">Dari nama-nama, lahir kisah yang abadi. Kenali tokoh-tokoh utama dalam dunia wayang.</p>
+                            <a href="#" onclick="startQuiz()" class="btn-start-quiz">Mulai Kuis</a>
                         </div>
-                        <div class="feature-content">
-                            <h3 class="feature-title">Tokoh Wayang</h3>
-                            <p class="feature-description">
-                                Kenali nama, sifat, dan peran berbagai tokoh dalam cerita wayang.
-                            </p>
-                        </div>
+                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-image">
-                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Cerita+Mahabharata" alt="Cerita Mahabharata">
+                    <div class="quiz-card" data-aos="fade-up">
+                        <div class="quiz-card-content">
+                            <h3 class="quiz-level">Intermediate</h3>
+                            <p class="quiz-name">Cerita Mahabharata</p>
+                            <p class="quiz-desc">Pelajari alur cerita dan nilai-nilai dalam epos Mahabharata yang penuh hikmah.</p>
+                            <a href="#" class="btn-start-quiz">Mulai Kuis</a>
                         </div>
-                        <div class="feature-content">
-                            <h3 class="feature-title">Cerita Mahabharata</h3>
-                            <p class="feature-description">
-                                Pelajari alur cerita dan nilai-nilai dalam epos Mahabharata.
-                            </p>
-                        </div>
+                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-image">
-                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Filsafat+Wayang" alt="Filsafat Wayang">
+                    <div class="quiz-card" data-aos="fade-up">
+                        <div class="quiz-card-content">
+                            <h3 class="quiz-level">Advanced</h3>
+                            <p class="quiz-name">Filsafat Wayang</p>
+                            <p class="quiz-desc">Eksplorasi makna filosofis dan ajaran moral dalam wayang kulit yang mendalam.</p>
+                            <a href="#" class="btn-start-quiz">Mulai Kuis</a>
                         </div>
-                        <div class="feature-content">
-                            <h3 class="feature-title">Filsafat Wayang</h3>
-                            <p class="feature-description">
-                                Eksplorasi makna filosofis dan ajaran moral dalam wayang kulit.
-                            </p>
+                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
+                    </div>
+                    <div class="quiz-card" data-aos="fade-up">
+                        <div class="quiz-card-content">
+                            <h3 class="quiz-level">Expert</h3>
+                            <p class="quiz-name">Sejarah & Budaya</p>
+                            <p class="quiz-desc">Uji pengetahuan mendalam tentang sejarah dan budaya wayang kulit Jawa.</p>
+                            <a href="#" class="btn-start-quiz">Mulai Kuis</a>
                         </div>
+                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init();
+
+        function startQuiz() {
+            // Check if user is logged in before proceeding
+            if (!{{ session.get('user_logged_in', False)|tojson }}) {
+                alert('Silakan login terlebih dahulu untuk menggunakan fitur quiz.');
+                window.location.href = '{{ url_for("login_user") }}';
+                return;
+            }
+            // If logged in, redirect to quiz play
+            window.location.href = '{{ url_for("quiz_play") }}';
+        }
+    </script>
 </body>
 </html>

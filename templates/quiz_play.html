@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Play - WAYANUSA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz_play.css') }}">
+</head>
+<body>
+    <div class="quiz-container">
+        <!-- Header -->
+        <header class="quiz-header">
+            <h1 class="level-title">Level Beginner</h1>
+        </header>
+
+        <!-- Progress and Timer -->
+        <div class="quiz-info">
+            <div class="question-counter">Pertanyaan 1/10</div>
+            <div class="timer">⏱ Waktu: <span id="time-left">30</span> detik</div>
+        </div>
+
+        <!-- Question Section -->
+        <div class="question-section">
+            <div class="question-card">
+                <h2 id="question-text">Siapakah tokoh utama dalam cerita Ramayana?</h2>
+            </div>
+
+            <div class="answers-grid">
+                <button class="answer-btn" data-answer="A">A. Rama</button>
+                <button class="answer-btn" data-answer="B">B. Arjuna</button>
+                <button class="answer-btn" data-answer="C">C. Yudhistira</button>
+                <button class="answer-btn" data-answer="D">D. Bima</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Modal -->
+    <div id="result-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="result-icon" class="result-icon"></div>
+            <h2 id="result-title" class="result-title"></h2>
+            <div id="result-details" class="result-details"></div>
+            <button id="next-btn" class="next-btn">Lanjut</button>
+        </div>
+    </div>
+
+    <!-- Score Modal -->
+    <div id="score-modal" class="score-modal-overlay">
+        <div class="score-modal-content">
+            <div class="score-header">
+                <h1>🎉 KUIS SELESAI!</h1>
+            </div>
+            <div class="score-display">
+                <div class="score-number">
+                    <span id="final-score">8</span>/10
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+            <div id="motivation-text" class="motivation-text">
+                Luar biasa! Kamu benar-benar paham materi ini!
+            </div>
+            <div class="score-buttons">
+                <button id="play-again-btn" class="score-btn play-again">🔁 Main Lagi</button>
+                <button id="back-to-quiz-btn" class="score-btn back-to-quiz">🏠 Kembali ke Menu Kuis</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/quiz_play.js') }}"></script>
+</body>
+</html>

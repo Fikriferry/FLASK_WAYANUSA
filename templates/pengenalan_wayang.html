@@ -8,17 +8,417 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Custom styles for Pengenalan Wayang page */
+        .wayang-recognition {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+            padding: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wayang-recognition::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .recognition-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            background: #6B4226;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #5A3620;
+            transform: scale(1.1);
+        }
+
+        .recognition-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #6B4226;
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .method-selection {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 1.1rem;
+            color: #6B4226;
+            font-weight: 500;
+        }
+
+        .method-selection span {
+            margin: 0 15px;
+        }
+
+        .method-btn {
+            background: #D4A373;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .method-btn:hover {
+            background: #C37A48;
+            transform: translateY(-2px);
+        }
+
+        .recognition-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .recognition-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(107, 66, 38, 0.15);
+            border: 2px solid #D4A373;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recognition-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #D4A373, #C37A48, #6B4226);
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #E0E0E0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-right: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .step-circle.active {
+            background: #D4A373;
+            color: white;
+        }
+
+        .step-circle.completed {
+            background: #6B4226;
+            color: white;
+        }
+
+        .step-line {
+            width: 40px;
+            height: 2px;
+            background: #E0E0E0;
+            margin: 0 5px;
+        }
+
+        .step-line.active {
+            background: #D4A373;
+        }
+
+        .step-line.completed {
+            background: #6B4226;
+        }
+
+        .stage-content {
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .camera-simulation {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            background: #2a2a2a;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-lens {
+            width: 200px;
+            height: 200px;
+            border: 3px solid #666;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .camera-lens::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: #999;
+            border-radius: 50%;
+        }
+
+        .camera-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .capture-btn {
+            background: #D4A373;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .capture-btn:hover {
+            background: #C37A48;
+            transform: scale(1.05);
+        }
+
+        .photo-result {
+            width: 100%;
+            max-width: 300px;
+            height: 250px;
+            border-radius: 15px;
+            border: 3px solid #D4A373;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed #D4A373;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #FBEDE3;
+        }
+
+        .upload-area:hover {
+            background: #EEDAC1;
+            border-color: #C37A48;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #D4A373;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #6B4226;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .result-image {
+            width: 150px;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 2px solid #D4A373;
+        }
+
+        .result-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #6B4226;
+            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .result-description {
+            color: #333;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .next-btn {
+            background: #D4A373;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover {
+            background: #C37A48;
+            transform: translateY(-2px);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .recognition-title {
+                font-size: 1.5rem;
+            }
+
+            .method-selection {
+                font-size: 1rem;
+            }
+
+            .method-btn {
+                display: block;
+                margin: 10px auto;
+                width: 200px;
+            }
+
+            .recognition-card {
+                padding: 20px;
+            }
+
+            .progress-step {
+                margin: 0 5px;
+            }
+
+            .step-line {
+                width: 20px;
+            }
+
+            .camera-simulation {
+                height: 250px;
+            }
+
+            .camera-lens {
+                width: 150px;
+                height: 150px;
+            }
+
+            .result-card {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar">
+    <nav class="navbar" >
         <div class="container">
-            <div class="navbar-content">
+            <div class="navbar-content" >
                 <div class="navbar-logo">
                     <a href="{{ url_for('home') }}" class="logo-link">
                         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
                     </a>
                 </div>
-                <div class="navbar-menu">
+                <div class="navbar-menu" >
                     <ul class="nav-links">
                         <li><a href="{{ url_for('pengenalan_wayang') }}">Pengenalan Wayang</a></li>
                         <li><a href="{{ url_for('quiz') }}">Quiz</a></li>
@@ -27,80 +427,185 @@
                     </ul>
                 </div>
                 <div class="navbar-actions">
-                    <a href="{{ url_for('login_user') }}" class="btn-login">Login</a>
+                    {% if session.get('user_logged_in') %}
+                        <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
+                        <a href="{{ url_for('logout_user') }}" class="btn-login">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('login_user') }}" class="btn-login">Login</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <p class="hero-tag">🤖 AI Image Recognition</p>
-                    <h1 class="hero-title">
-                        Pengenalan <span class="highlight">Wayang</span> dengan Teknologi AI
-                    </h1>
-                    <p class="hero-description">
-                        Gunakan kamera atau unggah foto untuk mengenali tokoh wayang secara instan. Pelajari nama, sifat, dan kisah di balik setiap karakter wayang dengan bantuan kecerdasan buatan.
-                    </p>
-                    <div class="hero-buttons">
-                        <a href="#" class="btn btn-primary">Mulai Scan Wayang</a>
-                        <a href="#" class="btn btn-secondary">Pelajari Lebih Lanjut →</a>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <img src="https://via.placeholder.com/500x400/2a2a2a/ffd700?text=AI+Wayang+Recognition" alt="AI Wayang Recognition" class="wayang-image">
-                </div>
-            </div>
+    <section class="wayang-recognition"style="padding-top: 70px;">
+        <div class="recognition-header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <h1 class="recognition-title">Pengenalan Wayang</h1>
         </div>
-    </main>
 
-    <section class="features">
-        <div class="container">
-            <div class="features-content">
-                <p class="features-tag">CARA KERJA</p>
-                <h2 class="features-title">Bagaimana <span class="highlight">AI</span> Mengidentifikasi Wayang</h2>
-                <p class="features-description">
-                    Teknologi machine learning kami dapat mengenali lebih dari 100 tokoh wayang dengan akurasi tinggi melalui analisis visual dan pola karakteristik.
-                </p>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-image">
-                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Upload+Photo" alt="Upload Photo">
-                        </div>
-                        <div class="feature-content">
-                            <h3 class="feature-title">Upload Foto</h3>
-                            <p class="feature-description">
-                                Unggah foto tokoh wayang dari galeri atau ambil langsung dengan kamera.
-                            </p>
-                        </div>
+        <div class="method-selection">
+            <button class="method-btn" onclick="selectMethod('camera')">📷 Ambil Gambar</button>
+            <span>|</span>
+            <button class="method-btn" onclick="selectMethod('upload')">📁 Upload Foto</button>
+        </div>
+
+        <div class="recognition-container">
+            <div class="recognition-card" id="recognitionCard">
+                <div class="progress-indicator">
+                    <div class="progress-step">
+                        <div class="step-circle" id="step1">1</div>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-image">
-                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=AI+Analysis" alt="AI Analysis">
-                        </div>
-                        <div class="feature-content">
-                            <h3 class="feature-title">Analisis AI</h3>
-                            <p class="feature-description">
-                                Sistem AI menganalisis bentuk wajah, atribut, dan ciri khas tokoh wayang.
-                            </p>
-                        </div>
+                    <div class="step-line" id="line1"></div>
+                    <div class="progress-step">
+                        <div class="step-circle" id="step2">2</div>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-image">
-                            <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Get+Results" alt="Get Results">
-                        </div>
-                        <div class="feature-content">
-                            <h3 class="feature-title">Hasil Identifikasi</h3>
-                            <p class="feature-description">
-                                Dapatkan informasi lengkap tentang tokoh wayang yang dikenali.
-                            </p>
-                        </div>
+                    <div class="step-line" id="line2"></div>
+                    <div class="progress-step">
+                        <div class="step-circle" id="step3">3</div>
+                    </div>
+                    <div class="step-line" id="line3"></div>
+                    <div class="progress-step">
+                        <div class="step-circle" id="step4">4</div>
+                    </div>
+                </div>
+
+                <div class="stage-content" id="stageContent">
+                    <div id="stage1" class="stage">
+                        <p style="color: #6B4226; font-size: 1.2rem; margin-bottom: 30px;">Pilih metode pengenalan wayang di atas</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <script>
+        let currentStage = 1;
+        let selectedMethod = null;
+        let capturedImage = null;
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function selectMethod(method) {
+            selectedMethod = method;
+            currentStage = 1;
+            updateProgress();
+            // Check if user is logged in before proceeding
+            if (!{{ session.get('user_logged_in', False)|tojson }}) {
+                alert('Silakan login terlebih dahulu untuk menggunakan fitur pengenalan wayang.');
+                window.location.href = '{{ url_for("login_user") }}';
+                return;
+            }
+            showStage1();
+        }
+
+        function updateProgress() {
+            // Reset all steps
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`step${i}`).className = 'step-circle';
+                if (i < 4) {
+                    document.getElementById(`line${i}`).className = 'step-line';
+                }
+            }
+
+            // Update active/completed steps
+            for (let i = 1; i <= currentStage; i++) {
+                if (i < currentStage) {
+                    document.getElementById(`step${i}`).classList.add('completed');
+                    if (i < 4) {
+                        document.getElementById(`line${i}`).classList.add('completed');
+                    }
+                } else {
+                    document.getElementById(`step${i}`).classList.add('active');
+                    if (i < 4) {
+                        document.getElementById(`line${i}`).classList.add('active');
+                    }
+                }
+            }
+        }
+
+        function showStage1() {
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = '';
+
+            if (selectedMethod === 'camera') {
+                stageContent.innerHTML = `
+                    <div class="camera-simulation fade-in">
+                        <div class="camera-lens"></div>
+                        <div class="camera-text">📷 Kamera Siap Digunakan</div>
+                        <button class="capture-btn" onclick="capturePhoto()">Ambil Foto</button>
+                    </div>
+                `;
+            } else if (selectedMethod === 'upload') {
+                currentStage = 3;
+                updateProgress();
+                showStage3();
+            }
+        }
+
+        function capturePhoto() {
+            // Simulate photo capture
+            currentStage = 2;
+            updateProgress();
+
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = `
+                <div class="slide-in">
+                    <img src="https://via.placeholder.com/300x250/D4A373/FFFFFF?text=Arjuna+Photo" alt="Captured Photo" class="photo-result">
+                    <p style="color: #6B4226; margin: 20px 0;">Foto berhasil diambil!</p>
+                    <button class="next-btn" onclick="processImage()">Lanjutkan Analisis</button>
+                </div>
+            `;
+        }
+
+        function showStage3() {
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = `
+                <div class="upload-area fade-in" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📤</div>
+                    <div class="upload-text">Klik untuk Upload Foto Wayang</div>
+                    <div class="upload-subtext">Format: JPG, PNG, maksimal 5MB</div>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="handleFileUpload(event)">
+                </div>
+            `;
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    capturedImage = e.target.result;
+                    currentStage = 4;
+                    updateProgress();
+                    showResult();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function processImage() {
+            currentStage = 4;
+            updateProgress();
+            showResult();
+        }
+
+        function showResult() {
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = `
+                <div class="result-card slide-in">
+                    <img src="https://via.placeholder.com/150x200/6B4226/FFFFFF?text=Arjuna" alt="Arjuna" class="result-image">
+                    <h3 class="result-name">Arjuna</h3>
+                    <div class="result-description">
+                        <p>Arjuna adalah tokoh utama dalam epos Mahabharata, putra Pandu dan Kunti. Ia dikenal sebagai pemanah ulung yang mahir dalam ilmu kesaktian dan memiliki kepribadian yang bijaksana serta setia kawan.</p>
+                        <p>Arjuna adalah sosok yang sangat terampil dalam menggunakan busur dan panah. Ia mendapat ajaran ilmu kesaktian dari para dewa dan guru spiritual. Dalam perang Bharatayuddha, Arjuna menjadi panglima pasukan Pandawa.</p>
+                        <p>Karakter Arjuna menggambarkan nilai-nilai keberanian, kesetiaan, dan kebijaksanaan. Ia sering dianggap sebagai simbol dari manusia yang sempurna dalam ajaran Hindu.</p>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
 </body>
 </html>

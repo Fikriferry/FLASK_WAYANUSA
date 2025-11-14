@@ -27,7 +27,12 @@
                     </ul>
                 </div>
                 <div class="navbar-actions">
-                    <a href="{{ url_for('login_user') }}" class="btn-login">Login</a>
+                    {% if session.get('user_logged_in') %}
+                        <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
+                        <a href="{{ url_for('logout_user') }}" class="btn-login">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('login_user') }}" class="btn-login">Login</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -256,6 +261,13 @@
 
             // Toggle popup saat klik tombol
             chatbotButton.addEventListener('click', function() {
+                // Check if user is logged in before opening popup
+                if (!{{ session.get('user_logged_in', False)|tojson }}) {
+                    alert('Silakan login terlebih dahulu untuk menggunakan fitur chatbot.');
+                    window.location.href = '{{ url_for("login_user") }}';
+                    return;
+                }
+
                 chatPopup.classList.toggle('show');
                 if (chatPopup.classList.contains('show')) {
                     chatInput.focus();
@@ -276,6 +288,14 @@
 
             // Fungsi untuk mengirim pesan
             function sendMessage() {
+                // Check if user is logged in before proceeding
+                if (!{{ session.get('user_logged_in', False)|tojson }}) {
+                    alert('Silakan login terlebih dahulu untuk menggunakan fitur chatbot.');
+                    chatPopup.classList.remove('show');
+                    window.location.href = '{{ url_for("login_user") }}';
+                    return;
+                }
+
                 const message = chatInput.value.trim();
                 if (message === '') return;
 

@@ -2,7 +2,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
 import os
-from models import db, Dalang
+from models import db, Dalang, User
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -28,6 +28,17 @@ def login_required(f):
     return wrapper
 
 # ============================================================
+# DECORATOR UNTUK LOGIN USER
+# ============================================================
+def user_login_required(f):
+    def wrapper(*args, **kwargs):
+        if 'user_logged_in' not in session:
+            return redirect(url_for('login_user'))
+        return f(*args, **kwargs)
+    wrapper.__name__ = f.__name__
+    return wrapper
+
+# ============================================================
 # ROUTE UNTUK PENGGUNA (USER SIDE) - (WAJAH 1: WEBSITE)
 # ============================================================
 
@@ -35,13 +46,54 @@ def login_required(f):
 def home():
     return render_template('index.html')
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login_user():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        if user and user.check_password(password):
+            session['user_logged_in'] = True
+            session['user_id'] = user.id
+            session['user_name'] = user.name
+            flash('Login berhasil!', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('Email atau password salah!', 'error')
     return render_template('login.html')
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register_user():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm-password']
+
+        if password != confirm_password:
+            flash('Password dan konfirmasi password tidak cocok!', 'error')
+            return redirect(url_for('register_user'))
+
+        if User.query.filter_by(email=email).first():
+            flash('Email sudah terdaftar!', 'error')
+            return redirect(url_for('register_user'))
+
+        new_user = User(name=name, email=email)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Registrasi berhasil! Silakan login.', 'success')
+        return redirect(url_for('login_user'))
+
     return render_template('register.html')
+
+@app.route('/logout')
+def logout_user():
+    session.pop('user_logged_in', None)
+    session.pop('user_id', None)
+    session.pop('user_name', None)
+    flash('Logout berhasil!', 'success')
+    return redirect(url_for('home'))
 
 @app.route('/pengenalan-wayang')
 def pengenalan_wayang():
@@ -50,6 +102,11 @@ def pengenalan_wayang():
 @app.route('/quiz')
 def quiz():
     return render_template('quiz.html')
+
+@app.route("/quiz_play")
+@user_login_required
+def quiz_play():
+    return render_template("quiz_play.html")
 
 @app.route('/mencari-dalang')
 def mencari_dalang():
