@@ -1,24 +1,30 @@
-{% extends "base.html" %}
+{% extends "admin/layout_admin.html" %}
 
 {% block title %}{% if dalang %}Edit{% else %}Tambah{% endif %} Dalang{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-12">
+
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">{% if dalang %}Edit{% else %}Tambah{% endif %} Dalang</h3>
             </div>
+
             <div class="card-body">
+
                 <form action="{% if dalang %}{{ url_for('dalang_edit', id=dalang.id) }}{% else %}{{ url_for('dalang_add') }}{% endif %}" method="post" enctype="multipart/form-data">
+
                     <div class="form-group">
                         <label for="nama">Nama</label>
                         <input type="text" class="form-control" id="nama" name="nama" value="{{ dalang.nama if dalang else '' }}" required>
                     </div>
+
                     <div class="form-group">
                         <label for="alamat">Alamat</label>
                         <textarea class="form-control" id="alamat" name="alamat" rows="3" required>{{ dalang.alamat if dalang else '' }}</textarea>
                     </div>
+
                     <div class="form-group">
                         <label for="foto">Foto</label>
                         <input type="file" class="form-control" id="foto" name="foto" accept="image/*">
@@ -26,46 +32,54 @@
                             <img src="{{ url_for('uploaded_file', filename=dalang.foto) }}" alt="Foto" width="100" class="mt-2">
                         {% endif %}
                     </div>
+
                     <div class="form-group">
                         <label for="latitude">Latitude</label>
                         <input type="text" class="form-control" id="latitude" name="latitude" value="{{ dalang.latitude if dalang else '' }}" readonly>
                     </div>
+
                     <div class="form-group">
                         <label for="longitude">Longitude</label>
                         <input type="text" class="form-control" id="longitude" name="longitude" value="{{ dalang.longitude if dalang else '' }}" readonly>
                     </div>
+
                     <div class="form-group">
                         <label>Pilih Lokasi di Peta</label>
                         <div id="map" style="height: 400px;"></div>
                     </div>
+
                     <button type="submit" class="btn btn-primary">Simpan</button>
                     <a href="{{ url_for('dalang_list') }}" class="btn btn-secondary">Batal</a>
+
                 </form>
+
             </div>
         </div>
+
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    var map = L.map('map').setView([-6.2, 106.816666], 10); // Default to Jakarta
+    var map = L.map('map').setView([-6.2, 106.816666], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
     var marker;
+
     {% if dalang and dalang.latitude and dalang.longitude %}
-        marker = L.marker([{{ dalang.latitude|safe }}, {{ dalang.longitude|safe }}]).addTo(map);
-        map.setView([{{ dalang.latitude|safe }}, {{ dalang.longitude|safe }}], 15);
+        marker = L.marker([{{ dalang.latitude }}, {{ dalang.longitude }}]).addTo(map);
+        map.setView([{{ dalang.latitude }}, {{ dalang.longitude }}], 15);
     {% endif %}
 
     map.on('click', function(e) {
-        if (marker) {
-            map.removeLayer(marker);
-        }
+        if (marker) map.removeLayer(marker);
+
         marker = L.marker(e.latlng).addTo(map);
+
         document.getElementById('latitude').value = e.latlng.lat;
         document.getElementById('longitude').value = e.latlng.lng;
     });

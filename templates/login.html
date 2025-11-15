@@ -21,7 +21,7 @@
         </div>
 
         <!-- Ubah action ke route Flask -->
-        <form class="login-form" action="{{ url_for('login_user') }}" method="post">
+        <form class="login-form" action="{{ url_for('web.login_user') }}" method="post">
             <div class="form-group">
                 <label for="email" class="form-label">  
                     <i class="fas fa-envelope"></i> Email
@@ -50,7 +50,7 @@
 
             <div class="register-link">
                 <p>Belum punya akun? 
-                    <a href="{{ url_for('register_user') }}" class="register-text">Daftar</a>
+                    <a href="{{ url_for('web.register_user') }}" class="register-text">Daftar</a>
                 </p>
             </div>
         </form>

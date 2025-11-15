@@ -20,18 +20,18 @@
                 </div>
                 <div class="navbar-menu">
                     <ul class="nav-links">
-                        <li><a href="{{ url_for('pengenalan_wayang') }}">Pengenalan Wayang</a></li>
-                        <li><a href="{{ url_for('quiz') }}">Quiz</a></li>
-                        <li><a href="{{ url_for('mencari_dalang') }}">Mencari Dalang</a></li>
-                        <li><a href="{{ url_for('pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
+                        <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
+                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
                     </ul>
                 </div>
                 <div class="navbar-actions">
                     {% if session.get('user_logged_in') %}
                         <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
-                        <a href="{{ url_for('logout_user') }}" class="btn-login">Logout</a>
+                        <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
                     {% else %}
-                        <a href="{{ url_for('login_user') }}" class="btn-login">Login</a>
+                        <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
                     {% endif %}
                 </div>
             </div>
@@ -264,7 +264,7 @@
                 // Check if user is logged in before opening popup
                 if (!{{ session.get('user_logged_in', False)|tojson }}) {
                     alert('Silakan login terlebih dahulu untuk menggunakan fitur chatbot.');
-                    window.location.href = '{{ url_for("login_user") }}';
+                    window.location.href = '{{ url_for("web.login_user") }}';
                     return;
                 }
 
@@ -292,7 +292,7 @@
                 if (!{{ session.get('user_logged_in', False)|tojson }}) {
                     alert('Silakan login terlebih dahulu untuk menggunakan fitur chatbot.');
                     chatPopup.classList.remove('show');
-                    window.location.href = '{{ url_for("login_user") }}';
+                    window.location.href = '{{ url_for("web.login_user") }}';
                     return;
                 }
 
