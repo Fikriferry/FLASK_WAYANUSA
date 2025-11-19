@@ -13,7 +13,7 @@
 
             <div class="card-body">
 
-                <form action="{% if dalang %}{{ url_for('dalang_edit', id=dalang.id) }}{% else %}{{ url_for('dalang_add') }}{% endif %}" method="post" enctype="multipart/form-data">
+                <form action="{% if dalang %}{{ url_for('web.dalang_edit', id=dalang.id) }}{% else %}{{ url_for('web.dalang_add') }}{% endif %}" method="post" enctype="multipart/form-data">
 
                     <div class="form-group">
                         <label for="nama">Nama</label>
@@ -29,7 +29,7 @@
                         <label for="foto">Foto</label>
                         <input type="file" class="form-control" id="foto" name="foto" accept="image/*">
                         {% if dalang and dalang.foto %}
-                            <img src="{{ url_for('uploaded_file', filename=dalang.foto) }}" alt="Foto" width="100" class="mt-2">
+                            <img src="{{ url_for('web.uploaded_file', filename=dalang.foto) }}" alt="Foto" width="100" class="mt-2">
                         {% endif %}
                     </div>
 
@@ -49,7 +49,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Simpan</button>
-                    <a href="{{ url_for('dalang_list') }}" class="btn btn-secondary">Batal</a>
+                    <a href="{{ url_for('web.dalang_list') }}" class="btn btn-secondary">Batal</a>
 
                 </form>
 

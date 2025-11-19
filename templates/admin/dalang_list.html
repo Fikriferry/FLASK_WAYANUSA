@@ -15,7 +15,7 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('web.admin_dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item active">Data Dalang</li>
                 </ol>
             </div>
@@ -35,7 +35,7 @@
                             Daftar Dalang Terdaftar
                         </h3>
                         <div class="card-tools">
-                            <a href="{{ url_for('dalang_add') }}" class="btn btn-primary btn-sm">
+                            <a href="{{ url_for('web.dalang_add') }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-plus"></i> Tambah Dalang Baru
                             </a>
                         </div>
@@ -58,7 +58,7 @@
                                     <td>{{ dalang.id }}</td>
                                     <td>
                                         {% if dalang.foto %}
-                                            <img src="{{ url_for('uploaded_file', filename=dalang.foto) }}" alt="Foto {{ dalang.nama }}" class="img-circle elevation-2" width="40" height="40" style="object-fit: cover;">
+                                            <img src="{{ url_for('web.uploaded_file', filename=dalang.foto) }}" alt="Foto {{ dalang.nama }}" class="img-circle elevation-2" width="40" height="40" style="object-fit: cover;">
                                         {% else %}
                                             <div class="text-center">
                                                 <i class="fas fa-user-circle text-secondary" style="font-size: 40px;"></i>
@@ -80,10 +80,10 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ url_for('dalang_edit', id=dalang.id) }}" class="btn btn-warning btn-sm" title="Edit">
+                                            <a href="{{ url_for('web.dalang_edit', id=dalang.id) }}" class="btn btn-warning btn-sm" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="{{ url_for('dalang_delete', id=dalang.id) }}" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Yakin ingin menghapus dalang {{ dalang.nama }}?')">
+                                            <a href="{{ url_for('web.dalang_delete', id=dalang.id) }}" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Yakin ingin menghapus dalang {{ dalang.nama }}?')">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         </div>
@@ -95,7 +95,7 @@
                                     <td colspan="6" class="text-center py-4">
                                         <i class="fas fa-users text-muted" style="font-size: 48px;"></i>
                                         <p class="mt-2 text-muted">Belum ada dalang yang terdaftar</p>
-                                        <a href="{{ url_for('dalang_add') }}" class="btn btn-primary">
+                                        <a href="{{ url_for('web.dalang_add') }}" class="btn btn-primary">
                                             <i class="fas fa-plus"></i> Tambah Dalang Pertama
                                         </a>
                                     </td>
