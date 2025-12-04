@@ -33,3 +33,12 @@ class Admin(db.Model):
 
     def check_password(self, password):
         return self.password == password
+    
+
+class Video(db.Model):
+    __tablename__ = "video"
+
+    id = db.Column(db.Integer, primary_key=True)
+    judul = db.Column(db.String(255), nullable=False)
+    youtube_id = db.Column(db.String(50), nullable=False)
+    tampil = db.Column(db.Boolean, default=True)

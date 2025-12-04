@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 from functools import wraps
 import os
-
+from models import Video 
 from models import db, Dalang, User, Admin
 
 web_routes = Blueprint("web", __name__)
@@ -117,7 +117,8 @@ def mencari_dalang():
 
 @web_routes.route('/pertunjukan-wayang')
 def pertunjukan_wayang():
-    return render_template('pertunjukan_wayang.html')
+    videos = Video.query.filter_by(tampil=True).all()
+    return render_template('pertunjukan_wayang.html', videos=videos)
 
 
 # ----------------------------------------
@@ -272,3 +273,47 @@ def dalang_delete(id):
 @web_routes.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory("static/uploads", filename)
+
+
+# ----------------------------------------
+# VIDEO MANAGEMENT
+# ----------------------------------------
+
+
+
+@web_routes.route('/admin/video')
+@admin_login_required
+def video_list():
+    videos = Video.query.all()
+    return render_template('admin/video_list.html', videos=videos)
+
+
+@web_routes.route('/admin/video/add', methods=['GET', 'POST'])
+@admin_login_required
+def video_add():
+    if request.method == 'POST':
+        judul = request.form['judul']
+        youtube_id = request.form['youtube_id']
+
+        if not judul or not youtube_id:
+            flash("Judul dan YouTube ID wajib diisi!", "error")
+            return redirect(url_for('web.video_add'))
+
+        video = Video(judul=judul, youtube_id=youtube_id)
+        db.session.add(video)
+        db.session.commit()
+
+        flash("Video berhasil ditambahkan!", "success")
+        return redirect(url_for('web.video_list'))
+
+    return render_template('admin/video_add.html')
+
+
+@web_routes.route('/admin/video/delete/<int:id>')
+@admin_login_required
+def video_delete(id):
+    video = Video.query.get_or_404(id)
+    db.session.delete(video)
+    db.session.commit()
+    flash("Video berhasil dihapus!", "success")
+    return redirect(url_for('web.video_list'))

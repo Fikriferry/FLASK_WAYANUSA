@@ -1,0 +1,49 @@
+{% extends "admin/layout_admin.html" %}
+
+{% block title %}Kelola Video{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between">
+        <h3>Daftar Video YouTube</h3>
+        <a href="{{ url_for('web.video_add') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tambah Video
+        </a>
+    </div>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Judul</th>
+                <th>YouTube ID</th>
+                <th>Preview</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in videos %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ v.judul }}</td>
+                <td>{{ v.youtube_id }}</td>
+                <td>
+                    <iframe width="200" height="100"
+                        src="https://www.youtube.com/embed/{{ v.youtube_id }}">
+                    </iframe>
+                </td>
+                <td>
+                    <a href="{{ url_for('web.video_delete', id=v.id) }}"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('Hapus video?')">
+                       <i class="fas fa-trash"></i>  
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

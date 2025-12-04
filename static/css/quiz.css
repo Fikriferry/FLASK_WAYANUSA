@@ -179,6 +179,60 @@
     flex-shrink: 0;
 }
 
+/* Search Container */
+.search-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 30px 0 40px;
+}
+
+/* Search Box */
+.search-box {
+    width: 100%;
+    max-width: 500px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid #e5e5e5;
+    transition: all 0.25s ease;
+}
+
+.search-box:hover {
+    box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+}
+
+.search-box:focus-within {
+    border-color: #C58536;
+    box-shadow: 0 6px 25px rgba(197,133,54,0.25);
+}
+
+/* Search Icon */
+.search-icon {
+    font-size: 18px;
+    color: #888;
+    margin-right: 10px;
+}
+
+/* Input Style */
+.search-box input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    color: #333;
+}
+
+.search-box input::placeholder {
+    color: #aaa;
+}
+
+
 @keyframes fadeInUp {
     to {
         opacity: 1;

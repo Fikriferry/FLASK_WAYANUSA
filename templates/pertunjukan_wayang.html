@@ -3,308 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Pertunjukan Wayang - WAYANUSA</title>
+    <title>Pertunjukan Wayang - WAYANUSA</title>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        /* Video Pertunjukan Wayang Styles */
-        .video-page {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-            position: relative;
-            overflow: hidden;
-        }
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
 
-        .video-page::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 60%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        .video-header {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .back-btn {
-            position: absolute;
-            left: 0;
-            background: #A16B47;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.3s ease;
-        }
-
-        .back-btn:hover {
-            background: #8B5A3C;
-            transform: scale(1.1);
-        }
-
-        .page-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #000000;
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .search-section {
-            padding: 30px 20px;
-            background: white;
-            margin-bottom: 20px;
-        }
-
-        .search-container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 15px 50px 15px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            border-color: #A16B47;
-            box-shadow: 0 0 0 3px rgba(161, 107, 71, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #A16B47;
-            font-size: 1.2rem;
-        }
-
-        .search-wrapper {
-            position: relative;
-        }
-
-        .video-list {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px 40px;
-        }
-
-        .video-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .video-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .video-thumbnail {
-            width: 100%;
-            height: 200px;
-            background: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .video-thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .play-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 3rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .video-info {
-            padding: 20px;
-        }
-
-        .video-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #000000;
-            margin: 0 0 8px 0;
-            line-height: 1.4;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .video-subtitle {
-            font-size: 0.9rem;
-            color: #666;
-            margin: 0;
-            font-weight: 500;
-        }
-
-        /* Video Modal */
-        .video-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            position: relative;
-            width: 90%;
-            max-width: 900px;
-            max-height: 90vh;
-            background: black;
-            border-radius: 10px;
-            overflow: hidden;
-            animation: scaleIn 0.3s ease;
-        }
-
-        .modal-video {
-            width: 100%;
-            height: auto;
-            max-height: 80vh;
-            display: block;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            z-index: 10;
-            transition: all 0.3s ease;
-        }
-
-        .close-btn:hover {
-            background: rgba(0, 0, 0, 0.9);
-            transform: scale(1.1);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 480px) {
-            .page-title {
-                font-size: 1.5rem;
-            }
-
-            .search-input {
-                padding: 12px 45px 12px 15px;
-                font-size: 0.9rem;
-            }
-
-            .video-thumbnail {
-                height: 150px;
-            }
-
-            .video-title {
-                font-size: 1rem;
-            }
-
-            .video-info {
-                padding: 15px;
-            }
-
-            .modal-content {
-                width: 95%;
-                max-height: 95vh;
-            }
-
-            .modal-video {
-                max-height: 70vh;
-            }
-        }
-    </style>
+    <!-- AOS -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 </head>
+
 <body>
+
+    <!-- NAVBAR -->
     <nav class="navbar">
         <div class="container">
             <div class="navbar-content">
                 <div class="navbar-logo">
                     <a href="{{ url_for('web.home') }}" class="logo-link">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo-image">
                     </a>
                 </div>
                 <div class="navbar-menu">
@@ -312,12 +34,12 @@
                         <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
                         <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
                         <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
-                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}" class="active">Pertunjukan Wayang</a></li>
                     </ul>
                 </div>
                 <div class="navbar-actions">
                     {% if session.get('user_logged_in') %}
-                        <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
+                        <span class="user-greeting">Halo, {{ session.get('user_name') }}!</span>
                         <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
                     {% else %}
                         <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
@@ -327,159 +49,93 @@
         </div>
     </nav>
 
-    <div class="video-page" >
-        <header class="video-header"style="padding-top: 100px;">
-            <div class="header-content">
-                <button class="back-btn" onclick="goBack()">←</button>
-                <h1 class="page-title">Video</h1>
-            </div>
-        </header>
+    <!-- HERO -->
+    <section class="quiz-section">
+        <div class="container">
+            <div class="quiz-content">
+                <p class="quiz-tag">🎥 PERTUNJUKAN WAYANG</p>
+                <h2 class="quiz-title">Kumpulan <span class="highlight">Video</span> Wayang</h2>
+                <p class="quiz-description">
+                    Tonton berbagai pertunjukan wayang pilihan, lengkap dengan kisah dan karakter yang memukau.
+                </p>
 
-        <section class="search-section">
-            <div class="search-container">
-                <div class="search-wrapper">
-                    <input type="text" class="search-input" placeholder="Cari Video" id="searchInput">
-                    <div class="search-icon">🔍</div>
+                <!-- SEARCH -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <span class="search-icon">&#128269;</span>
+                        <input type="text" id="searchInput" placeholder="Cari video pertunjukan..." oninput="searchVideo()">
+                    </div>
                 </div>
-            </div>
-        </section>
 
-        <section class="video-list" id="videoList">
-            <div class="video-card" data-title="BAGONG LAWAN LUPIT UNTUK MEREBUTKAN KEKUASAAN" onclick="openVideo('video1')">
-                <div class="video-thumbnail">
-                    <img src="https://via.placeholder.com/400x200/A16B47/FFFFFF?text=Bagong+vs+Lupit" alt="Bagong vs Lupit">
-                    <div class="play-icon">▶️</div>
-                </div>
-                <div class="video-info">
-                    <h3 class="video-title">BAGONG LAWAN LUPIT UNTUK MEREBUTKAN KEKUASAAN</h3>
-                    <p class="video-subtitle">Wayang Indonesia</p>
-                </div>
-            </div>
+                <!-- VIDEO CARDS (Styled like quiz) -->
+                <div class="quiz-cards" id="videoList">
+                    {% for v in videos %}
+                    <div class="quiz-card" 
+                         data-title="{{ v.judul }}" 
+                         onclick="openVideo('{{ v.youtube_id }}')" 
+                         data-aos="fade-up">
 
-            <div class="video-card" data-title="PERTEMPURAN MAHABHARATA - ARJUNA LAWAN KARNA" onclick="openVideo('video2')">
-                <div class="video-thumbnail">
-                    <img src="https://via.placeholder.com/400x200/A16B47/FFFFFF?text=Arjuna+vs+Karna" alt="Arjuna vs Karna">
-                    <div class="play-icon">▶️</div>
-                </div>
-                <div class="video-info">
-                    <h3 class="video-title">PERTEMPURAN MAHABHARATA - ARJUNA LAWAN KARNA</h3>
-                    <p class="video-subtitle">Wayang Indonesia</p>
-                </div>
-            </div>
+                        <div class="quiz-card-content">
+                            <h3 class="quiz-level">{{ v.judul }}</h3>
+                            <p class="quiz-name">Pertunjukan Wayang</p>
+                            <p class="quiz-desc">Klik untuk menonton pertunjukan dari koleksi WAYANUSA.</p>
+                        </div>
 
-            <div class="video-card" data-title="KISAH RAMAYANA - RAMA LAWAN RAWANA" onclick="openVideo('video3')">
-                <div class="video-thumbnail">
-                    <img src="https://via.placeholder.com/400x200/A16B47/FFFFFF?text=Rama+vs+Rawana" alt="Rama vs Rawana">
-                    <div class="play-icon">▶️</div>
+                        <img src="https://img.youtube.com/vi/{{ v.youtube_id }}/hqdefault.jpg" 
+                             alt="{{ v.judul }}" 
+                             class="quiz-image"
+                             style="object-fit: cover;">
+                    </div>
+                    {% endfor %}
                 </div>
-                <div class="video-info">
-                    <h3 class="video-title">KISAH RAMAYANA - RAMA LAWAN RAWANA</h3>
-                    <p class="video-subtitle">Wayang Indonesia</p>
-                </div>
-            </div>
 
-            <div class="video-card" data-title="WAYANG GULING - PERTEMPURAN KLATEN" onclick="openVideo('video4')">
-                <div class="video-thumbnail">
-                    <img src="https://via.placeholder.com/400x200/A16B47/FFFFFF?text=Wayang+Guling" alt="Wayang Guling">
-                    <div class="play-icon">▶️</div>
-                </div>
-                <div class="video-info">
-                    <h3 class="video-title">WAYANG GULING - PERTEMPURAN KLATEN</h3>
-                    <p class="video-subtitle">Wayang Indonesia</p>
-                </div>
             </div>
-        </section>
-    </div>
+        </div>
+    </section>
 
-    <!-- Video Modal -->
-    <div class="video-modal" id="videoModal">
+    <!-- MODAL VIDEO -->
+    <div class="modal" id="videoModal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeVideo()">×</button>
-            <video class="modal-video" id="modalVideo" controls>
-                <source src="" type="video/mp4">
-                Browser Anda tidak mendukung tag video.
-            </video>
+            <span class="close-btn" onclick="closeVideo()">&times;</span>
+            <div class="modal-video" id="modalVideo"></div>
         </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-        // Sample video URLs (replace with actual video URLs)
-        const videoSources = {
-            video1: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-            video2: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
-            video3: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_5mb.mp4",
-            video4: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_10mb.mp4"
-        };
+        AOS.init();
 
-        function goBack() {
-            window.location.href = "{{ url_for('web.pertunjukan_wayang') }}";
-        }
-
-        function openVideo(videoId) {
-            // Check if user is logged in before proceeding
+        function openVideo(youtubeId) {
             if (!{{ session.get('user_logged_in', False)|tojson }}) {
-                alert('Silakan login terlebih dahulu untuk menonton video pertunjukan wayang.');
-                window.location.href = '{{ url_for("web.login_user") }}';
+                alert("Silakan login terlebih dahulu untuk menonton video.");
+                window.location.href = "{{ url_for('web.login_user') }}";
                 return;
             }
 
-            const modal = document.getElementById('videoModal');
-            const video = document.getElementById('modalVideo');
-
-            // Set video source
-            video.src = videoSources[videoId] || videoSources.video1;
-
-            // Show modal
-            modal.style.display = 'flex';
-
-            // Prevent body scroll
-            document.body.style.overflow = 'hidden';
+            const modal = document.getElementById("videoModal");
+            const modalVideo = document.getElementById("modalVideo");
+            modalVideo.innerHTML = `
+                <iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=1" allowfullscreen>
+                </iframe>`;
+            modal.style.display = "flex";
         }
 
         function closeVideo() {
-            const modal = document.getElementById('videoModal');
-            const video = document.getElementById('modalVideo');
-
-            // Hide modal
-            modal.style.display = 'none';
-
-            // Stop video
-            video.pause();
-            video.currentTime = 0;
-
-            // Restore body scroll
-            document.body.style.overflow = 'auto';
+            document.getElementById("videoModal").style.display = "none";
+            document.getElementById("modalVideo").innerHTML = "";
         }
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const videoCards = document.querySelectorAll('.video-card');
+        function searchVideo() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const cards = document.querySelectorAll(".quiz-card");
 
-            videoCards.forEach(card => {
+            cards.forEach(card => {
                 const title = card.dataset.title.toLowerCase();
-                if (title.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
+                card.style.display = title.includes(input) ? "block" : "none";
             });
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('videoModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeVideo();
-            }
-        });
-
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeVideo();
-            }
-        });
+        }
     </script>
+
 </body>
 </html>
- 
