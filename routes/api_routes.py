@@ -1,143 +1,55 @@
-from flask import Blueprint, jsonify, url_for, request
-from models import db, Dalang
-import os
-from werkzeug.utils import secure_filename
+from flask import Blueprint, jsonify, request
+from models import db, User, Dalang
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
-api_routes = Blueprint("api", __name__)
+api = Blueprint("api", __name__)
+auth_api = Blueprint("auth_api", __name__)
 
-UPLOAD_FOLDER = "static/uploads"
-
-
-def get_foto_url(filename):
-    if filename:
-        return url_for('web.uploaded_file', filename=filename, _external=True)
-    return None
-
-
-# GET ALL
-@api_routes.route('/dalang', methods=['GET'])
-def api_get_all_dalang():
+# DALANG API
+@api.route('/dalang', methods=['GET'])
+def get_dalang():
     dalangs = Dalang.query.all()
-    result = []
-    for d in dalangs:
-        result.append({
-            "id": d.id,
-            "nama": d.nama,
-            "alamat": d.alamat,
-            "latitude": d.latitude,
-            "longitude": d.longitude,
-            "foto_url": get_foto_url(d.foto)
-        })
-    return jsonify(result)
+    return jsonify([{
+        'id': d.id,
+        'nama': d.nama,
+        'alamat': d.alamat,
+        'latitude': d.latitude,
+        'longitude': d.longitude,
+        'foto': d.foto
+    } for d in dalangs])
 
+# Auth API (email/password + JWT)
+@auth_api.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    user = User.query.filter_by(email=email).first()
+    if user and user.check_password(password):
+        token = create_access_token(identity=user.id)
+        return jsonify({'access_token': token, 'user': {'id': user.id,'name': user.name,'email': user.email}}), 200
+    return jsonify({'message':'Invalid credentials'}), 401
 
-# GET ONE
-@api_routes.route('/dalang/<int:id>', methods=['GET'])
-def api_get_one_dalang(id):
-    d = Dalang.query.get_or_404(id)
-    return jsonify({
-        "id": d.id,
-        "nama": d.nama,
-        "alamat": d.alamat,
-        "latitude": d.latitude,
-        "longitude": d.longitude,
-        "foto_url": get_foto_url(d.foto)
-    })
-
-# CREATE (POST)
-@api_routes.route('/dalang/create', methods=['POST'])
-def api_create_dalang():
-
-    # --- Ambil data dari JSON atau form-data ---
-    if request.is_json:
-        data = request.get_json()
-        file = None  # JSON tidak bisa upload file
-    else:
-        data = request.form
-        file = request.files.get('foto')
-
-    # --- Validasi wajib ---
-    nama = data.get("nama")
-    if not nama:
-        return jsonify({"error": "Nama wajib diisi"}), 400
-
-    # --- Default filename ---
-    filename = None
-
-    # --- Simpan foto jika form-data dan ada file ---
-    if file:
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(UPLOAD_FOLDER, filename))
-
-    # --- Buat object baru ---
-    new_dalang = Dalang(
-        nama=data.get("nama"),
-        alamat=data.get("alamat"),
-        latitude=data.get("latitude"),
-        longitude=data.get("longitude"),
-        foto=filename
-    )
-
-    db.session.add(new_dalang)
+@auth_api.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    name = data.get('name')
+    email = data.get('email')
+    password = data.get('password')
+    if User.query.filter_by(email=email).first():
+        return jsonify({'message':'Email already exists'}), 400
+    user = User(name=name, email=email)
+    user.set_password(password)
+    db.session.add(user)
     db.session.commit()
+    token = create_access_token(identity=user.id)
+    return jsonify({'access_token': token,'user':{'id':user.id,'name':user.name,'email':user.email}}), 201
 
-    return jsonify({
-        "message": "Data dalang berhasil ditambahkan",
-        "id": new_dalang.id
-    }), 201
-
-
-# UPDATE (PUT)
-@api_routes.route('/dalang/update/<int:id>', methods=['PUT'])
-def api_update_dalang(id):
-    dalang = Dalang.query.get_or_404(id)
-
-    nama = request.form.get("nama")
-    alamat = request.form.get("alamat")
-    latitude = request.form.get("latitude")
-    longitude = request.form.get("longitude")
-
-    # Validasi sama seperti di web
-    if not nama or not alamat:
-        return jsonify({"error": "Nama dan alamat wajib diisi"}), 400
-
-    # Update foto jika ada
-    if 'foto' in request.files:
-        file = request.files['foto']
-        if file and file.filename:
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            dalang.foto = filename
-
-    # Update data lain
-    dalang.nama = nama
-    dalang.alamat = alamat
-    dalang.latitude = latitude
-    dalang.longitude = longitude
-
-    db.session.commit()
-
-    return jsonify({
-        "message": "Data dalang berhasil diupdate",
-        "id": dalang.id
-    }), 200
-
-# DELETE
-@api_routes.route('/dalang/delete/<int:id>', methods=['DELETE'])
-def api_delete_dalang(id):
-    dalang = Dalang.query.get(id)
-    if not dalang:
-        return jsonify({"error": "Data tidak ditemukan"}), 404
-
-    # Hapus foto jika ada
-    if dalang.foto:
-        foto_path = os.path.join(UPLOAD_FOLDER, dalang.foto)
-        if os.path.exists(foto_path):
-            os.remove(foto_path)
-
-    db.session.delete(dalang)
-    db.session.commit()
-
-    return jsonify({
-        "message": "Data dalang berhasil dihapus"
-    }), 200
+@auth_api.route('/profile', methods=['GET'])
+@jwt_required()
+def profile():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if user:
+        return jsonify({'id': user.id, 'name': user.name, 'email': user.email}), 200
+    return jsonify({'message':'User not found'}), 404

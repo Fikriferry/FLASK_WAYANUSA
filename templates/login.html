@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <!-- Ubah action ke route Flask -->
+        <!-- Form login biasa -->
         <form class="login-form" action="{{ url_for('web.login_user') }}" method="post">
             <div class="form-group">
                 <label for="email" class="form-label">  
@@ -55,16 +55,20 @@
             </div>
         </form>
 
+        <!-- Social login -->
         <div class="social-login">
             <div class="divider">
                 <span>Login Menggunakan</span>
             </div>
             <div class="social-buttons">
-                <button class="social-btn google-btn" title="Login dengan Google">
-                    <i class="fab fa-google"></i>
-                </button>
+                <!-- Tombol Google diarahkan ke Flask route OAuth -->
+                <a href="{{ url_for('auth_routes.login_google') }}" class="social-btn google-btn" title="Login dengan Google">
+                    <i class="fab fa-google"></i> Masuk dengan Google
+                </a>
+
+                <!-- Tombol Facebook masih dummy -->
                 <button class="social-btn facebook-btn" title="Login dengan Facebook">
-                    <i class="fab fa-facebook-f"></i>
+                    <i class="fab fa-facebook-f"></i> Masuk dengan Facebook
                 </button>
             </div>
         </div>

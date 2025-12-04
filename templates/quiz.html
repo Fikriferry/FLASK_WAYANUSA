@@ -49,42 +49,17 @@
                     Tantang diri Anda dengan berbagai level quiz wayang kulit. Mulai dari pemula hingga ahli, setiap level menawarkan pengalaman belajar yang unik.
                 </p>
                 <div class="quiz-cards">
+                    {% for level in ['Beginner','Intermediate','Advanced','Expert'] %}
                     <div class="quiz-card" data-aos="fade-up">
                         <div class="quiz-card-content">
-                            <h3 class="quiz-level">Beginner</h3>
-                            <p class="quiz-name">Pengenalan Tokoh Wayang</p>
-                            <p class="quiz-desc">Dari nama-nama, lahir kisah yang abadi. Kenali tokoh-tokoh utama dalam dunia wayang.</p>
+                            <h3 class="quiz-level">{{ level }}</h3>
+                            <p class="quiz-name">Quiz {{ level }}</p>
+                            <p class="quiz-desc">Klik tombol "Mulai Kuis" untuk memulai quiz {{ level }}.</p>
                             <a href="#" onclick="startQuiz()" class="btn-start-quiz">Mulai Kuis</a>
                         </div>
                         <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
                     </div>
-                    <div class="quiz-card" data-aos="fade-up">
-                        <div class="quiz-card-content">
-                            <h3 class="quiz-level">Intermediate</h3>
-                            <p class="quiz-name">Cerita Mahabharata</p>
-                            <p class="quiz-desc">Pelajari alur cerita dan nilai-nilai dalam epos Mahabharata yang penuh hikmah.</p>
-                            <a href="#" class="btn-start-quiz">Mulai Kuis</a>
-                        </div>
-                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
-                    </div>
-                    <div class="quiz-card" data-aos="fade-up">
-                        <div class="quiz-card-content">
-                            <h3 class="quiz-level">Advanced</h3>
-                            <p class="quiz-name">Filsafat Wayang</p>
-                            <p class="quiz-desc">Eksplorasi makna filosofis dan ajaran moral dalam wayang kulit yang mendalam.</p>
-                            <a href="#" class="btn-start-quiz">Mulai Kuis</a>
-                        </div>
-                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
-                    </div>
-                    <div class="quiz-card" data-aos="fade-up">
-                        <div class="quiz-card-content">
-                            <h3 class="quiz-level">Expert</h3>
-                            <p class="quiz-name">Sejarah & Budaya</p>
-                            <p class="quiz-desc">Uji pengetahuan mendalam tentang sejarah dan budaya wayang kulit Jawa.</p>
-                            <a href="#" class="btn-start-quiz">Mulai Kuis</a>
-                        </div>
-                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -95,13 +70,13 @@
         AOS.init();
 
         function startQuiz() {
-            // Check if user is logged in before proceeding
-            if (!{{ session.get('user_logged_in', False)|tojson }}) {
+            const loggedIn = {{ session.get('user_logged_in', False)|tojson }};
+            if (!loggedIn) {
                 alert('Silakan login terlebih dahulu untuk menggunakan fitur quiz.');
                 window.location.href = '{{ url_for("web.login_user") }}';
                 return;
             }
-            // If logged in, redirect to quiz play
+            // Redirect ke halaman quiz_play (pastikan route Flask snake_case)
             window.location.href = '{{ url_for("web.quiz_play") }}';
         }
     </script>

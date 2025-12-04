@@ -2,15 +2,17 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 from functools import wraps
 import os
-from models import Video 
+from models import Video
+
+
 from models import db, Dalang, User, Admin
 
 web_routes = Blueprint("web", __name__)
 
 
-# ----------------------------------------
+# -------------------------
 # DECORATORS
-# ----------------------------------------
+# -------------------------
 def admin_login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -29,9 +31,9 @@ def user_login_required(f):
     return wrapper
 
 
-# ----------------------------------------
+# -------------------------
 # FRONTEND USER ROUTES
-# ----------------------------------------
+# -------------------------
 
 @web_routes.route('/')
 def home():
@@ -43,6 +45,7 @@ def login_user():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+
         user = User.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
@@ -63,9 +66,9 @@ def register_user():
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
-        confirm_password = request.form['confirm-password']
+        confirm = request.form['confirm-password']
 
-        if password != confirm_password:
+        if password != confirm:
             flash('Password dan konfirmasi tidak cocok!', 'error')
             return redirect(url_for('web.register_user'))
 
@@ -73,22 +76,20 @@ def register_user():
             flash('Email sudah terdaftar!', 'error')
             return redirect(url_for('web.register_user'))
 
-        new_user = User(name=name, email=email)
-        new_user.set_password(password)
-        db.session.add(new_user)
+        user = User(name=name, email=email)
+        user.set_password(password)
+        db.session.add(user)
         db.session.commit()
 
-        flash('Registrasi berhasil! Silakan login.', 'success')
+        flash('Registrasi berhasil!', 'success')
         return redirect(url_for('web.login_user'))
 
-    return render_template('register.html')
+    return render_template('register_user.html')
 
 
 @web_routes.route('/logout')
 def logout_user():
-    session.pop('user_logged_in', None)
-    session.pop('user_id', None)
-    session.pop('user_name', None)
+    session.clear()
     flash('Logout berhasil!', 'success')
     return redirect(url_for('web.home'))
 
@@ -102,17 +103,14 @@ def pengenalan_wayang():
 def quiz():
     return render_template('quiz.html')
 
-
-@web_routes.route('/quiz_play')
-@user_login_required
+@web_routes.route('/quiz/play')
 def quiz_play():
-    return render_template("quiz_play.html")
+    return render_template('quiz_play.html')
 
 
 @web_routes.route('/mencari-dalang')
 def mencari_dalang():
-    dalangs = Dalang.query.all()
-    return render_template('mencari_dalang.html', dalangs=dalangs)
+    return render_template('mencari_dalang.html')
 
 
 @web_routes.route('/pertunjukan-wayang')
@@ -121,22 +119,15 @@ def pertunjukan_wayang():
     return render_template('pertunjukan_wayang.html', videos=videos)
 
 
-# ----------------------------------------
+# -------------------------
 # ADMIN ROUTES
-# ----------------------------------------
-
-@web_routes.route('/admin')
-def index_admin():
-    if 'admin_logged_in' not in session:
-        return redirect(url_for('web.login_admin'))
-    return redirect(url_for('web.admin_dashboard'))
-
+# -------------------------
 
 @web_routes.route('/admin/login', methods=['GET', 'POST'])
 def login_admin():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = request.form['username']
+        password = request.form['password']
 
         admin = Admin.query.filter_by(username=username).first()
 
@@ -144,16 +135,21 @@ def login_admin():
             flash('Username atau password salah!', 'error')
             return redirect(url_for('web.login_admin'))
 
-        session.update({
-            'admin_logged_in': True,
-            'admin_id': admin.id,
-            'admin_username': admin.username
-        })
+        session['admin_logged_in'] = True
+        session['admin_id'] = admin.id
+        session['admin_username'] = admin.username
 
-        flash('Login berhasil!', 'success')
         return redirect(url_for('web.admin_dashboard'))
 
     return render_template('admin/login.html')
+
+
+@web_routes.route('/admin/dashboard')
+@admin_login_required
+def admin_dashboard():
+    dalang_count = Dalang.query.count()
+    dalangs = Dalang.query.all()
+    return render_template('admin/index.html', dalang_count=dalang_count, dalangs=dalangs)
 
 
 @web_routes.route('/admin/logout')
@@ -164,17 +160,11 @@ def logout_admin():
     return redirect(url_for('web.login_admin'))
 
 
-# Dashboard
-@web_routes.route('/admin/dashboard')
-@admin_login_required
-def admin_dashboard():
-    dalang_count = Dalang.query.count()
-    dalangs = Dalang.query.all()
-    return render_template('admin/index.html', dalang_count=dalang_count, dalangs=dalangs)
+# -------------------------
+# CRUD DALANG
+# -------------------------
 
-
-# DALANG CRUD
-@web_routes.route('/admin/dalang')
+@web_routes.route('/admin/dalang/list')
 @admin_login_required
 def dalang_list():
     dalangs = Dalang.query.all()
@@ -190,30 +180,20 @@ def dalang_add():
         latitude = request.form.get('latitude')
         longitude = request.form.get('longitude')
 
-        if not nama or not alamat:
-            flash('Nama dan alamat wajib diisi!', 'error')
-            return redirect(url_for('web.dalang_add'))
-
         foto = None
         if 'foto' in request.files:
             file = request.files['foto']
-            if file and file.filename:
+            if file.filename:
                 filename = secure_filename(file.filename)
                 file.save(os.path.join('static/uploads', filename))
                 foto = filename
 
-        new_dalang = Dalang(
-            nama=nama,
-            alamat=alamat,
-            foto=foto,
-            latitude=latitude,
-            longitude=longitude
-        )
+        new_dalang = Dalang(nama=nama, alamat=alamat, latitude=latitude, longitude=longitude, foto=foto)
         db.session.add(new_dalang)
         db.session.commit()
 
         flash('Dalang berhasil ditambahkan!', 'success')
-        return redirect(url_for('web.dalang_list'))
+        return redirect(url_for('web.admin_dashboard'))
 
     return render_template('admin/dalang_form.html', dalang=None)
 
@@ -222,31 +202,21 @@ def dalang_add():
 @admin_login_required
 def dalang_edit(id):
     dalang = Dalang.query.get_or_404(id)
-
     if request.method == 'POST':
-        nama = request.form['nama']
-        alamat = request.form['alamat']
-        latitude = request.form.get('latitude')
-        longitude = request.form.get('longitude')
-
-        if not nama or not alamat:
-            flash('Nama dan alamat wajib diisi!', 'error')
-            return redirect(url_for('web.dalang_edit', id=id))
+        dalang.nama = request.form['nama']
+        dalang.alamat = request.form['alamat']
+        dalang.latitude = request.form.get('latitude')
+        dalang.longitude = request.form.get('longitude')
 
         if 'foto' in request.files:
             file = request.files['foto']
-            if file and file.filename:
+            if file.filename:
                 filename = secure_filename(file.filename)
                 file.save(os.path.join('static/uploads', filename))
                 dalang.foto = filename
 
-        dalang.nama = nama
-        dalang.alamat = alamat
-        dalang.latitude = latitude
-        dalang.longitude = longitude
-
         db.session.commit()
-        flash('Dalang berhasil diupdate!', 'success')
+        flash('Dalang berhasil diperbarui!', 'success')
         return redirect(url_for('web.dalang_list'))
 
     return render_template('admin/dalang_form.html', dalang=dalang)
@@ -256,23 +226,10 @@ def dalang_edit(id):
 @admin_login_required
 def dalang_delete(id):
     dalang = Dalang.query.get_or_404(id)
-
-    if dalang.foto:
-        path = os.path.join('static/uploads', dalang.foto)
-        if os.path.exists(path):
-            os.remove(path)
-
     db.session.delete(dalang)
     db.session.commit()
-
     flash('Dalang berhasil dihapus!', 'success')
     return redirect(url_for('web.dalang_list'))
-
-
-# File Upload Serving
-@web_routes.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory("static/uploads", filename)
 
 
 # ----------------------------------------
@@ -317,3 +274,11 @@ def video_delete(id):
     db.session.commit()
     flash("Video berhasil dihapus!", "success")
     return redirect(url_for('web.video_list'))
+
+# -------------------------
+# ROUTE FOTO (PENTING)
+# -------------------------
+
+@web_routes.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory("static/uploads", filename)
