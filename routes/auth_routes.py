@@ -1,19 +1,25 @@
 from flask import Blueprint, redirect, url_for, session, flash
 from authlib.integrations.flask_client import OAuth
 from models import db, User
+import os
+from dotenv import load_dotenv
 
 auth_routes = Blueprint("auth_routes", __name__)
 
+# Load .env
+load_dotenv()
+
 # OAuth Google
 oauth = OAuth()
+google = None
 
 def init_oauth(app):
     global google
     oauth.init_app(app)
     google = oauth.register(
         name='google',
-        client_id="REDACTED_CLIENT_ID",
-        client_secret="REDACTED_CLIENT_SECRET",
+        client_id=os.getenv("GOOGLE_CLIENT_ID"),
+        client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
         access_token_url="https://oauth2.googleapis.com/token",
         authorize_url="https://accounts.google.com/o/oauth2/auth",
         jwks_uri='https://www.googleapis.com/oauth2/v3/certs',
