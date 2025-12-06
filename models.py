@@ -55,7 +55,7 @@ class Video(db.Model):
 
 class AIModel(db.Model):
     __tablename__ = 'ai_models'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     version_name = db.Column(db.String(100), nullable=False)  # Nama versi, misal "V1 MobileNet"
     file_path = db.Column(db.String(255), nullable=False)     # Path file, misal "static/models/model_v1.keras"
@@ -65,3 +65,13 @@ class AIModel(db.Model):
 
     def __repr__(self):
         return f'<AIModel {self.version_name}>'
+
+
+class Article(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    source_link = db.Column(db.String(500), nullable=True)
+    thumbnail = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

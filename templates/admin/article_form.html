@@ -1,0 +1,54 @@
+{% extends "admin/layout_admin.html" %}
+
+{% block title %}{% if artikel %}Edit{% else %}Tambah{% endif %} Artikel{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{% if artikel %}Edit{% else %}Tambah{% endif %} Artikel</h3>
+            </div>
+
+            <div class="card-body">
+
+                <form action="{% if artikel %}{{ url_for('web.artikel_edit', id=artikel.id) }}{% else %}{{ url_for('web.artikel_add') }}{% endif %}" method="post" enctype="multipart/form-data">
+
+                    <div class="form-group">
+                        <label for="title">Judul Artikel</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ artikel.title if artikel else '' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content">Konten Artikel</label>
+                        <textarea class="form-control" id="content" name="content" rows="10" required>{{ artikel.content if artikel else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="source_link">Link Sumber (Opsional)</label>
+                        <input type="url" class="form-control" id="source_link" name="source_link" value="{{ artikel.source_link if artikel else '' }}" placeholder="https://example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="thumbnail">Thumbnail (JPG, JPEG, PNG - Max 2MB)</label>
+                        <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*">
+                        {% if artikel and artikel.thumbnail %}
+                            <div class="mt-2">
+                                <small class="text-muted">Thumbnail saat ini:</small><br>
+                                <img src="{{ url_for('web.uploaded_file', filename='thumbnails/' + artikel.thumbnail) }}" alt="Thumbnail" width="150" class="mt-1 border">
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <a href="{{ url_for('web.artikel_list') }}" class="btn btn-secondary">Batal</a>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
