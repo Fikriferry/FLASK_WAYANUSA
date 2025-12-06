@@ -126,6 +126,29 @@ def pertunjukan_wayang():
     videos = Video.query.filter_by(tampil=True).all()
     return render_template('pertunjukan_wayang.html', videos=videos)
 
+@web_routes.route("/pertunjukan_wayang/video/<youtube_id>")
+def video_detail(youtube_id):
+    if not session.get("user_logged_in"):
+        return redirect(url_for("web.login_user"))
+
+    video = Video.query.filter_by(youtube_id=youtube_id).first_or_404()
+    related_videos = Video.query.filter(Video.youtube_id != youtube_id).all()
+    return render_template("video_detail.html", video=video, related_videos=related_videos)
+
+@web_routes.route('/search')
+def search_video():
+    q = request.args.get("q", "")
+
+    # HINDARI: q kosong tapi masih tampil ""
+    q = q.strip()
+
+    if q:
+        videos = Video.query.filter(Video.judul.like(f"%{q}%")).all()
+    else:
+        videos = []
+
+    return render_template("search_video.html", q=q, videos=videos)
+
 
 @web_routes.route('/artikel')
 def artikel():

@@ -35,7 +35,6 @@
                         <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
                         <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
                         <li><a href="{{ url_for('web.pertunjukan_wayang') }}" class="active">Pertunjukan Wayang</a></li>
-                        <li><a href="{{ url_for('web.artikel') }}">Artikel</a></li>
                     </ul>
                 </div>
                 <div class="navbar-actions">
@@ -68,12 +67,12 @@
                     </div>
                 </div>
 
-                <!-- VIDEO CARDS (Styled like quiz) -->
+                <!-- VIDEO CARDS -->
                 <div class="quiz-cards" id="videoList">
                     {% for v in videos %}
-                    <div class="quiz-card" 
-                         data-title="{{ v.judul }}" 
-                         onclick="openVideo('{{ v.youtube_id }}')" 
+                    <div class="quiz-card"
+                         data-title="{{ v.judul }}"
+                         onclick="goToVideo('{{ v.youtube_id }}')"
                          data-aos="fade-up">
 
                         <div class="quiz-card-content">
@@ -82,8 +81,8 @@
                             <p class="quiz-desc">Klik untuk menonton pertunjukan dari koleksi WAYANUSA.</p>
                         </div>
 
-                        <img src="https://img.youtube.com/vi/{{ v.youtube_id }}/hqdefault.jpg" 
-                             alt="{{ v.judul }}" 
+                        <img src="https://img.youtube.com/vi/{{ v.youtube_id }}/hqdefault.jpg"
+                             alt="{{ v.judul }}"
                              class="quiz-image"
                              style="object-fit: cover;">
                     </div>
@@ -94,37 +93,19 @@
         </div>
     </section>
 
-    <!-- MODAL VIDEO -->
-    <div class="modal" id="videoModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeVideo()">&times;</span>
-            <div class="modal-video" id="modalVideo"></div>
-        </div>
-    </div>
-
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
         AOS.init();
 
-        function openVideo(youtubeId) {
+        function goToVideo(youtubeId) {
             if (!{{ session.get('user_logged_in', False)|tojson }}) {
                 alert("Silakan login terlebih dahulu untuk menonton video.");
                 window.location.href = "{{ url_for('web.login_user') }}";
                 return;
             }
 
-            const modal = document.getElementById("videoModal");
-            const modalVideo = document.getElementById("modalVideo");
-            modalVideo.innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=1" allowfullscreen>
-                </iframe>`;
-            modal.style.display = "flex";
-        }
-
-        function closeVideo() {
-            document.getElementById("videoModal").style.display = "none";
-            document.getElementById("modalVideo").innerHTML = "";
+            window.location.href = "/pertunjukan_wayang/video/" + youtubeId;
         }
 
         function searchVideo() {
@@ -133,7 +114,7 @@
 
             cards.forEach(card => {
                 const title = card.dataset.title.toLowerCase();
-                card.style.display = title.includes(input) ? "block" : "none";
+                card.style.display = title.includes(input) ? "" : "none";
             });
         }
     </script>
