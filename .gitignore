@@ -1,3 +1,11 @@
+venv/
 __pycache__/
 *.pyc
+<<<<<<< HEAD
 .env
+=======
+instance/
+.env
+static/uploads/
+static/models_storage/
+>>>>>>> f77accace11e9ddfe7bb9755286b890d6ea54082
