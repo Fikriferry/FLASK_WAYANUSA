@@ -1,14 +1,15 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, send_from_directory
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, send_from_directory, current_app, jsonify
 from werkzeug.utils import secure_filename
 from functools import wraps
 import os
-from models import Video
-
-
-from models import db, Dalang, User, Admin
+from models import Video, db, AIModel, Dalang, User, Admin
+from ai_manager import reload_model
 
 web_routes = Blueprint("web", __name__)
 
+# Konfigurasi folder upload (bisa ditaruh di config app)
+UPLOAD_FOLDER = 'static/models_storage'
+ALLOWED_EXTENSIONS = {'keras', 'h5'}
 
 # -------------------------
 # DECORATORS
@@ -42,9 +43,14 @@ def home():
 
 @web_routes.route('/login', methods=['GET', 'POST'])
 def login_user():
+    # 1. FIX: Cek apakah user sudah login? Jika ya, tendang ke home
+    if 'user_logged_in' in session:
+        return redirect(url_for('web.home'))
+
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        # 2. FIX: Gunakan .get() agar tidak error 400 jika input kosong/salah nama
+        email = request.form.get('email')
+        password = request.form.get('password')
 
         user = User.query.filter_by(email=email).first()
 
@@ -56,6 +62,8 @@ def login_user():
             return redirect(url_for('web.home'))
         else:
             flash('Email atau password salah!', 'error')
+            # 3. FIX: Redirect balik ke diri sendiri agar URL bersih (hindari resubmit form)
+            return redirect(url_for('web.login_user'))
 
     return render_template('login.html')
 
@@ -282,3 +290,87 @@ def video_delete(id):
 @web_routes.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory("static/uploads", filename)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@web_routes.route('/admin/models', methods=['GET', 'POST'])
+def admin_models():
+    # 1. HANDLE UPLOAD MODEL BARU
+    if request.method == 'POST':
+        if 'model_file' not in request.files:
+            flash('Tidak ada file', 'danger')
+            return redirect(request.url)
+        
+        file = request.files['model_file']
+        version_name = request.form.get('version_name')
+        accuracy = request.form.get('accuracy')
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            # Pastikan folder ada
+            save_dir = os.path.join(current_app.root_path, UPLOAD_FOLDER)
+            os.makedirs(save_dir, exist_ok=True)
+            
+            file_path = os.path.join(UPLOAD_FOLDER, filename) # Path relatif untuk DB
+            full_path = os.path.join(save_dir, filename)
+            
+            file.save(full_path)
+
+            # Simpan ke Database
+            new_model = AIModel(
+                version_name=version_name,
+                file_path=file_path, # Simpan path relatif
+                accuracy=accuracy,
+                is_active=False
+            )
+            db.session.add(new_model)
+            db.session.commit()
+            flash('Model berhasil diupload!', 'success')
+        else:
+            flash('Format file salah. Harap upload .keras atau .h5', 'danger')
+
+    # 2. TAMPILKAN LIST MODEL
+    models = AIModel.query.order_by(AIModel.created_at.desc()).all()
+    return render_template('admin/model_list.html', models=models)
+
+@web_routes.route('/admin/models/activate/<int:id>')
+def activate_model(id):
+    # 1. Nonaktifkan semua model dulu
+    AIModel.query.update({AIModel.is_active: False})
+    
+    # 2. Aktifkan model yang dipilih
+    target = AIModel.query.get_or_404(id)
+    target.is_active = True
+    db.session.commit()
+
+    # 3. HOT RELOAD: Ganti model di RAM tanpa restart server
+    success = reload_model(id)
+    
+    if success:
+        flash(f'Model "{target.version_name}" sekarang AKTIF dan digunakan!', 'success')
+    else:
+        flash('Gagal memuat model. File mungkin hilang.', 'danger')
+
+    return redirect(url_for('web.admin_models'))
+
+@web_routes.route('/admin/models/delete/<int:id>')
+def delete_model(id):
+    target = AIModel.query.get_or_404(id)
+    
+    if target.is_active:
+        flash('Tidak bisa menghapus model yang sedang aktif!', 'warning')
+        return redirect(url_for('web.admin_models'))
+
+    # Hapus file fisik
+    try:
+        full_path = os.path.join(current_app.root_path, target.file_path)
+        if os.path.exists(full_path):
+            os.remove(full_path)
+    except Exception as e:
+        print(f"Error deleting file: {e}")
+
+    db.session.delete(target)
+    db.session.commit()
+    flash('Model berhasil dihapus.', 'success')
+    return redirect(url_for('web.admin_models'))

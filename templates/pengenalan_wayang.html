@@ -1,424 +1,491 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengenalan Wayang - WAYANUSA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        /* Custom styles for Pengenalan Wayang page */
+        /* --- GLOBAL & BACKGROUND --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212;
+        }
+
         .wayang-recognition {
             min-height: 100vh;
-            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-            padding: 20px 0;
+            background: radial-gradient(circle at top right, #3d2b1f 0%, #1a1a1a 40%, #000000 100%);
+            padding: 40px 0;
             position: relative;
-            overflow: hidden;
-        }
-
-        .wayang-recognition::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 60%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        .recognition-header {
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* --- CONTAINER UTAMA --- */
+        .recognition-wrapper {
+            width: 100%;
+            max-width: 900px;
             padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- HEADER SECTION --- */
+        .recognition-header {
+            text-align: center;
+            margin-bottom: 40px;
             position: relative;
         }
 
-        .back-btn {
+        .back-btn-wrapper {
             position: absolute;
-            left: 20px;
-            background: #6B4226;
-            color: white;
-            border: none;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #D4A373;
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 18px;
             transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
         }
 
         .back-btn:hover {
-            background: #5A3620;
+            background: #D4A373;
+            color: #fff;
             transform: scale(1.1);
         }
 
         .recognition-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #6B4226;
-            margin: 0;
             font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #D4A373, #F3E5AB, #D4A373);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
-        .method-selection {
-            text-align: center;
-            margin: 30px 0;
-            font-size: 1.1rem;
-            color: #6B4226;
-            font-weight: 500;
-        }
-
-        .method-selection span {
-            margin: 0 15px;
-        }
-
-        .method-btn {
-            background: #D4A373;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin: 0 10px;
-            transition: all 0.3s ease;
-        }
-
-        .method-btn:hover {
-            background: #C37A48;
-            transform: translateY(-2px);
-        }
-
-        .recognition-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
+        /* --- MAIN CARD --- */
         .recognition-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(107, 66, 38, 0.15);
-            border: 2px solid #D4A373;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(212, 163, 115, 0.3);
             position: relative;
             overflow: hidden;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Hiasan Batik Halus di Header Card */
         .recognition-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #D4A373, #C37A48, #6B4226);
+            height: 6px;
+            background: linear-gradient(90deg, #6B4226, #D4A373, #6B4226);
         }
 
+        /* --- PROGRESS BAR --- */
         .progress-indicator {
             display: flex;
             justify-content: center;
-            margin-bottom: 30px;
+            align-items: center;
+            margin-bottom: 40px;
+            position: relative;
         }
 
         .progress-step {
-            display: flex;
-            align-items: center;
-            margin: 0 10px;
+            z-index: 2;
         }
 
         .step-circle {
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
-            background: #E0E0E0;
-            color: #666;
+            background: #f0f0f0;
+            color: #999;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.9rem;
-            margin-right: 8px;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #e0e0e0;
         }
 
         .step-circle.active {
             background: #D4A373;
             color: white;
+            border-color: #D4A373;
+            box-shadow: 0 0 15px rgba(212, 163, 115, 0.5);
+            transform: scale(1.1);
         }
 
         .step-circle.completed {
             background: #6B4226;
             color: white;
+            border-color: #6B4226;
         }
 
         .step-line {
-            width: 40px;
-            height: 2px;
-            background: #E0E0E0;
+            width: 60px;
+            height: 3px;
+            background: #e0e0e0;
             margin: 0 5px;
+            transition: all 0.4s ease;
+            border-radius: 2px;
         }
 
-        .step-line.active {
-            background: #D4A373;
-        }
-
+        .step-line.active,
         .step-line.completed {
-            background: #6B4226;
+            background: linear-gradient(90deg, #6B4226, #D4A373);
         }
 
+        /* --- STAGE CONTENT AREA --- */
         .stage-content {
-            text-align: center;
-            min-height: 300px;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-        }
-
-        .camera-simulation {
             width: 100%;
-            max-width: 400px;
-            height: 300px;
-            background: #2a2a2a;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
         }
 
-        .camera-lens {
-            width: 200px;
-            height: 200px;
-            border: 3px solid #666;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .camera-lens::before {
-            content: '';
-            width: 20px;
-            height: 20px;
-            background: #999;
-            border-radius: 50%;
-        }
-
-        .camera-text {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
-
-        .capture-btn {
-            background: #D4A373;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .capture-btn:hover {
-            background: #C37A48;
-            transform: scale(1.05);
-        }
-
-        .photo-result {
+        /* --- STAGE 1: SELECTION CARDS --- */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             width: 100%;
-            max-width: 300px;
-            height: 250px;
-            border-radius: 15px;
-            border: 3px solid #D4A373;
-            object-fit: cover;
-            margin-bottom: 20px;
+            max-width: 600px;
         }
 
-        .upload-area {
-            border: 2px dashed #D4A373;
-            border-radius: 15px;
-            padding: 40px;
+        .selection-card {
+            background: #fff;
+            border: 2px solid #f0f0f0;
+            border-radius: 16px;
+            padding: 30px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #FBEDE3;
         }
 
-        .upload-area:hover {
-            background: #EEDAC1;
-            border-color: #C37A48;
+        .selection-card:hover {
+            border-color: #D4A373;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(212, 163, 115, 0.2);
         }
 
-        .upload-icon {
+        .selection-icon {
             font-size: 3rem;
-            color: #D4A373;
+            color: #6B4226;
             margin-bottom: 15px;
         }
 
-        .upload-text {
-            color: #6B4226;
-            font-weight: 500;
+        .selection-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .selection-desc {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        /* --- STAGE 2: CAMERA UI --- */
+        .camera-frame {
+            width: 100%;
+            max-width: 450px;
+            height: 350px;
+            background: #000;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Scanner Animation */
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+            animation: scan 2s linear infinite;
+            z-index: 5;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .shutter-btn {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .shutter-btn:active {
+            transform: scale(0.9);
+            background: #ddd;
+        }
+
+        /* --- STAGE 3: UPLOAD UI --- */
+        .upload-zone {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            border: 3px dashed #D4A373;
+            border-radius: 20px;
+            background: #FBEDE3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover {
+            background: #F5DEC9;
+            transform: scale(1.02);
+        }
+
+        /* --- PREVIEW IMAGE --- */
+        .preview-container {
+            position: relative;
+            padding: 10px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transform: rotate(-2deg);
+            /* Artistic tilt */
+        }
+
+        .image-preview {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+
+        /* --- STAGE 4: RESULT --- */
+        .result-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+            text-align: left;
+            width: 100%;
+            align-items: flex-start;
+        }
+
+        .result-img-wrapper {
+            flex: 0 0 150px;
+        }
+
+        .result-img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 3px solid #D4A373;
+        }
+
+        .result-info {
+            flex: 1;
+        }
+
+        .confidence-badge {
+            display: inline-block;
+            background: #e6f4ea;
+            color: #1e8e3e;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
             margin-bottom: 10px;
         }
 
-        .upload-subtext {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .result-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .result-image {
-            width: 150px;
-            height: 200px;
-            border-radius: 10px;
-            object-fit: cover;
-            margin-bottom: 20px;
-            border: 2px solid #D4A373;
-        }
-
-        .result-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #6B4226;
-            margin-bottom: 15px;
+        .wayang-name {
             font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #6B4226;
+            margin: 0 0 15px 0;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
         }
 
-        .result-description {
-            color: #333;
-            line-height: 1.6;
-            text-align: left;
+        .wayang-desc {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #555;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #D4A373;
         }
 
-        .next-btn {
-            background: #D4A373;
-            color: white;
+        /* --- BUTTONS --- */
+        .action-btn {
+            padding: 12px 30px;
+            border-radius: 30px;
             border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 1rem;
             font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
+            transition: all 0.3s;
             margin-top: 20px;
-            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .next-btn:hover {
-            background: #C37A48;
+        .btn-primary {
+            background: linear-gradient(135deg, #D4A373 0%, #B88656 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(212, 163, 115, 0.4);
+        }
+
+        .btn-primary:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 163, 115, 0.6);
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease;
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
         }
 
-        .slide-in {
-            animation: slideIn 0.5s ease;
+        .btn-secondary:hover {
+            background: #e0e0e0;
         }
 
-        @keyframes fadeIn {
-            from {
+        /* --- ANIMATIONS --- */
+        @keyframes scan {
+            0% {
+                top: 0;
                 opacity: 0;
             }
-            to {
+
+            10% {
                 opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 100%;
+                opacity: 0;
             }
         }
 
-        @keyframes slideIn {
+        .fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateX(30px);
+                transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translateY(0);
             }
         }
 
-        @media (max-width: 480px) {
-            .recognition-title {
-                font-size: 1.5rem;
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .selection-grid {
+                grid-template-columns: 1fr;
             }
 
-            .method-selection {
-                font-size: 1rem;
+            .result-layout {
+                flex-direction: column;
+                text-align: center;
+                align-items: center;
             }
 
-            .method-btn {
-                display: block;
-                margin: 10px auto;
-                width: 200px;
+            .result-img-wrapper {
+                width: 150px;
+                margin-bottom: 20px;
             }
 
-            .recognition-card {
-                padding: 20px;
-            }
-
-            .progress-step {
-                margin: 0 5px;
+            .wayang-desc {
+                text-align: left;
             }
 
             .step-line {
-                width: 20px;
+                width: 30px;
             }
 
-            .camera-simulation {
-                height: 250px;
+            .recognition-title {
+                font-size: 1.8rem;
             }
 
-            .camera-lens {
-                width: 150px;
-                height: 150px;
-            }
-
-            .result-card {
-                padding: 20px;
+            .back-btn-wrapper {
+                position: static;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: center;
+                transform: none;
             }
         }
     </style>
 </head>
+
 <body>
-    <nav class="navbar" >
+    <nav class="navbar">
         <div class="container">
-            <div class="navbar-content" >
+            <div class="navbar-content">
                 <div class="navbar-logo">
                     <a href="{{ url_for('web.home') }}" class="logo-link">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo"
+                            class="logo-image">
                     </a>
                 </div>
-                <div class="navbar-menu" >
+                <div class="navbar-menu">
                     <ul class="nav-links">
                         <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
                         <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
@@ -428,224 +495,345 @@
                 </div>
                 <div class="navbar-actions">
                     {% if session.get('user_logged_in') %}
-                        <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
-                        <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
+                    <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
+                    <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
                     {% else %}
-                        <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
+                    <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </nav>
 
-    <section class="wayang-recognition"style="padding-top: 70px;">
-        <div class="recognition-header">
-            <button class="back-btn" onclick="goBack()">←</button>
-            <h1 class="recognition-title">Pengenalan Wayang</h1>
-        </div>
+    <section class="wayang-recognition" style="padding-top: 100px;">
+        <div class="recognition-wrapper">
 
-        <div class="method-selection">
-            <button class="method-btn" onclick="selectMethod('camera')">📷 Ambil Gambar</button>
-            <span>|</span>
-            <button class="method-btn" onclick="selectMethod('upload')">📁 Upload Foto</button>
-        </div>
+            <div class="recognition-header">
+                <div class="back-btn-wrapper">
+                    <button class="back-btn" onclick="goBack()" title="Kembali">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+                <h1 class="recognition-title">Identifikasi Wayang AI</h1>
+                <p style="color: #bbb; margin-top: 10px;">Gunakan teknologi AI untuk mengenali tokoh wayang favoritmu
+                </p>
+            </div>
 
-        <div class="recognition-container">
             <div class="recognition-card" id="recognitionCard">
                 <div class="progress-indicator">
                     <div class="progress-step">
                         <div class="step-circle" id="step1">1</div>
                     </div>
                     <div class="step-line" id="line1"></div>
+
                     <div class="progress-step">
                         <div class="step-circle" id="step2">2</div>
                     </div>
                     <div class="step-line" id="line2"></div>
+
                     <div class="progress-step">
                         <div class="step-circle" id="step3">3</div>
                     </div>
                     <div class="step-line" id="line3"></div>
+
                     <div class="progress-step">
                         <div class="step-circle" id="step4">4</div>
                     </div>
                 </div>
 
                 <div class="stage-content" id="stageContent">
-                    <div id="stage1" class="stage">
-                        <p style="color: #6B4226; font-size: 1.2rem; margin-bottom: 30px;">Pilih metode pengenalan wayang di atas</p>
+
+                    <div id="stage1" class="fade-in-up"
+                        style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                        <h3 style="margin-bottom: 30px; color: #6B4226;">Pilih Metode Pengambilan Gambar</h3>
+                        <div class="selection-grid">
+                            <div class="selection-card" onclick="selectMethod('camera')">
+                                <div class="selection-icon"><i class="fas fa-camera"></i></div>
+                                <div class="selection-title">Gunakan Kamera</div>
+                                <div class="selection-desc">Ambil foto langsung dari kamera perangkatmu</div>
+                            </div>
+                            <div class="selection-card" onclick="selectMethod('upload')">
+                                <div class="selection-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                                <div class="selection-title">Upload File</div>
+                                <div class="selection-desc">Pilih foto dari galeri (JPG/PNG)</div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </section>
 
     <script>
-        // Variabel global untuk tracking stage dan data
-        let currentStage = 1; // Stage saat ini (1-4)
-        let selectedMethod = null; // Metode yang dipilih: 'camera' atau 'upload'
-        let capturedImage = null; // Data gambar yang di-capture atau di-upload
+        // --- 1. SETUP VARIABEL GLOBAL ---
+        let currentStage = 1;
+        let selectedMethod = null;
+        let selectedFile = null;
+        let previewUrl = null;
 
-        // Fungsi untuk kembali ke halaman sebelumnya
+        // --- 2. DATABASE DESKRIPSI ---
+        const wayangData = {
+            "Abimanyu": "Putra Arjuna yang dikenal sebagai ksatria muda pemberani dan ahli strategi perang. Ia gugur secara heroik di medan perang Baratayuda saat dikeroyok Kurawa.",
+            "Anoman": "Kera putih sakti mandraguna, putra Batara Guru. Ia adalah abdi setia Sri Rama dalam kisah Ramayana dan memiliki umur panjang hingga era Mahabharata.",
+            "Arjuna": "Putra ketiga Pandawa yang berparas tampan dan lemah lembut. Ia adalah pemanah ulung pemilik panah Pasopati dan penengah Pandawa.",
+            "Bagong": "Punakawan bungsu anak Semar. Bertubuh gemuk, bermata lebar, dan lucu. Sifatnya lugu, ceplas-ceplos, dan sering melontarkan kritik jenaka.",
+            "Baladewa": "Kakak Prabu Kresna, Raja Mandura. Berwatak keras dan mudah marah, namun sangat jujur dan adil. Senjata andalannya adalah Nanggala.",
+            "Bima": "Putra kedua Pandawa (Werkudara). Bertubuh tinggi besar, kuku Pancanaka, dan Gada Rujakpala. Sifatnya jujur, tegas, dan tidak basa-basi.",
+            "Buta": "Istilah umum untuk Raksasa dalam pewayangan. Menggambarkan sifat angkara murka, kasar, dan menjadi musuh para ksatria.",
+            "Cakil": "Tokoh raksasa dengan rahang bawah menonjol (cameh). Ia sangat lincah, namun melambangkan sifat pantang menyerah di jalan yang salah.",
+            "Durna": "Guru besar ilmu perang Pandawa dan Kurawa. Sangat sakti namun sering berpihak pada Kurawa karena politik dan sumpah setianya pada negara Hastina.",
+            "Dursasana": "Adik Duryudana yang berbadan gagah namun bermulut besar dan kasar. Ia melambangkan kesewenang-wenangan.",
+            "Duryudana": "Raja Hastinapura dan pemimpin Kurawa. Wataknya angkuh, keras kepala, dan mudah terhasut oleh Sengkuni untuk memusuhi Pandawa.",
+            "Gareng": "Anak tertua Semar. Kakinya pincang dan tangannya ceko, melambangkan kehati-hatian dalam melangkah dan tidak suka mengambil hak orang lain.",
+            "Gatotkaca": "Putra Bima, ksatria Pringgandani. Dikenal dengan 'Otot kawat tulang besi', bisa terbang, dan menjadi pelindung Pandawa.",
+            "Karna": "Kakak tertua Pandawa yang berada di pihak Kurawa. Pemanah sakti yang setara dengan Arjuna, dikenal sangat dermawan dan setia kawan.",
+            "Kresna": "Raja Dwarawati, titisan Dewa Wisnu. Penasihat utama Pandawa yang bijaksana, ahli strategi ulung, dan pemilik senjata Cakra.",
+            "Nakula Sadewa": "Putra kembar Pandawa. Nakula ahli merawat kuda dan sangat tampan, sedangkan Sadewa ahli perbintangan dan bijaksana.",
+            "Patih Sabrang": "Sebutan untuk patih dari kerajaan seberang (luar Jawa/raksasa). Biasanya digambarkan gagah, brangasan, dan menjadi musuh.",
+            "Petruk": "Anak kedua Semar. Berbadan tinggi, hidung panjang, dan selalu tersenyum. Ia cerdas, humoris, dan suka menyindir ketidakadilan.",
+            "Puntadewa": "Putra tertua Pandawa (Yudhistira). Berdarah putih (suci), tidak pernah berbohong, sangat sabar, dan tidak memiliki musuh.",
+            "Semar": "Tokoh punakawan utama, pengasuh para ksatria. Sejatinya adalah dewa (Batara Ismaya) yang turun ke bumi. Simbol kebijaksanaan rakyat.",
+            "Sengkuni": "Patih Hastinapura yang licik. Ia adalah dalang di balik permusuhan Pandawa dan Kurawa, ahli siasat buruk dan adu domba.",
+            "Togog": "Kakak Semar yang memihak pada musuh (raksasa). Tugasnya menasihati majikan yang jahat agar kembali ke jalan benar, meski jarang didengar."
+        };
+
         function goBack() {
             window.history.back();
         }
 
-        // Fungsi untuk memilih metode pengenalan wayang
-        // Stage 1: Pilih metode
+        // --- 3. PILIH METODE & UPDATE UI ---
         function selectMethod(method) {
-            selectedMethod = method;
-            currentStage = 1; // Reset ke stage 1
-            updateProgress();
-
-            // Cek apakah user sudah login
-            if (!{{ session.get('user_logged_in', False)|tojson }}) {
-                alert('Silakan login terlebih dahulu untuk menggunakan fitur pengenalan wayang.');
-                window.location.href = '{{ url_for("web.login_user") }}';
-                return;
-            }
-
-            // Lanjut ke stage berikutnya berdasarkan metode
-            if (selectedMethod === 'camera') {
-                showStage2(); // Camera: langsung ke stage 2 (capture)
-            } else if (selectedMethod === 'upload') {
-                showStage3(); // Upload: langsung ke stage 3 (upload)
-            }
+            // Cek Login Session (Template Jinja)
+            const isLoggedIn = {{ session.get('user_logged_in', False) | tojson
+        }};
+        if (!isLoggedIn) {
+            alert('Silakan login terlebih dahulu untuk menggunakan fitur ini.');
+            window.location.href = "{{ url_for('web.login_user') }}";
+            return;
         }
 
-        // Fungsi untuk update progress bar berdasarkan currentStage
-        function updateProgress() {
-            // Reset semua step ke default
+        selectedMethod = method;
+        selectedFile = null;
+
+        if (selectedMethod === 'camera') {
+            showStage2();
+        } else if (selectedMethod === 'upload') {
+            showStage3();
+        }
+        }
+
+        function updateProgress(stage) {
+            currentStage = stage;
             for (let i = 1; i <= 4; i++) {
-                document.getElementById(`step${i}`).className = 'step-circle';
-                if (i < 4) {
-                    document.getElementById(`line${i}`).className = 'step-line';
-                }
-            }
+                const step = document.getElementById(`step${i}`);
+                const line = document.getElementById(`line${i}`);
 
-            // Update step yang aktif dan completed
-            for (let i = 1; i <= currentStage; i++) {
+                step.className = 'step-circle';
+                if (line) line.className = 'step-line';
+
                 if (i < currentStage) {
-                    document.getElementById(`step${i}`).classList.add('completed');
-                    if (i < 4) {
-                        document.getElementById(`line${i}`).classList.add('completed');
-                    }
-                } else {
-                    document.getElementById(`step${i}`).classList.add('active');
-                    if (i < 4) {
-                        document.getElementById(`line${i}`).classList.add('active');
-                    }
+                    step.classList.add('completed');
+                    if (line) line.classList.add('completed');
+                } else if (i === currentStage) {
+                    step.classList.add('active');
+                    if (line) line.classList.add('active');
                 }
             }
         }
 
-        // Fungsi untuk menampilkan Stage 2: Capture foto (hanya untuk camera)
+        // --- STAGE 2: CAMERA UI (SIMULASI) ---
         function showStage2() {
-            currentStage = 2;
-            updateProgress();
-
+            updateProgress(2);
             const stageContent = document.getElementById('stageContent');
             stageContent.innerHTML = `
-                <div class="camera-simulation fade-in">
-                    <div class="camera-lens"></div>
-                    <div class="camera-text">📷 Kamera Siap Digunakan</div>
-                    <button class="capture-btn" onclick="capturePhoto()">Ambil Foto</button>
+                <div class="fade-in-up" style="display:flex; flex-direction:column; align-items:center;">
+                    <div class="camera-frame">
+                        <div class="scanner-line"></div>
+                        <div style="width:100%; height:100%; background: #222; display:flex; align-items:center; justify-content:center;">
+                            <i class="fas fa-video" style="color:#444; font-size:3rem;"></i>
+                        </div>
+                        <div class="camera-overlay">
+                            <button class="shutter-btn" onclick="capturePhoto()" title="Ambil Foto"></button>
+                        </div>
+                    </div>
+                    <p style="margin-top:15px; color:#666; font-size:0.9rem;">Posisikan wayang di dalam bingkai</p>
+                    <button onclick="resetToStage1()" class="action-btn btn-secondary" style="margin-top:10px;">Kembali</button>
                 </div>
             `;
         }
 
-        // Fungsi untuk capture foto (simulasi)
-        // Dari stage 2 ke stage 3 (konfirmasi)
         function capturePhoto() {
-            currentStage = 3; // Set ke stage 3 untuk konfirmasi
-            updateProgress();
-
-            const stageContent = document.getElementById('stageContent');
-            stageContent.innerHTML = `
-                <div class="slide-in">
-                    <img src="https://via.placeholder.com/300x250/D4A373/FFFFFF?text=Arjuna+Photo" alt="Captured Photo" class="photo-result">
-                    <p style="color: #6B4226; margin: 20px 0;">Foto berhasil diambil!</p>
-                    <button class="next-btn" onclick="processImage()">Lanjutkan Analisis</button>
-                </div>
-            `;
+            // Simulasi Fetch Gambar
+            fetch("https://via.placeholder.com/300x400/D4A373/FFFFFF?text=Wayang+Capture")
+                .then(res => res.blob())
+                .then(blob => {
+                    selectedFile = new File([blob], "capture.jpg", { type: "image/jpeg" });
+                    previewUrl = URL.createObjectURL(blob);
+                    showPreviewStage();
+                });
         }
 
-        // Fungsi untuk menampilkan Stage 3: Upload area (untuk upload method)
+        // --- STAGE 3: UPLOAD UI ---
+        // --- REVISI: STAGE 3 (FIX BUG UPLOAD) ---
         function showStage3() {
-            currentStage = 3;
-            updateProgress();
+            updateProgress(3);
 
             const stageContent = document.getElementById('stageContent');
+
+            // PERBAIKAN:
+            // 1. Mengganti <div> menjadi <label>
+            // 2. Menambahkan atribut 'for="fileInput"'
+            // 3. Menghapus 'onclick="..."' karena <label> otomatis memicu input di dalamnya
+
             stageContent.innerHTML = `
-                <div class="upload-area fade-in" onclick="document.getElementById('fileInput').click()">
-                    <div class="upload-icon">📤</div>
-                    <div class="upload-text">Klik untuk Upload Foto Wayang</div>
-                    <div class="upload-subtext">Format: JPG, PNG, maksimal 5MB</div>
-                    <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="handleFileUpload(event)">
+                <div class="fade-in-up" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                    
+                    <label class="upload-zone" for="fileInput">
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div class="upload-text">Klik untuk Upload Foto</div>
+                        <div class="upload-subtext">JPG, PNG (Max 5MB)</div>
+                        
+                        <input type="file" id="fileInput" class="file-input" accept="image/*" 
+                               onclick="this.value=null" 
+                               onchange="handleFileUpload(event)">
+                    </label>
+
+                    <button onclick="resetToStage1()" class="action-btn btn-secondary" style="margin-top:20px;">Kembali</button>
                 </div>
             `;
         }
 
-        // Fungsi untuk handle upload file
-        // Dari stage 3 ke stage 4 (hasil)
+        // --- REVISI: HANDLE FILE (LEBIH AMAN) ---
         function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    capturedImage = e.target.result;
-                    currentStage = 4; // Set ke stage 4
-                    updateProgress();
-                    showResult(); // Tampilkan hasil
-                };
-                reader.readAsDataURL(file);
+            // Cek apakah ada file yang dipilih
+            if (event.target.files && event.target.files.length > 0) {
+                const file = event.target.files[0];
+
+                // Validasi tipe file (Opsional tapi disarankan)
+                if (!file.type.startsWith('image/')) {
+                    alert('Mohon upload file gambar (JPG/PNG).');
+                    return;
+                }
+
+                selectedFile = file;
+                previewUrl = URL.createObjectURL(file);
+
+                // Langsung lanjut ke preview
+                showPreviewStage();
             }
         }
 
-        // Fungsi untuk proses analisis gambar (dari capture)
-        // Dari stage 3 ke stage 4 (hasil)
-        function processImage() {
-            // Simulasi loading analisis
+        // --- PREVIEW / CONFIRMATION ---
+        function showPreviewStage() {
+            updateProgress(3); // Dianggap tahap konfirmasi
             const stageContent = document.getElementById('stageContent');
             stageContent.innerHTML = `
-                <div class="fade-in" style="text-align: center;">
-                    <p style="color: #6B4226; font-size: 1.2rem; margin-bottom: 20px;">Sedang menganalisis gambar...</p>
-                    <div style="width: 50px; height: 50px; border: 4px solid #D4A373; border-top: 4px solid #6B4226; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-                </div>
-            `;
-
-            // Simulasi delay untuk analisis
-            setTimeout(() => {
-                currentStage = 4; // Set ke stage 4
-                updateProgress();
-                showResult(); // Tampilkan hasil
-            }, 2000); // 2 detik simulasi
-        }
-
-        // Fungsi untuk menampilkan hasil pengenalan (Stage 4)
-        function showResult() {
-            const stageContent = document.getElementById('stageContent');
-            stageContent.innerHTML = `
-                <div class="result-card slide-in">
-                    <img src="https://via.placeholder.com/150x200/6B4226/FFFFFF?text=Arjuna" alt="Arjuna" class="result-image">
-                    <h3 class="result-name">Arjuna</h3>
-                    <div class="result-description">
-                        <p>Arjuna adalah tokoh utama dalam epos Mahabharata, putra Pandu dan Kunti. Ia dikenal sebagai pemanah ulung yang mahir dalam ilmu kesaktian dan memiliki kepribadian yang bijaksana serta setia kawan.</p>
-                        <p>Arjuna adalah sosok yang sangat terampil dalam menggunakan busur dan panah. Ia mendapat ajaran ilmu kesaktian dari para dewa dan guru spiritual. Dalam perang Bharatayuddha, Arjuna menjadi panglima pasukan Pandawa.</p>
-                        <p>Karakter Arjuna menggambarkan nilai-nilai keberanian, kesetiaan, dan kebijaksanaan. Ia sering dianggap sebagai simbol dari manusia yang sempurna dalam ajaran Hindu.</p>
+                <div class="fade-in-up" style="display:flex; flex-direction:column; align-items:center;">
+                    <div class="preview-container">
+                        <img src="${previewUrl}" class="image-preview" alt="Preview">
+                    </div>
+                    <h4 style="margin-top:20px; color:#444;">Apakah foto sudah jelas?</h4>
+                    <div style="display:flex; gap:15px;">
+                        <button class="action-btn btn-secondary" onclick="resetToStage1()">Ulangi</button>
+                        <button class="action-btn btn-primary" onclick="processImage()">
+                            <i class="fas fa-search"></i> Analisis Sekarang
+                        </button>
                     </div>
                 </div>
             `;
         }
 
-        // Animasi spin untuk loading
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
+        function resetToStage1() {
+            updateProgress(1);
+            document.getElementById('stageContent').innerHTML = `
+                <div id="stage1" class="fade-in-up" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                    <h3 style="margin-bottom: 30px; color: #6B4226;">Pilih Metode Pengambilan Gambar</h3>
+                    <div class="selection-grid">
+                        <div class="selection-card" onclick="selectMethod('camera')">
+                            <div class="selection-icon"><i class="fas fa-camera"></i></div>
+                            <div class="selection-title">Gunakan Kamera</div>
+                            <div class="selection-desc">Ambil foto langsung dari kamera perangkatmu</div>
+                        </div>
+                        <div class="selection-card" onclick="selectMethod('upload')">
+                            <div class="selection-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div class="selection-title">Upload File</div>
+                            <div class="selection-desc">Pilih foto dari galeri (JPG/PNG)</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- CONNECT TO API ---
+        async function processImage() {
+            if (!selectedFile) return;
+
+            // Loading UI
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = `
+                <div class="fade-in-up" style="text-align: center; padding:40px;">
+                    <div style="width: 60px; height: 60px; border: 5px solid #f3f3f3; border-top: 5px solid #D4A373; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                    <h3 style="color: #6B4226; margin-top: 20px;">AI Sedang Berpikir...</h3>
+                    <p style="color: #888;">Menganalisis pola wayang</p>
+                </div>
+            `;
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+
+            try {
+                const response = await fetch('/api/predict-wayang', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    showResult(data);
+                } else {
+                    alert("Error: " + (data.error || "Gagal"));
+                    resetToStage1();
+                }
+            } catch (error) {
+                console.error("API Error", error);
+                alert("Koneksi Error");
+                resetToStage1();
             }
-        `;
+        }
+
+        // --- STAGE 4: RESULT ---
+        function showResult(data) {
+            updateProgress(4);
+            const namaWayang = data.prediksi;
+            const confidence = data.confidence;
+            const deskripsi = wayangData[namaWayang] || `Tokoh ${namaWayang} berhasil terdeteksi, namun deskripsi detail belum tersedia di database.`;
+
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = `
+                <div class="result-layout fade-in-up">
+                    <div class="result-img-wrapper">
+                        <img src="${previewUrl}" class="result-img" alt="${namaWayang}">
+                    </div>
+                    <div class="result-info">
+                        <span class="confidence-badge"><i class="fas fa-check-circle"></i> Akurasi: ${confidence}</span>
+                        <h2 class="wayang-name">${namaWayang}</h2>
+                        <div class="wayang-desc">
+                            ${deskripsi}
+                        </div>
+                        <button class="action-btn btn-primary" onclick="resetToStage1()">
+                            <i class="fas fa-redo"></i> Coba Lagi
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Add Spin Animation
+        const style = document.createElement('style');
+        style.textContent = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
         document.head.appendChild(style);
     </script>
 </body>
+
 </html>

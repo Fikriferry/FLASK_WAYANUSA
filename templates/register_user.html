@@ -9,6 +9,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        .alert {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .alert-error, .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .alert-success {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+    </style>
 </head>
 <body class="login-page">
     <div class="login-container">
@@ -19,6 +49,19 @@
                 </div>
             </div>
         </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    <span>{{ message }}</span>
+                    <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
         <form class="login-form" action="{{ url_for('web.register_user') }}" method="post">
             <div class="form-group">
                 <label for="name" class="form-label">
@@ -58,17 +101,18 @@
                 <i class="fas fa-user-plus"></i> Daftar
             </button>
             <div class="register-link">
-                <p>Sudah punya akun? <a href="/login" class="register-text">Masuk</a></p>
+                <p>Sudah punya akun? <a href="{{ url_for('web.login_user') }}" class="register-text">Masuk</a></p>
             </div>
         </form>
+
         <div class="social-login">
             <div class="divider">
                 <span>Daftar Menggunakan</span>
             </div>
             <div class="social-buttons">
-                <button class="social-btn google-btn" title="Daftar dengan Google">
+                <a href="{{ url_for('auth_routes.login_google') }}" class="social-btn google-btn" title="Daftar dengan Google">
                     <i class="fab fa-google"></i>
-                </button>
+                </a>
                 <button class="social-btn facebook-btn" title="Daftar dengan Facebook">
                     <i class="fab fa-facebook-f"></i>
                 </button>
@@ -116,13 +160,13 @@
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
 
+            // Basic Validation (Jika gagal, e.preventDefault() akan menahan submit)
             if (!name || !email || !password || !confirmPassword) {
                 e.preventDefault();
                 alert('Mohon lengkapi semua field yang diperlukan.');
                 return;
             }
 
-            // Basic email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 e.preventDefault();
@@ -130,31 +174,25 @@
                 return;
             }
 
-            // Password confirmation validation
             if (password !== confirmPassword) {
                 e.preventDefault();
                 alert('Password dan konfirmasi password tidak cocok.');
                 return;
             }
 
-            // Password strength validation
             if (password.length < 6) {
                 e.preventDefault();
                 alert('Password harus memiliki minimal 6 karakter.');
                 return;
             }
 
-            // Show loading state
+            // Jika semua lolos, form akan tersubmit otomatis ke server Flask.
+            // Saya menghapus 'setTimeout' simulasi agar tidak membingungkan, 
+            // biarkan loading browser yang bekerja.
             const submitBtn = document.querySelector('.btn-login');
-            const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mendaftar...';
-            submitBtn.disabled = true;
-
-            // Simulate registration process (remove this in production)
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }, 2000);
+            // Jangan disable button di sini jika tidak pakai AJAX, 
+            // karena kadang browser tidak jadi submit kalau didisable terlalu cepat.
         });
 
         // Input focus effects
