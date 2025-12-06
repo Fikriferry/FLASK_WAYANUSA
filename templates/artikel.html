@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artikel Wayang - WAYANUSA</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+
+    <!-- AOS -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-logo">
+                    <a href="{{ url_for('web.home') }}" class="logo-link">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo-image">
+                    </a>
+                </div>
+                <div class="navbar-menu">
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
+                        <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
+                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                        <li><a href="{{ url_for('web.artikel') }}" class="active">Artikel</a></li>
+                    </ul>
+                </div>
+                <div class="navbar-actions">
+                    {% if session.get('user_logged_in') %}
+                        <span class="user-greeting">Halo, {{ session.get('user_name') }}!</span>
+                        <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="quiz-section">
+        <div class="container">
+            <div class="quiz-content">
+                <p class="quiz-tag">📖 ARTIKEL WAYANG</p>
+                <h2 class="quiz-title">Koleksi <span class="highlight">Artikel</span> Wayang</h2>
+                <p class="quiz-description">
+                    Baca berbagai artikel menarik tentang dunia wayang, sejarah, karakter, dan budaya yang memukau.
+                </p>
+
+                <!-- SEARCH -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <span class="search-icon">&#128269;</span>
+                        <input type="text" id="searchInput" placeholder="Cari artikel..." oninput="searchArticle()">
+                    </div>
+                </div>
+
+                <!-- ARTICLE CARDS -->
+                <div class="quiz-cards" id="articleList">
+                    {% for article in articles %}
+                    <div class="quiz-card"
+                         data-title="{{ article.title }}"
+                         onclick="window.location.href='/artikel/{{ article.id }}'"
+                         data-aos="fade-up"
+                         style="cursor: pointer;">
+
+                        <div class="quiz-card-content">
+                            <h3 class="quiz-level">{{ article.title }}</h3>
+                            <p class="quiz-name">Artikel Wayang</p>
+                            <p class="quiz-desc">{{ article.content }}</p>
+                            <small class="text-muted">{{ article.created_at.strftime('%d/%m/%Y') }}</small>
+                        </div>
+
+                        {% if article.thumbnail %}
+                            <img src="{{ url_for('web.uploaded_thumbnail', filename=article.thumbnail) }}"
+                                 alt="{{ article.title }}"
+                                 class="quiz-image"
+                                 style="object-fit: cover;">
+                        {% else %}
+                            <div class="quiz-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-newspaper" style="font-size: 48px; color: white;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if not articles %}
+                <div class="text-center py-5">
+                    <i class="fas fa-newspaper text-muted" style="font-size: 64px;"></i>
+                    <h3 class="mt-3 text-muted">Belum ada artikel tersedia</h3>
+                    <p class="text-muted">Artikel akan segera ditambahkan. Silakan kembali lagi nanti!</p>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init();
+
+        function searchArticle() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const cards = document.querySelectorAll(".quiz-card");
+
+            cards.forEach(card => {
+                const title = card.dataset.title.toLowerCase();
+                card.style.display = title.includes(input) ? "block" : "none";
+            });
+        }
+    </script>
+
+</body>
+</html>

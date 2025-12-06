@@ -1,0 +1,173 @@
+{% extends "admin/layout_admin.html" %}
+
+{% block title %}Data Artikel - WAYANUSA Admin{% endblock %}
+
+{% block content %}
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">
+                    <i class="fas fa-newspaper mr-2"></i>
+                    Data Artikel
+                </h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url_for('web.admin_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Data Artikel</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list mr-2"></i>
+                            Daftar Artikel
+                        </h3>
+                        <div class="card-tools">
+                            <a href="{{ url_for('web.article_add') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Tambah Artikel Baru
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th style="width: 80px;">Thumbnail</th>
+                                    <th>Judul Artikel</th>
+                                    <th>Konten</th>
+                                    <th>Source Link</th>
+                                    <th>Status</th>
+                                    <th>Dibuat</th>
+                                    <th style="width: 200px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for article in articles %}
+                                <tr>
+                                    <td>{{ article.id }}</td>
+                                    <td>
+                                        {% if article.thumbnail %}
+                                            <img src="{{ url_for('web.uploaded_thumbnail', filename=article.thumbnail) }}" 
+                                                 alt="Thumbnail {{ article.title }}" 
+                                                 class="img-circle elevation-2" 
+                                                 width="60" height="60"
+                                                 style="object-fit: cover;">
+                                        {% else %}
+                                            <div class="text-center">
+                                                <i class="fas fa-image text-secondary" style="font-size: 40px;"></i>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                    <td><strong>{{ article.title }}</strong></td>
+
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ article.content[:100] }}{% if article.content|length > 100 %}...{% endif %}
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        {% if article.source_link %}
+                                            <a href="{{ article.source_link }}" target="_blank" class="text-primary">
+                                                <i class="fas fa-external-link-alt"></i> Link
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if article.approved %}
+                                            <span class="badge badge-success">Disetujui</span>
+                                        {% else %}
+                                            <span class="badge badge-warning">Menunggu</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ article.created_at.strftime('%d/%m/%Y %H:%M') }}
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        <div class="btn-group" role="group">
+
+                                            {% if not article.approved %}
+                                            <a href="{{ url_for('web.article_approve', id=article.id) }}"
+                                               class="btn btn-success btn-sm"
+                                               title="Setujui">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+
+                                            <a href="{{ url_for('web.article_reject', id=article.id) }}"
+                                               class="btn btn-danger btn-sm"
+                                               title="Tolak"
+                                               onclick='return confirm("Yakin ingin menolak artikel {{ article.title }}?")'>
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                            {% endif %}
+
+                                            <a href="{{ url_for('web.article_edit', id=article.id) }}"
+                                               class="btn btn-warning btn-sm"
+                                               title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <a href="{{ url_for('web.article_delete', id=article.id) }}"
+                                               class="btn btn-danger btn-sm"
+                                               title="Hapus"
+                                               onclick='return confirm("Yakin ingin menghapus artikel {{ article.title }}?")'>
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                                {% if not articles %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <i class="fas fa-newspaper text-muted" style="font-size: 48px;"></i>
+                                        <p class="mt-2 text-muted">Belum ada artikel yang dibuat</p>
+                                        <a href="{{ url_for('web.article_add') }}" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Tambah Artikel Pertama
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if articles %}
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-5">
+                                <div class="dataTables_info" role="status" aria-live="polite">
+                                    Menampilkan {{ articles|length }} artikel
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

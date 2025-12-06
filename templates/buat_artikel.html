@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Artikel - WAYANUSA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-logo">
+                    <a href="/" class="logo-link">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
+                    </a>
+                </div>
+                <div class="navbar-menu">
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
+                        <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
+                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                        <li><a href="{{ url_for('web.artikel') }}">Artikel</a></li>
+                        <li><a href="{{ url_for('web.create_article') }}" class="active">Buat Artikel</a></li>
+                    </ul>
+                </div>
+                <div class="navbar-actions">
+                    {% if session.get('user_logged_in') %}
+                        <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
+                        <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="create-article-section">
+            <div class="section-header">
+                <p class="section-tag">✍️ BUAT ARTIKEL</p>
+                <h1 class="section-title">Bagikan <span class="highlight">Pengetahuan</span> Wayang Anda</h1>
+                <p class="section-description">
+                    Tulis artikel tentang budaya wayang, cerita tokoh, atau pengalaman Anda. Berkontribusi untuk melestarikan budaya nusantara!
+                </p>
+            </div>
+
+            <div class="article-form-container">
+                <form action="{{ url_for('web.create_article') }}" method="post" enctype="multipart/form-data" class="article-form">
+                    <div class="form-group">
+                        <label for="title" class="form-label">
+                            <i class="fas fa-heading"></i> Judul Artikel *
+                        </label>
+                        <input type="text" id="title" name="title" class="form-input" placeholder="Masukkan judul artikel yang menarik..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content" class="form-label">
+                            <i class="fas fa-edit"></i> Isi Artikel *
+                        </label>
+                        <textarea id="content" name="content" class="form-textarea" rows="15" placeholder="Tulis isi artikel Anda di sini... Gunakan paragraf yang jelas dan informatif." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="source_link" class="form-label">
+                            <i class="fas fa-link"></i> Link Sumber (Opsional)
+                        </label>
+                        <input type="url" id="source_link" name="source_link" class="form-input" placeholder="https://contoh-link-sumber.com">
+                        <small class="form-help">Tambahkan link ke sumber artikel asli jika ada</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="thumbnail" class="form-label">
+                            <i class="fas fa-image"></i> Thumbnail Artikel (Opsional)
+                        </label>
+                        <div class="file-upload-area">
+                            <input type="file" id="thumbnail" name="thumbnail" class="file-input" accept="image/*">
+                            <div class="file-upload-content">
+                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                <p>Klik untuk memilih gambar atau seret ke sini</p>
+                                <small>Format: JPG, PNG, JPEG | Maksimal: 2MB</small>
+                            </div>
+                        </div>
+                        <div id="image-preview" class="image-preview" style="display: none;">
+                            <img id="preview-img" src="" alt="Preview" class="preview-image">
+                            <button type="button" id="remove-image" class="remove-image-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-paper-plane"></i> Publikasikan Artikel
+                        </button>
+                        <a href="{{ url_for('web.artikel') }}" class="btn-cancel">
+                            <i class="fas fa-times"></i> Batal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        .create-article-section {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-tag {
+            color: #ffd700;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .section-title .highlight {
+            color: #ffd700;
+        }
+
+        .section-description {
+            color: #ccc;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .article-form-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 40px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .article-form {
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            display: block;
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .form-label i {
+            margin-right: 8px;
+            color: #ffd700;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: #aaa;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 200px;
+            line-height: 1.6;
+        }
+
+        .form-help {
+            display: block;
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .file-upload-area {
+            position: relative;
+            border: 2px dashed rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .file-upload-content p {
+            color: #fff;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .file-upload-content small {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .image-preview {
+            margin-top: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .btn-submit, .btn-cancel {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            color: #000;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .article-form-container {
+                padding: 30px 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-submit, .btn-cancel {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('thumbnail');
+            const imagePreview = document.getElementById('image-preview');
+            const previewImg = document.getElementById('preview-img');
+            const removeBtn = document.getElementById('remove-image');
+            const fileUploadArea = document.querySelector('.file-upload-area');
+
+            // Handle file selection
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Format file harus JPG, JPEG, atau PNG!');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    // Validate file size (2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('Ukuran file maksimal 2MB!');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    // Show preview
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                        fileUploadArea.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Handle drag and drop
+            fileUploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                fileUploadArea.style.borderColor = '#ffd700';
+                fileUploadArea.style.background = 'rgba(255, 215, 0, 0.1)';
+            });
+
+            fileUploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                fileUploadArea.style.borderColor = 'rgba(255, 215, 0, 0.3)';
+                fileUploadArea.style.background = 'rgba(255, 255, 255, 0.05)';
+            });
+
+            fileUploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                fileUploadArea.style.borderColor = 'rgba(255, 215, 0, 0.3)';
+                fileUploadArea.style.background = 'rgba(255, 255, 255, 0.05)';
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    fileInput.dispatchEvent(new Event('change'));
+                }
+            });
+
+            // Remove image
+            removeBtn.addEventListener('click', function() {
+                fileInput.value = '';
+                imagePreview.style.display = 'none';
+                fileUploadArea.style.display = 'block';
+            });
+
+            // Form validation
+            const form = document.querySelector('.article-form');
+            form.addEventListener('submit', function(e) {
+                const title = document.getElementById('title').value.trim();
+                const content = document.getElementById('content').value.trim();
+
+                if (!title) {
+                    alert('Judul artikel wajib diisi!');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (!content) {
+                    alert('Isi artikel wajib diisi!');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (content.length < 50) {
+                    alert('Isi artikel minimal 50 karakter!');
+                    e.preventDefault();
+                    return;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
