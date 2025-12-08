@@ -10,31 +10,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <div class="navbar-content">
-                <div class="navbar-logo">
-                    <a href="{{ url_for('web.home') }}" class="logo-link">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
-                    </a>
-                </div>
-                <div class="navbar-menu">
-                    <ul class="nav-links">
-                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
-                        <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
-                        <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
-                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
-                        <li><a href="{{ url_for('web.artikel') }}" class="active">Artikel</a></li>
-                    </ul>
-                </div>
-                <div class="navbar-actions">
-                    <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-
+    
+    {% include "partials/navbar.html" %}
 
     <section class="features">
         <div class="container">
