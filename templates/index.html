@@ -19,41 +19,7 @@
 
 <body>
 
-    <!-- ================= NAVBAR ================= -->
-    <nav class="navbar">
-        <div class="container">
-            <div class="navbar-content">
-
-                <!-- Logo -->
-                <div class="navbar-logo">
-                    <a href="/" class="logo-link">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
-                    </a>
-                </div>
-
-                <!-- Menu -->
-                <div class="navbar-menu">
-                    <ul class="nav-links">
-                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
-                        <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
-                        <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
-                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
-                    </ul>
-                </div>
-
-                <!-- Login / User -->
-                <div class="navbar-actions">
-                    {% if session.get('user_logged_in') %}
-                        <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
-                        <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
-                    {% else %}
-                        <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
-                    {% endif %}
-                </div>
-
-            </div>
-        </div>
-    </nav>
+    {% include "partials/navbar.html" %}
 
     <main class="hero">
         <div class="container">
@@ -116,7 +82,7 @@
                 <div class="features-grid">
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_ai.jpg') }}"
+                            <img src="{{ url_for('static', filename='images/PengenalanWayang.jpeg') }}"
                                 onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Pengenalan+Wayang'"
                                 alt="Pengenalan Wayang">
                         </div>
@@ -131,7 +97,7 @@
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_quiz.jpg') }}"
+                            <img src="{{ url_for('static', filename='images/Quiz.jpeg') }}"
                                 onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Kuis+Edukatif'"
                                 alt="Kuis Edukatif">
                         </div>
@@ -146,7 +112,7 @@
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_dalang.jpg') }}"
+                            <img src="{{ url_for('static', filename='images/MencariDalang.jpeg') }}"
                                 onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Mencari+Dalang'"
                                 alt="Mencari Dalang">
                         </div>
