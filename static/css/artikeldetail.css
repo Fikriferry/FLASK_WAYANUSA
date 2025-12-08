@@ -83,16 +83,29 @@
     box-shadow: 0 15px 40px rgba(212, 175, 55, 0.3);
 }
 
+/* ===========================================================
+   ALL ARTICLE TEXT WHITE
+   =========================================================== */
 .article-content {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     padding: 40px;
     line-height: 1.8;
     font-size: 18px;
-    color: #e0e0e0;
+    color: #ffffff; /* MAIN TEXT WHITE */
     margin-bottom: 30px;
     border: 1px solid rgba(212, 175, 55, 0.1);
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.article-content p,
+.article-content span,
+.article-content li,
+.article-content ul,
+.article-content ol,
+.article-content strong,
+.article-content em {
+    color: #ffffff; /* FULL WHITE */
 }
 
 .article-content h1,
@@ -108,10 +121,6 @@
     font-weight: 600;
 }
 
-.article-content p {
-    margin-bottom: 20px;
-}
-
 .article-content img {
     max-width: 100%;
     height: auto;
@@ -124,7 +133,7 @@
     padding-left: 20px;
     margin: 20px 0;
     font-style: italic;
-    color: #ccc;
+    color: #ffffff; /* WHITE QUOTE */
 }
 
 .article-source {

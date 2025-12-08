@@ -3,7 +3,6 @@
 {% block title %}Artikel - WAYANUSA Admin{% endblock %}
 
 {% block content %}
-<!-- Content Header (Page header) -->
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -23,16 +22,15 @@
     </div>
 </div>
 
-<!-- Main content -->
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
+
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <i class="fas fa-list mr-2"></i>
-                            Daftar Artikel
+                            <i class="fas fa-list mr-2"></i> Daftar Artikel
                         </h3>
                         <div class="card-tools">
                             <a href="{{ url_for('web.artikel_add') }}" class="btn btn-primary btn-sm">
@@ -40,6 +38,7 @@
                             </a>
                         </div>
                     </div>
+
                     <div class="card-body table-responsive p-0">
                         <table class="table table-hover text-nowrap">
                             <thead>
@@ -51,40 +50,45 @@
                                     <th style="width: 150px;">Aksi</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 {% for artikel in artikels %}
                                 <tr>
                                     <td>{{ artikel.id }}</td>
                                     <td>
                                         {% if artikel.thumbnail %}
-                                            <!-- <img src="{{ url_for('web.uploaded_file', filename='thumbnails/' + artikel.thumbnail) }}" alt="Thumbnail {{ artikel.title }}" class="img-circle elevation-2" width="80" height="80" style="object-fit: cover;"> -->
-                                             <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}"
-                                                    alt="Thumbnail {{ artikel.title }}"
-                                                    class="img-circle elevation-2"
-                                                    width="80" height="80"
-                                                    style="object-fit: cover;">
+                                            <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}"
+                                                 alt="Thumbnail {{ artikel.title }}"
+                                                 class="img-circle elevation-2"
+                                                 width="80" height="80"
+                                                 style="object-fit: cover;">
                                         {% else %}
                                             <div class="text-center">
                                                 <i class="fas fa-image text-secondary" style="font-size: 50px;"></i>
                                             </div>
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <strong>{{ artikel.title }}</strong>
-                                    </td>
+
+                                    <td><strong>{{ artikel.title }}</strong></td>
                                     <td>{{ artikel.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+
                                     <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ url_for('web.artikel_edit', id=artikel.id) }}" class="btn btn-warning btn-sm" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="{{ url_for('web.artikel_delete', id=artikel.id) }}" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Yakin ingin menghapus artikel {{ artikel.title }}?')">
+
+                                            <a href="{{ url_for('web.artikel_delete', id=artikel.id) }}"
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Yakin ingin menghapus artikel {{ artikel.title }}?')"
+                                               title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
+
                                 {% if not artikels %}
                                 <tr>
                                     <td colspan="5" class="text-center py-4">
@@ -99,18 +103,14 @@
                             </tbody>
                         </table>
                     </div>
+
                     {% if artikels %}
                     <div class="card-footer">
-                        <div class="row">
-                            <div class="col-sm-12 col-md-5">
-                                <div class="dataTables_info" role="status" aria-live="polite">
-                                    Menampilkan {{ artikels|length }} artikel
-                                </div>
-                            </div>
-                        </div>
+                        <div class="dataTables_info">Menampilkan {{ artikels|length }} artikel</div>
                     </div>
                     {% endif %}
                 </div>
+
             </div>
         </div>
     </div>
