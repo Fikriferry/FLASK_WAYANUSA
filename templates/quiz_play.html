@@ -9,11 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz_play.css') }}">
 </head>
-<body>
+<body data-user-id="{{ session.user_id }}">
     <div class="quiz-container">
         <!-- Header -->
         <header class="quiz-header">
-            <h1 class="level-title">Level Beginner</h1>
+            <h1 class="level-title">{{ level.name }}</h1>
         </header>
 
         <!-- Progress and Timer -->
@@ -24,18 +24,18 @@
 
         <!-- Question Section -->
         <div class="question-section">
-            <div class="question-card">
-                <h2 id="question-text">Siapakah tokoh utama dalam cerita Ramayana?</h2>
-            </div>
+        <div class="question-card">
+            <h2 id="question-text"></h2> <!-- Kosong saja -->
+        </div>
 
-            <div class="answers-grid">
-                <button class="answer-btn" data-answer="A">A. Rama</button>
-                <button class="answer-btn" data-answer="B">B. Arjuna</button>
-                <button class="answer-btn" data-answer="C">C. Yudhistira</button>
-                <button class="answer-btn" data-answer="D">D. Bima</button>
-            </div>
+        <div class="answers-grid">
+            <button class="answer-btn" data-answer="A"></button>
+            <button class="answer-btn" data-answer="B"></button>
+            <button class="answer-btn" data-answer="C"></button>
+            <button class="answer-btn" data-answer="D"></button>
         </div>
     </div>
+
 
     <!-- Popup Modal -->
     <div id="result-modal" class="modal-overlay">
