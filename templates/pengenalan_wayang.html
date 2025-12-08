@@ -5,474 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengenalan Wayang - WAYANUSA</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        /* --- GLOBAL & BACKGROUND --- */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #121212;
-        }
-
-        .wayang-recognition {
-            min-height: 100vh;
-            background: radial-gradient(circle at top right, #3d2b1f 0%, #1a1a1a 40%, #000000 100%);
-            padding: 40px 0;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* --- CONTAINER UTAMA --- */
-        .recognition-wrapper {
-            width: 100%;
-            max-width: 900px;
-            padding: 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* --- HEADER SECTION --- */
-        .recognition-header {
-            text-align: center;
-            margin-bottom: 40px;
-            position: relative;
-        }
-
-        .back-btn-wrapper {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .back-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #D4A373;
-            border: 1px solid rgba(212, 163, 115, 0.3);
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .back-btn:hover {
-            background: #D4A373;
-            color: #fff;
-            transform: scale(1.1);
-        }
-
-        .recognition-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            background: linear-gradient(to right, #D4A373, #F3E5AB, #D4A373);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        /* --- MAIN CARD --- */
-        .recognition-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(212, 163, 115, 0.3);
-            position: relative;
-            overflow: hidden;
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Hiasan Batik Halus di Header Card */
-        .recognition-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, #6B4226, #D4A373, #6B4226);
-        }
-
-        /* --- PROGRESS BAR --- */
-        .progress-indicator {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 40px;
-            position: relative;
-        }
-
-        .progress-step {
-            z-index: 2;
-        }
-
-        .step-circle {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #f0f0f0;
-            color: #999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid #e0e0e0;
-        }
-
-        .step-circle.active {
-            background: #D4A373;
-            color: white;
-            border-color: #D4A373;
-            box-shadow: 0 0 15px rgba(212, 163, 115, 0.5);
-            transform: scale(1.1);
-        }
-
-        .step-circle.completed {
-            background: #6B4226;
-            color: white;
-            border-color: #6B4226;
-        }
-
-        .step-line {
-            width: 60px;
-            height: 3px;
-            background: #e0e0e0;
-            margin: 0 5px;
-            transition: all 0.4s ease;
-            border-radius: 2px;
-        }
-
-        .step-line.active,
-        .step-line.completed {
-            background: linear-gradient(90deg, #6B4226, #D4A373);
-        }
-
-        /* --- STAGE CONTENT AREA --- */
-        .stage-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
-
-        /* --- STAGE 1: SELECTION CARDS --- */
-        .selection-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .selection-card {
-            background: #fff;
-            border: 2px solid #f0f0f0;
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .selection-card:hover {
-            border-color: #D4A373;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(212, 163, 115, 0.2);
-        }
-
-        .selection-icon {
-            font-size: 3rem;
-            color: #6B4226;
-            margin-bottom: 15px;
-        }
-
-        .selection-title {
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 5px;
-            font-size: 1.1rem;
-        }
-
-        .selection-desc {
-            font-size: 0.85rem;
-            color: #777;
-        }
-
-        /* --- STAGE 2: CAMERA UI --- */
-        .camera-frame {
-            width: 100%;
-            max-width: 450px;
-            height: 350px;
-            background: #000;
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-            border: 4px solid #333;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Scanner Animation */
-        .scanner-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #00ff00;
-            box-shadow: 0 0 10px #00ff00;
-            animation: scan 2s linear infinite;
-            z-index: 5;
-        }
-
-        .camera-overlay {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            z-index: 10;
-        }
-
-        .shutter-btn {
-            width: 60px;
-            height: 60px;
-            background: white;
-            border-radius: 50%;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .shutter-btn:active {
-            transform: scale(0.9);
-            background: #ddd;
-        }
-
-        /* --- STAGE 3: UPLOAD UI --- */
-        .upload-zone {
-            width: 100%;
-            max-width: 500px;
-            height: 300px;
-            border: 3px dashed #D4A373;
-            border-radius: 20px;
-            background: #FBEDE3;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .upload-zone:hover {
-            background: #F5DEC9;
-            transform: scale(1.02);
-        }
-
-        /* --- PREVIEW IMAGE --- */
-        .preview-container {
-            position: relative;
-            padding: 10px;
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            transform: rotate(-2deg);
-            /* Artistic tilt */
-        }
-
-        .image-preview {
-            max-width: 300px;
-            max-height: 300px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 1px solid #ddd;
-        }
-
-        /* --- STAGE 4: RESULT --- */
-        .result-layout {
-            display: flex;
-            flex-direction: row;
-            gap: 30px;
-            text-align: left;
-            width: 100%;
-            align-items: flex-start;
-        }
-
-        .result-img-wrapper {
-            flex: 0 0 150px;
-        }
-
-        .result-img {
-            width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            border: 3px solid #D4A373;
-        }
-
-        .result-info {
-            flex: 1;
-        }
-
-        .confidence-badge {
-            display: inline-block;
-            background: #e6f4ea;
-            color: #1e8e3e;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .wayang-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            color: #6B4226;
-            margin: 0 0 15px 0;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
-        }
-
-        .wayang-desc {
-            font-size: 0.95rem;
-            line-height: 1.7;
-            color: #555;
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #D4A373;
-        }
-
-        /* --- BUTTONS --- */
-        .action-btn {
-            padding: 12px 30px;
-            border-radius: 30px;
-            border: none;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #D4A373 0%, #B88656 100%);
-            color: white;
-            box-shadow: 0 5px 15px rgba(212, 163, 115, 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(212, 163, 115, 0.6);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #666;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        /* --- ANIMATIONS --- */
-        @keyframes scan {
-            0% {
-                top: 0;
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 1;
-            }
-
-            100% {
-                top: 100%;
-                opacity: 0;
-            }
-        }
-
-        .fade-in-up {
-            animation: fadeInUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* --- RESPONSIVE --- */
-        @media (max-width: 768px) {
-            .selection-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .result-layout {
-                flex-direction: column;
-                text-align: center;
-                align-items: center;
-            }
-
-            .result-img-wrapper {
-                width: 150px;
-                margin-bottom: 20px;
-            }
-
-            .wayang-desc {
-                text-align: left;
-            }
-
-            .step-line {
-                width: 30px;
-            }
-
-            .recognition-title {
-                font-size: 1.8rem;
-            }
-
-            .back-btn-wrapper {
-                position: static;
-                margin-bottom: 20px;
-                display: flex;
-                justify-content: center;
-                transform: none;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -481,17 +21,15 @@
             <div class="navbar-content">
                 <div class="navbar-logo">
                     <a href="{{ url_for('web.home') }}" class="logo-link">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo"
-                            class="logo-image">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
                     </a>
                 </div>
                 <div class="navbar-menu">
                     <ul class="nav-links">
-                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('web.pengenalan_wayang') }}" class="active">Pengenalan Wayang</a></li>
                         <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
                         <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
                         <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
-                        <li><a href="{{ url_for('web.artikel') }}" class="active">Artikel</a></li>
                     </ul>
                 </div>
                 <div class="navbar-actions">
@@ -516,36 +54,25 @@
                     </button>
                 </div>
                 <h1 class="recognition-title">Identifikasi Wayang AI</h1>
-                <p style="color: #bbb; margin-top: 10px;">Gunakan teknologi AI untuk mengenali tokoh wayang favoritmu
-                </p>
+                <p style="color: #bbb; margin-top: 10px;">Gunakan teknologi AI untuk mengenali tokoh wayang favoritmu</p>
             </div>
 
             <div class="recognition-card" id="recognitionCard">
                 <div class="progress-indicator">
-                    <div class="progress-step">
-                        <div class="step-circle" id="step1">1</div>
-                    </div>
+                    <div class="progress-step"><div class="step-circle" id="step1">1</div></div>
                     <div class="step-line" id="line1"></div>
 
-                    <div class="progress-step">
-                        <div class="step-circle" id="step2">2</div>
-                    </div>
+                    <div class="progress-step"><div class="step-circle" id="step2">2</div></div>
                     <div class="step-line" id="line2"></div>
 
-                    <div class="progress-step">
-                        <div class="step-circle" id="step3">3</div>
-                    </div>
+                    <div class="progress-step"><div class="step-circle" id="step3">3</div></div>
                     <div class="step-line" id="line3"></div>
 
-                    <div class="progress-step">
-                        <div class="step-circle" id="step4">4</div>
-                    </div>
+                    <div class="progress-step"><div class="step-circle" id="step4">4</div></div>
                 </div>
 
                 <div class="stage-content" id="stageContent">
-
-                    <div id="stage1" class="fade-in-up"
-                        style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                    <div id="stage1" class="fade-in-up" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                         <h3 style="margin-bottom: 30px; color: #6B4226;">Pilih Metode Pengambilan Gambar</h3>
                         <div class="selection-grid">
                             <div class="selection-card" onclick="selectMethod('camera')">
@@ -560,7 +87,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -606,22 +132,21 @@
         // --- 3. PILIH METODE & UPDATE UI ---
         function selectMethod(method) {
             // Cek Login Session (Template Jinja)
-            const isLoggedIn = {{ session.get('user_logged_in', False) | tojson
-        }};
-        if (!isLoggedIn) {
-            alert('Silakan login terlebih dahulu untuk menggunakan fitur ini.');
-            window.location.href = "{{ url_for('web.login_user') }}";
-            return;
-        }
+            const isLoggedIn = {{ session.get('user_logged_in', False)|tojson }};
+            if (!isLoggedIn) {
+                alert('Silakan login terlebih dahulu untuk menggunakan fitur ini.');
+                window.location.href = "{{ url_for('web.login_user') }}";
+                return;
+            }
 
-        selectedMethod = method;
-        selectedFile = null;
+            selectedMethod = method;
+            selectedFile = null;
 
-        if (selectedMethod === 'camera') {
-            showStage2();
-        } else if (selectedMethod === 'upload') {
-            showStage3();
-        }
+            if (selectedMethod === 'camera') {
+                showStage2();
+            } else if (selectedMethod === 'upload') {
+                showStage3();
+            }
         }
 
         function updateProgress(stage) {
@@ -675,59 +200,42 @@
                 });
         }
 
-        // --- STAGE 3: UPLOAD UI ---
-        // --- REVISI: STAGE 3 (FIX BUG UPLOAD) ---
+        // --- STAGE 3: UPLOAD UI (FIXED) ---
         function showStage3() {
             updateProgress(3);
-
             const stageContent = document.getElementById('stageContent');
-
-            // PERBAIKAN:
-            // 1. Mengganti <div> menjadi <label>
-            // 2. Menambahkan atribut 'for="fileInput"'
-            // 3. Menghapus 'onclick="..."' karena <label> otomatis memicu input di dalamnya
-
             stageContent.innerHTML = `
                 <div class="fade-in-up" style="width:100%; display:flex; flex-direction:column; align-items:center;">
-                    
                     <label class="upload-zone" for="fileInput">
                         <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                         <div class="upload-text">Klik untuk Upload Foto</div>
                         <div class="upload-subtext">JPG, PNG (Max 5MB)</div>
-                        
                         <input type="file" id="fileInput" class="file-input" accept="image/*" 
                                onclick="this.value=null" 
                                onchange="handleFileUpload(event)">
                     </label>
-
                     <button onclick="resetToStage1()" class="action-btn btn-secondary" style="margin-top:20px;">Kembali</button>
                 </div>
             `;
         }
 
-        // --- REVISI: HANDLE FILE (LEBIH AMAN) ---
+        // --- HANDLE FILE ---
         function handleFileUpload(event) {
-            // Cek apakah ada file yang dipilih
             if (event.target.files && event.target.files.length > 0) {
                 const file = event.target.files[0];
-
-                // Validasi tipe file (Opsional tapi disarankan)
                 if (!file.type.startsWith('image/')) {
                     alert('Mohon upload file gambar (JPG/PNG).');
                     return;
                 }
-
                 selectedFile = file;
                 previewUrl = URL.createObjectURL(file);
-
-                // Langsung lanjut ke preview
                 showPreviewStage();
             }
         }
 
         // --- PREVIEW / CONFIRMATION ---
         function showPreviewStage() {
-            updateProgress(3); // Dianggap tahap konfirmasi
+            updateProgress(3);
             const stageContent = document.getElementById('stageContent');
             stageContent.innerHTML = `
                 <div class="fade-in-up" style="display:flex; flex-direction:column; align-items:center;">
@@ -829,11 +337,6 @@
                 </div>
             `;
         }
-
-        // Add Spin Animation
-        const style = document.createElement('style');
-        style.textContent = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
-        document.head.appendChild(style);
     </script>
 </body>
 
