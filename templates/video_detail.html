@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ video.judul }} - WayangNusa</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/video.css') }}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+
+                <!-- Logo -->
+                <div class="navbar-logoo">
+                    <a href="/" class="logo-link">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo"
+                            class="logo-image">
+                    </a>
+                </div>
+
+                <!-- Search -->
+                <div class="nav-center">
+                    <form action="{{ url_for('web.search_video') }}" method="GET" class="search-box">
+                        <input type="text" name="q" placeholder="Cari video wayang..." required>
+                        <button type="submit" class="search-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#e2e2e2"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M10 2a8 8 0 015.292 13.708l4 4a1 1 0 01-1.414 1.414l-4-4A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+
+                <!-- Login / User -->
+                <div class="navbar-actions">
+                    {% if session.get('user_logged_in') %}
+                    <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
+                    <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
+                    {% else %}
+                    <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+
+
+    <div class="page-wrapper">
+
+        <!-- LEFT SECTION -->
+        <div class="left-section">
+
+            <div class="video-player">
+                <iframe
+                    src="https://www.youtube.com/embed/{{ video.youtube_id }}?autoplay=1&controls=1&modestbranding=1&rel=0"
+                    allowfullscreen>
+                </iframe>
+            </div>
+
+            <h2 class="video-title">{{ video.judul }}</h2>
+
+            <div class="video-info">
+                <div class="video-description">
+                    {{ video.deskripsi if video.deskripsi else 'Tidak ada deskripsi untuk video ini.' }}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT SECTION (RELATED VIDEOS) -->
+        <div class="right-section">
+            <div class="related-title">Video Lainnya</div>
+
+            {% if related_videos %}
+            {% for v in related_videos %}
+            <a href="{{ url_for('web.video_detail', youtube_id=v.youtube_id) }}" style="text-decoration:none;">
+                <div class="related-item">
+                    <img class="related-thumbnail" src="https://img.youtube.com/vi/{{ v.youtube_id }}/mqdefault.jpg"
+                        alt="thumbnail">
+
+                    <div class="related-info">
+                        <div class="title">{{ v.judul }}</div>
+                        <div class="duration">Lihat Selengkapnya</div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+            {% else %}
+            <p>Tidak ada video lainnya.</p>
+            {% endif %}
+
+        </div>
+    </div>
+
+</body>
+
+</html>

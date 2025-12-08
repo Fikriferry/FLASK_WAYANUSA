@@ -4,20 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mengenal Budaya Wayang Kulit Mahabarata</title>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
+
+    <!-- ================= NAVBAR ================= -->
     <nav class="navbar">
         <div class="container">
             <div class="navbar-content">
+
+                <!-- Logo -->
                 <div class="navbar-logo">
                     <a href="/" class="logo-link">
                         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
                     </a>
                 </div>
+
+                <!-- Menu -->
                 <div class="navbar-menu">
                     <ul class="nav-links">
                         <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
@@ -26,6 +37,8 @@
                         <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
                     </ul>
                 </div>
+
+                <!-- Login / User -->
                 <div class="navbar-actions">
                     {% if session.get('user_logged_in') %}
                         <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
@@ -34,41 +47,60 @@
                         <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
                     {% endif %}
                 </div>
+
             </div>
         </div>
     </nav>
+
+    <!-- ================= HERO ================= -->
     <main class="hero">
         <div class="container">
             <div class="hero-content">
+
+                <!-- Text -->
                 <div class="hero-text">
                     <p class="hero-tag">✨ Melestarikan Budaya Nusantara</p>
+
                     <h1 class="hero-title">
-                        Mengenal Budaya <span class="highlight">Wayang Kulit</span> Mahabarata <span class="highlight"></span>
+                        Mengenal Budaya <span class="highlight">Wayang Kulit</span> Mahabarata
                     </h1>
+
                     <p class="hero-description">
                         Belajar, bermain, dan melestarikan budaya Indonesia melalui pengalaman digital interaktif yang menawan dan penuh makna.
                     </p>
+
                     <div class="hero-buttons">
                         <a href="#" class="btn btn-primary">⬇ Unduh Sekarang</a>
                         <a href="#" class="btn btn-secondary">Pelajari Lebih Lanjut →</a>
                     </div>
                 </div>
+
+                <!-- Image -->
                 <div class="hero-image">
-                    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Siluet Wayang Kulit" class="wayang-image">
+                    <img src="{{ url_for('static', filename='images/banner.jpg') }}"
+                         alt="Siluet Wayang Kulit"
+                         class="wayang-image">
                 </div>
+
             </div>
         </div>
     </main>
 
-    <!-- About Section -->
+    <!-- ================= ABOUT SECTION ================= -->
     <section class="about">
         <div class="container">
             <div class="about-content">
+
                 <p class="about-tag">TENTANG WAYANUSA</p>
-                <h2 class="about-title">Cara Baru Mengenal <span class="highlight">Budaya Wayang</span></h2>
+
+                <h2 class="about-title">
+                    Cara Baru Mengenal <span class="highlight">Budaya Wayang</span>
+                </h2>
+
                 <p class="about-description">
-                    WAYANUSA adalah aplikasi edukatif berbasis mobile yang menghadirkan cara baru untuk mengenal budaya wayang kulit. Melalui fitur pengenalan wayang, kuis interaktif, pencarian dalang, hingga simulasi menjadi dalang, WAYANUSA berkomitmen melestarikan budaya nusantara di era digital.
+                    WAYANUSA adalah aplikasi edukatif berbasis mobile yang menghadirkan cara baru untuk mengenal budaya wayang kulit.
                 </p>
+
                 <div class="stats">
                     <div class="stat-card">
                         <div class="stat-number">6+</div>
@@ -83,79 +115,104 @@
                         <div class="stat-label">Video Edukatif</div>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- ================= FEATURES ================= -->
     <section class="features">
         <div class="container">
             <div class="features-content">
+
                 <p class="features-tag">FITUR UTAMA</p>
-                <h2 class="features-title">Eksplorasi Budaya Wayang dengan <span class="highlight">Teknologi Modern</span></h2>
+
+                <h2 class="features-title">
+                    Eksplorasi Budaya Wayang dengan <span class="highlight">Teknologi Modern</span>
+                </h2>
+
                 <p class="features-description">
-                    Setiap fitur dirancang dengan tujuan edukatif untuk melestarikan dan mempertemukan kekayaan budaya Indonesia.
+                    Setiap fitur dirancang untuk memberikan pengalaman edukatif terbaik.
                 </p>
+
                 <div class="features-grid">
+
+                    <!-- Feature 1 -->
                     <div class="feature-card">
                         <div class="feature-image">
                             <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Pengenalan+Wayang" alt="Pengenalan Wayang">
                         </div>
+
                         <div class="feature-content">
                             <h3 class="feature-title">Pengenalan Wayang</h3>
                             <div class="feature-badge">🤖 AI Image Recognition</div>
+
                             <p class="feature-description">
-                                Menggunakan teknologi AI untuk mengenali tokoh wayang dari foto atau kamera pengguna.
+                                Mengenali tokoh wayang dari foto atau kamera.
                             </p>
+
                             <div class="feature-details">
-                                <p><strong>Tujuan:</strong> Mempermudah pengguna mempelajari nama, sifat, dan kisah di balik setiap karakter wayang.</p>
-                                <p><strong>Nilai Edukatif:</strong> Menumbuhkan rasa ingin tahu dan apresiasi terhadap seni dan filsafat wayang.</p>
+                                <p><strong>Tujuan:</strong> Mempermudah mempelajari karakter wayang.</p>
+                                <p><strong>Nilai Edukatif:</strong> Menumbuhkan apresiasi seni wayang.</p>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Feature 2 -->
                     <div class="feature-card">
                         <div class="feature-image">
                             <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Kuis+Edukatif" alt="Kuis Edukatif">
                         </div>
+
                         <div class="feature-content">
                             <h3 class="feature-title">Kuis Edukatif</h3>
                             <div class="feature-badge">🎮 Gamifikasi Pembelajaran</div>
+
                             <p class="feature-description">
-                                Mini game berbentuk kuis tentang cerita, filsafat, dan karakter wayang dengan sistem poin dan badge.
+                                Mini game berbentuk kuis dengan sistem poin dan badge.
                             </p>
+
                             <div class="feature-details">
-                                <p><strong>Tujuan:</strong> Membuat proses belajar budaya menjadi seru dan kompetitif.</p>
-                                <p><strong>Nilai Edukatif:</strong> Mengasah ingatan dan menambah wawasan budaya Jawa dengan cara menyenangkan.</p>
+                                <p><strong>Tujuan:</strong> Belajar budaya jadi seru.</p>
+                                <p><strong>Nilai Edukatif:</strong> Menambah wawasan budaya Jawa.</p>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Feature 3 (+ Dalang List) -->
                     <div class="feature-card">
                         <div class="feature-image">
                             <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Mencari+Dalang" alt="Mencari Dalang">
                         </div>
+
                         <div class="feature-content">
                             <h3 class="feature-title">Mencari Dalang</h3>
                             <div class="feature-badge">📍 Lokasi Berbasis Komunitas</div>
+
                             <p class="feature-description">
-                                Menampilkan daftar dalang atau sanggar wayang terdekat, lengkap dengan profil dan jadwal pementasan.
+                                Menampilkan daftar dalang atau sanggar wayang terdekat.
                             </p>
+
                             <div class="feature-details">
-                                <p><strong>Tujuan:</strong> Menghubungkan masyarakat dengan pelaku seni tradisional.</p>
-                                <p><strong>Nilai Edukatif:</strong> Mendorong interaksi langsung antara pengguna dan komunitas budaya lokal.</p>
+                                <p><strong>Tujuan:</strong> Menghubungkan masyarakat dengan pelaku seni.</p>
+                                <p><strong>Nilai Edukatif:</strong> Mendukung komunitas budaya lokal.</p>
+
+                                <!-- Embedded Dalang List -->
                                 <div class="dalang-list-section">
                                     <h4>Dalang Tersedia:</h4>
+
                                     {% if dalangs %}
                                         <div class="dalang-grid">
                                             {% for dalang in dalangs %}
                                             <div class="dalang-card">
-                                                {% if dalang.foto %}
-                                                    <img src="{{ url_for('static', filename='uploads/' + dalang.foto) }}" alt="Foto {{ dalang.nama }}" class="dalang-photo">
-                                                {% else %}
-                                                    <img src="https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo" alt="No Photo" class="dalang-photo">
-                                                {% endif %}
+                                                <img src="{{ dalang.foto and url_for('static', filename='uploads/' + dalang.foto) or 'https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo' }}" 
+                                                     alt="Foto {{ dalang.nama }}"
+                                                     class="dalang-photo">
+
                                                 <div class="dalang-info">
                                                     <h4>{{ dalang.nama }}</h4>
                                                     <p><strong>Alamat:</strong> {{ dalang.alamat }}</p>
+
                                                     {% if dalang.latitude and dalang.longitude %}
                                                         <p><strong>Koordinat:</strong> {{ dalang.latitude }}, {{ dalang.longitude }}</p>
                                                     {% endif %}
@@ -163,56 +220,72 @@
                                             </div>
                                             {% endfor %}
                                         </div>
+
                                     {% else %}
                                         <p>Belum ada dalang yang terdaftar.</p>
                                     {% endif %}
                                 </div>
+
                             </div>
                         </div>
                     </div>
+
+                    <!-- Feature 4 -->
                     <div class="feature-card">
                         <div class="feature-image">
                             <img src="https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Simulasi+Dalang" alt="Simulasi Dalang">
                         </div>
+
                         <div class="feature-content">
                             <h3 class="feature-title">Simulasi Dalang</h3>
                             <div class="feature-badge">🎭 Mode Interaktif</div>
+
                             <p class="feature-description">
-                                Memberikan pengalaman pengguna menjadi dalang virtual dengan gerak, suara, dan narasi.
+                                Pengalaman menjadi dalang virtual.
                             </p>
+
                             <div class="feature-details">
-                                <p><strong>Tujuan:</strong> Memberikan pengalaman digital yang imersif.</p>
-                                <p><strong>Nilai Edukatif:</strong> Menanamkan kecintaan terhadap seni pertunjukan tradisional.</p>
+                                <p><strong>Tujuan:</strong> Pengalaman digital imersif.</p>
+                                <p><strong>Nilai Edukatif:</strong> Menumbuhkan kecintaan terhadap seni tradisional.</p>
                             </div>
                         </div>
                     </div>
+
                 </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Dalang List Section -->
+    <!-- ================= DALANG SHOWCASE ================= -->
     <section class="dalang-showcase">
         <div class="container">
             <div class="dalang-showcase-content">
+
                 <p class="dalang-showcase-tag">DALANG TERSEDIA</p>
-                <h2 class="dalang-showcase-title">Temukan <span class="highlight">Dalang</span> Terdekat</h2>
+
+                <h2 class="dalang-showcase-title">
+                    Temukan <span class="highlight">Dalang</span> Terdekat
+                </h2>
+
                 <p class="dalang-showcase-description">
-                    Jelajahi daftar lengkap dalang dan sanggar wayang yang telah terdaftar di platform WAYANUSA. Temukan profil lengkap, lokasi, dan informasi kontak untuk pengalaman budaya yang autentik.
+                    Jelajahi daftar lengkap dalang dan sanggar wayang yang terdaftar di WAYANUSA.
                 </p>
+
                 <div class="dalang-list-section">
+
                     {% if dalangs %}
                         <div class="dalang-grid">
                             {% for dalang in dalangs %}
                             <div class="dalang-card">
-                                {% if dalang.foto %}
-                                    <img src="{{ url_for('static', filename='uploads/' + dalang.foto) }}" alt="Foto {{ dalang.nama }}" class="dalang-photo">
-                                {% else %}
-                                    <img src="https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo" alt="No Photo" class="dalang-photo">
-                                {% endif %}
+                                <img src="{{ dalang.foto and url_for('static', filename='uploads/' + dalang.foto) or 'https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo' }}"
+                                     alt="Foto {{ dalang.nama }}"
+                                     class="dalang-photo">
+
                                 <div class="dalang-info">
                                     <h4>{{ dalang.nama }}</h4>
                                     <p><strong>Alamat:</strong> {{ dalang.alamat }}</p>
+
                                     {% if dalang.latitude and dalang.longitude %}
                                         <p><strong>Koordinat:</strong> {{ dalang.latitude }}, {{ dalang.longitude }}</p>
                                     {% endif %}
@@ -220,38 +293,44 @@
                             </div>
                             {% endfor %}
                         </div>
+
                     {% else %}
                         <p>Belum ada dalang yang terdaftar.</p>
                     {% endif %}
+
                 </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Chatbot Button -->
+    <!-- ================= CHATBOT ================= -->
     <div class="chatbot-button" id="chatbotButton">
         <img src="{{ url_for('static', filename='images/icon_robot.png') }}" alt="Chatbot" class="chatbot-icon">
     </div>
 
-    <!-- Chat Popup -->
     <div class="chat-popup" id="chatPopup">
         <div class="chat-popup-header">
             <h3>Chatbot WAYANUSA</h3>
             <button class="chat-close" id="chatClose">&times;</button>
         </div>
+
         <div class="chat-messages" id="chatMessages">
             <div class="message bot-message">
                 <p>👋 Halo! Ada yang bisa saya bantu?</p>
             </div>
         </div>
+
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="Ketik pesan Anda..." maxlength="500">
             <button id="sendButton">Kirim</button>
         </div>
     </div>
 
+    <!-- ================= SCRIPT ================= -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
             const chatbotButton = document.getElementById('chatbotButton');
             const chatPopup = document.getElementById('chatPopup');
             const chatClose = document.getElementById('chatClose');
@@ -259,37 +338,38 @@
             const sendButton = document.getElementById('sendButton');
             const chatMessages = document.getElementById('chatMessages');
 
-            // Toggle popup saat klik tombol
+            // Toggle popup
             chatbotButton.addEventListener('click', function() {
-                // Check if user is logged in before opening popup
-                if (!{{ session.get('user_logged_in', False)|tojson }}) {
+
+                if (!{{ session.get('user_logged_in', False) | tojson }}) {
                     alert('Silakan login terlebih dahulu untuk menggunakan fitur chatbot.');
                     window.location.href = '{{ url_for("web.login_user") }}';
                     return;
                 }
 
                 chatPopup.classList.toggle('show');
+
                 if (chatPopup.classList.contains('show')) {
                     chatInput.focus();
                 }
             });
 
-            // Tutup popup saat klik tombol close
+            // Close popup
             chatClose.addEventListener('click', function() {
                 chatPopup.classList.remove('show');
             });
 
-            // Tutup popup saat klik di luar popup
+            // Close when clicking outside popup
             document.addEventListener('click', function(event) {
                 if (!chatbotButton.contains(event.target) && !chatPopup.contains(event.target)) {
                     chatPopup.classList.remove('show');
                 }
             });
 
-            // Fungsi untuk mengirim pesan
+            // Send message
             function sendMessage() {
-                // Check if user is logged in before proceeding
-                if (!{{ session.get('user_logged_in', False)|tojson }}) {
+
+                if (!{{ session.get('user_logged_in', False) | tojson }}) {
                     alert('Silakan login terlebih dahulu untuk menggunakan fitur chatbot.');
                     chatPopup.classList.remove('show');
                     window.location.href = '{{ url_for("web.login_user") }}';
@@ -299,40 +379,33 @@
                 const message = chatInput.value.trim();
                 if (message === '') return;
 
-                // Tambah pesan user
+                // User message
                 const userMessageDiv = document.createElement('div');
                 userMessageDiv.className = 'message user-message';
                 userMessageDiv.innerHTML = `<p>${message}</p>`;
                 chatMessages.appendChild(userMessageDiv);
 
-                // Clear input
                 chatInput.value = '';
-
-                // Auto scroll ke bawah
                 chatMessages.scrollTop = chatMessages.scrollHeight;
 
-                // Placeholder response bot (karena belum ada dataset)
+                // Placeholder bot response
                 setTimeout(function() {
                     const botMessageDiv = document.createElement('div');
                     botMessageDiv.className = 'message bot-message';
-                    botMessageDiv.innerHTML = `<p>Terima kasih atas pesannya! Fitur chatbot sedang dalam pengembangan. 😊</p>`;
+                    botMessageDiv.innerHTML = `<p>Terima kasih! Fitur chatbot masih dalam pengembangan. 😊</p>`;
                     chatMessages.appendChild(botMessageDiv);
 
-                    // Auto scroll ke bawah
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 }, 1000);
             }
 
-            // Event listener untuk tombol kirim
             sendButton.addEventListener('click', sendMessage);
-
-            // Event listener untuk enter key
             chatInput.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    sendMessage();
-                }
+                if (event.key === 'Enter') sendMessage();
             });
+
         });
     </script>
+
 </body>
 </html>

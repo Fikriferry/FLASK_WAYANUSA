@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 from functools import wraps
 import os
-from models import Video, db, AIModel, Dalang, User, Admin, QuizLevel, QuizQuestion
+from models import Video, db, AIModel, Dalang, User, Admin, QuizLevel, QuizQuestion, Article
 from ai_manager import reload_model
 
 web_routes = Blueprint("web", __name__)
@@ -95,6 +95,11 @@ def logout_user():
 def pengenalan_wayang():
     return render_template('pengenalan_wayang.html')
 
+@web_routes.route('/pertunjukan-wayang')
+def pertunjukan_wayang():
+    videos = Video.query.filter_by(tampil=True).all()
+    return render_template('pertunjukan_wayang.html', videos=videos)
+
 @web_routes.route('/quiz')
 @user_login_required
 def quiz():
@@ -120,10 +125,38 @@ def quiz_play():
 def mencari_dalang():
     return render_template('mencari_dalang.html')
 
-@web_routes.route('/pertunjukan-wayang')
-def pertunjukan_wayang():
-    videos = Video.query.filter_by(tampil=True).all()
-    return render_template('pertunjukan_wayang.html', videos=videos)
+@web_routes.route("/pertunjukan_wayang/video/<youtube_id>")
+def video_detail(youtube_id):
+    if not session.get("user_logged_in"):
+        return redirect(url_for("web.login_user"))
+
+    video = Video.query.filter_by(youtube_id=youtube_id).first_or_404()
+    related_videos = Video.query.filter(Video.youtube_id != youtube_id).all()
+    return render_template("video_detail.html", video=video, related_videos=related_videos)
+
+@web_routes.route('/search')
+def search_video():
+    q = request.args.get("q", "")
+
+    # HINDARI: q kosong tapi masih tampil ""
+    q = q.strip()
+
+    if q:
+        videos = Video.query.filter(Video.judul.like(f"%{q}%")).all()
+    else:
+        videos = []
+
+    return render_template("search_video.html", q=q, videos=videos)
+
+@web_routes.route('/artikel')
+def artikel():
+    artikels = Article.query.order_by(Article.created_at.desc()).all()
+    return render_template('artikel.html', artikels=artikels)
+
+@web_routes.route('/artikel/<int:id>')
+def artikel_detail(id):
+    artikel = Article.query.get_or_404(id)
+    return render_template('artikel_detail.html', artikel=artikel)
 
 # -------------------------
 # ADMIN ROUTES
@@ -151,8 +184,9 @@ def login_admin():
 @admin_login_required
 def admin_dashboard():
     dalang_count = Dalang.query.count()
+    artikel_count = Article.query.count()
     dalangs = Dalang.query.all()
-    return render_template('admin/index.html', dalang_count=dalang_count, dalangs=dalangs)
+    return render_template('admin/index.html', dalang_count=dalang_count, artikel_count=artikel_count, dalangs=dalangs)
 
 @web_routes.route('/admin/logout')
 @admin_login_required
@@ -269,6 +303,27 @@ def video_delete(id):
 # -------------------------
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def allowed_thumbnail(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'jpeg', 'png'}
+
+def save_thumbnail(file):
+    if file and allowed_thumbnail(file.filename):
+        from datetime import datetime
+        ext = file.filename.rsplit('.', 1)[1].lower()
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"artikel_{timestamp}.{ext}"
+        filepath = os.path.join('static/uploads/thumbnails', filename)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        # Check file size <= 2MB
+        file.seek(0, os.SEEK_END)
+        size = file.tell()
+        file.seek(0)
+        if size > 2 * 1024 * 1024:  # 2MB
+            return None, "Ukuran file maksimal 2MB!"
+        file.save(filepath)
+        return filename, None
+    return None, "Format file tidak didukung! Hanya JPG, JPEG, PNG."
 
 @web_routes.route('/admin/models', methods=['GET', 'POST'])
 @admin_login_required
@@ -437,3 +492,94 @@ def quiz_delete(id):
 @web_routes.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory("static/uploads", filename)
+
+# ----------------------------------------
+# ARTIKEL MANAGEMENT
+# ----------------------------------------
+
+@web_routes.route('/admin/artikel')
+@admin_login_required
+def artikel_list():
+    artikels = Article.query.order_by(Article.created_at.desc()).all()
+    return render_template('admin/article_list.html', artikels=artikels)
+
+@web_routes.route('/admin/artikel/add', methods=['GET', 'POST'])
+@admin_login_required
+def artikel_add():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        source_link = request.form.get('source_link')
+
+        if not title or not content:
+            flash('Judul dan konten artikel wajib diisi!', 'error')
+            return redirect(url_for('web.artikel_add'))
+
+        thumbnail = None
+        if 'thumbnail' in request.files:
+            file = request.files['thumbnail']
+            if file.filename:
+                thumbnail, error = save_thumbnail(file)
+                if error:
+                    flash(error, 'error')
+                    return redirect(url_for('web.artikel_add'))
+
+        new_artikel = Article(title=title, content=content, source_link=source_link, thumbnail=thumbnail)
+        db.session.add(new_artikel)
+        db.session.commit()
+
+        flash('Artikel berhasil ditambahkan!', 'success')
+        return redirect(url_for('web.artikel_list'))
+
+    return render_template('admin/article_form.html', artikel=None)
+
+@web_routes.route('/admin/artikel/edit/<int:id>', methods=['GET', 'POST'])
+@admin_login_required
+def artikel_edit(id):
+    artikel = Article.query.get_or_404(id)
+    if request.method == 'POST':
+        artikel.title = request.form.get('title')
+        artikel.content = request.form.get('content')
+        artikel.source_link = request.form.get('source_link')
+
+        if not artikel.title or not artikel.content:
+            flash('Judul dan konten artikel wajib diisi!', 'error')
+            return redirect(url_for('web.artikel_edit', id=id))
+
+        if 'thumbnail' in request.files:
+            file = request.files['thumbnail']
+            if file.filename:
+                # Hapus thumbnail lama jika ada
+                if artikel.thumbnail:
+                    old_path = os.path.join('static/uploads/thumbnails', artikel.thumbnail)
+                    if os.path.exists(old_path):
+                        os.remove(old_path)
+
+                # Upload thumbnail baru
+                thumbnail, error = save_thumbnail(file)
+                if error:
+                    flash(error, 'error')
+                    return redirect(url_for('web.artikel_edit', id=id))
+                artikel.thumbnail = thumbnail
+
+        db.session.commit()
+        flash('Artikel berhasil diperbarui!', 'success')
+        return redirect(url_for('web.artikel_list'))
+
+    return render_template('admin/article_form.html', artikel=artikel)
+
+@web_routes.route('/admin/artikel/delete/<int:id>')
+@admin_login_required
+def artikel_delete(id):
+    artikel = Article.query.get_or_404(id)
+
+    # Hapus thumbnail fisik jika ada
+    if artikel.thumbnail:
+        thumbnail_path = os.path.join('static/uploads/thumbnails', artikel.thumbnail)
+        if os.path.exists(thumbnail_path):
+            os.remove(thumbnail_path)
+
+    db.session.delete(artikel)
+    db.session.commit()
+    flash('Artikel berhasil dihapus!', 'success')
+    return redirect(url_for('web.artikel_list'))

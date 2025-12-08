@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pertunjukan Wayang - WAYANUSA</title>
+    <title>Artikel - WAYANUSA</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,7 +34,8 @@
                         <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
                         <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
                         <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
-                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}" class="active">Pertunjukan Wayang</a></li>
+                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                        <li><a href="{{ url_for('web.artikel') }}" class="active">Artikel</a></li>
                     </ul>
                 </div>
                 <div class="navbar-actions">
@@ -53,38 +54,47 @@
     <section class="quiz-section">
         <div class="container">
             <div class="quiz-content">
-                <p class="quiz-tag">🎥 PERTUNJUKAN WAYANG</p>
-                <h2 class="quiz-title">Kumpulan <span class="highlight">Video</span> Wayang</h2>
+                <p class="quiz-tag">📖 ARTIKEL</p>
+                <h2 class="quiz-title">Kumpulan <span class="highlight">Artikel</span> Wayang</h2>
                 <p class="quiz-description">
-                    Tonton berbagai pertunjukan wayang pilihan, lengkap dengan kisah dan karakter yang memukau.
+                    Baca berbagai artikel menarik tentang wayang, lengkap dengan informasi dan pengetahuan yang mendalam.
                 </p>
 
                 <!-- SEARCH -->
                 <div class="search-container">
                     <div class="search-box">
                         <span class="search-icon">&#128269;</span>
-                        <input type="text" id="searchInput" placeholder="Cari video pertunjukan..." oninput="searchVideo()">
+                        <input type="text" id="searchInput" placeholder="Cari artikel..." oninput="searchArtikel()">
                     </div>
                 </div>
 
-                <!-- VIDEO CARDS -->
-                <div class="quiz-cards" id="videoList">
-                    {% for v in videos %}
-                    <div class="quiz-card"
-                         data-title="{{ v.judul }}"
-                         onclick="goToVideo('{{ v.youtube_id }}')"
+                <!-- ARTICLE CARDS -->
+                <div class="quiz-cards" id="artikelList">
+                    {% for artikel in artikels %}
+                    <div class="quiz-card" 
+                         data-title="{{ artikel.title }}" 
+                         onclick="viewArtikel({{ artikel.id }})" 
                          data-aos="fade-up">
 
                         <div class="quiz-card-content">
-                            <h3 class="quiz-level">{{ v.judul }}</h3>
-                            <p class="quiz-name">Pertunjukan Wayang</p>
-                            <p class="quiz-desc">Klik untuk menonton pertunjukan dari koleksi WAYANUSA.</p>
+                            <h3 class="quiz-level">{{ artikel.title }}</h3>
+                            <p class="quiz-name">Artikel Wayang</p>
+                            <p class="quiz-desc">{{ artikel.content[:100] }}...</p>
                         </div>
 
-                        <img src="https://img.youtube.com/vi/{{ v.youtube_id }}/hqdefault.jpg"
-                             alt="{{ v.judul }}"
+                        <!-- <img src="{% if artikel.thumbnail %}{{ url_for('web.uploaded_file', filename='thumbnails/' + artikel.thumbnail) }}{% else %}{{ url_for('static', filename='images/logo.png') }}{% endif %}" 
+                             alt="{{ artikel.title }}" 
                              class="quiz-image"
-                             style="object-fit: cover;">
+                             style="object-fit: cover;"> -->
+                        <img src="{% if artikel.thumbnail %}
+                                    {{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}
+                                {% else %}
+                                    {{ url_for('static', filename='images/logo.png') }}
+                                {% endif %}"
+                            alt="{{ artikel.title }}"
+                            class="quiz-image"
+                            style="object-fit: cover;">
+                             
                     </div>
                     {% endfor %}
                 </div>
@@ -98,23 +108,17 @@
     <script>
         AOS.init();
 
-        function goToVideo(youtubeId) {
-            if (!{{ session.get('user_logged_in', False)|tojson }}) {
-                alert("Silakan login terlebih dahulu untuk menonton video.");
-                window.location.href = "{{ url_for('web.login_user') }}";
-                return;
-            }
-
-            window.location.href = "/pertunjukan_wayang/video/" + youtubeId;
+        function viewArtikel(id) {
+            window.location.href = "/artikel/" + id;
         }
 
-        function searchVideo() {
+        function searchArtikel() {
             const input = document.getElementById("searchInput").value.toLowerCase();
             const cards = document.querySelectorAll(".quiz-card");
 
             cards.forEach(card => {
                 const title = card.dataset.title.toLowerCase();
-                card.style.display = title.includes(input) ? "" : "none";
+                card.style.display = title.includes(input) ? "block" : "none";
             });
         }
     </script>

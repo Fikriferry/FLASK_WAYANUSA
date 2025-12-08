@@ -74,7 +74,7 @@ class Video(db.Model):
 # ---------------------------------------------------
 class AIModel(db.Model):
     __tablename__ = 'ai_models'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     version_name = db.Column(db.String(100), nullable=False)
     file_path = db.Column(db.String(255), nullable=False)
@@ -142,3 +142,13 @@ class UserAnswer(db.Model):
     user_answer = db.Column(db.String(255), nullable=False)
     is_correct = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Article(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    source_link = db.Column(db.String(500), nullable=True)
+    thumbnail = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

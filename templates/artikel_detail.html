@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ artikel.title }} - WAYANUSA</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+
+    <!-- AOS -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-logo">
+                    <a href="{{ url_for('web.home') }}" class="logo-link">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo-image">
+                    </a>
+                </div>
+                <div class="navbar-menu">
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
+                        <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
+                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                        <li><a href="{{ url_for('web.artikel') }}">Artikel</a></li>
+                    </ul>
+                </div>
+                <div class="navbar-actions">
+                    {% if session.get('user_logged_in') %}
+                        <span class="user-greeting">Halo, {{ session.get('user_name') }}!</span>
+                        <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ARTICLE DETAIL -->
+    <section class="quiz-section">
+        <div class="container">
+            <div class="quiz-content">
+                <a href="{{ url_for('web.artikel') }}" class="btn-login" style="margin-bottom: 20px;">← Kembali ke Daftar Artikel</a>
+                <h2 class="quiz-title">{{ artikel.title }}</h2>
+                <p class="quiz-description">Diterbitkan pada {{ artikel.created_at.strftime('%d %B %Y') }}</p>
+
+                {% if artikel.thumbnail %}
+                <!-- <img src="{{ url_for('web.uploaded_file', filename='thumbnails/' + artikel.thumbnail) }}" 
+                     alt="{{ artikel.title }}" 
+                     style="width: 100%; max-width: 600px; height: auto; margin: 20px 0; border-radius: 8px;"> -->
+                <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}" 
+                    alt="{{ artikel.title }}" 
+                    style="width: 100%; max-width: 600px; height: auto; margin: 20px 0; border-radius: 8px;">
+                     {% endif %}
+
+                <div class="artikel-content" style="line-height: 1.6; font-size: 18px; color: #333;">
+                    {{ artikel.content | safe }}
+                </div>
+
+                {% if artikel.source_link %}
+                <p style="margin-top: 20px;">
+                    <strong>Sumber:</strong> <a href="{{ artikel.source_link }}" target="_blank">{{ artikel.source_link }}</a>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+
+</body>
+</html>
