@@ -4,12 +4,13 @@ import os
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
-from ai_manager import init_ai_model # Import AI Model Manager
+from ai_manager import init_ai_model
 
 # Routes
 from routes.web_routes import web_routes
 from routes.api_routes import api, auth_api
-from routes.auth_routes import auth_routes, init_oauth  # Authlib Google OAuth
+from routes.auth_routes import auth_routes, init_oauth
+from routes.quiz_routes import quiz_routes  # <<--- Tambahkan ini
 
 # ================================ #
 #          LOAD ENV FILE           #
@@ -27,22 +28,27 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024
 
-# JWT SECRET
+# JWT Secret
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 
 # CORS
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 # JWT
 jwt = JWTManager(app)
 
-# Init OAuth (Google OAuth pakai env juga)
+# Init OAuth Google
 init_oauth(app)
 
 # Init DB
 db.init_app(app)
 with app.app_context():
-    db.create_all()  # Ini akan membuat semua tabel (User, Dalang, AIModel) jika belum ada
+    db.create_all()
+
+# Ensure upload dir exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Init AI Model
 init_ai_model(app)
 
 # ================================ #
@@ -51,7 +57,8 @@ init_ai_model(app)
 app.register_blueprint(web_routes)
 app.register_blueprint(api, url_prefix="/api")
 app.register_blueprint(auth_api, url_prefix="/api/auth")
-app.register_blueprint(auth_routes)  # Google OAuth
+app.register_blueprint(auth_routes)
+app.register_blueprint(quiz_routes, url_prefix="/api/quiz")  # <<--- Tambahkan ini
 
 # ================================ #
 #             RUN APP              #

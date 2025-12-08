@@ -49,18 +49,8 @@
                 <p class="quiz-description">
                     Tantang diri Anda dengan berbagai level quiz wayang kulit. Mulai dari pemula hingga ahli, setiap level menawarkan pengalaman belajar yang unik.
                 </p>
-                <div class="quiz-cards">
-                    {% for level in ['Beginner','Intermediate','Advanced','Expert'] %}
-                    <div class="quiz-card" data-aos="fade-up">
-                        <div class="quiz-card-content">
-                            <h3 class="quiz-level">{{ level }}</h3>
-                            <p class="quiz-name">Quiz {{ level }}</p>
-                            <p class="quiz-desc">Klik tombol "Mulai Kuis" untuk memulai quiz {{ level }}.</p>
-                            <a href="#" onclick="startQuiz()" class="btn-start-quiz">Mulai Kuis</a>
-                        </div>
-                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
-                    </div>
-                    {% endfor %}
+                <div class="quiz-cards" id="quiz-cards">
+                    <!-- Levels will be loaded dynamically -->
                 </div>
             </div>
         </div>
@@ -70,16 +60,61 @@
     <script>
         AOS.init();
 
-        function startQuiz() {
+        // Load quiz levels from API
+        async function loadQuizLevels() {
+            try {
+                const response = await fetch('/api/quiz/levels');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch levels');
+                }
+                const data = await response.json();
+                displayLevels(data.levels);
+            } catch (error) {
+                console.error('Error loading levels:', error);
+                // Fallback to static levels if API fails
+                displayLevels([
+                    {id: 1, name: 'Beginner'},
+                    {id: 2, name: 'Intermediate'},
+                    {id: 3, name: 'Advanced'},
+                    {id: 4, name: 'Expert'}
+                ]);
+            }
+        }
+
+        function displayLevels(levels) {
+            const container = document.getElementById('quiz-cards');
+            container.innerHTML = '';
+
+            levels.forEach(level => {
+                const card = document.createElement('div');
+                card.className = 'quiz-card';
+                card.setAttribute('data-aos', 'fade-up');
+                card.innerHTML = `
+                    <div class="quiz-card-content">
+                        <h3 class="quiz-level">${level.name}</h3>
+                        <p class="quiz-name">Quiz ${level.name}</p>
+                        <p class="quiz-desc">Klik tombol "Mulai Kuis" untuk memulai quiz ${level.name}.</p>
+                        <a href="#" onclick="startQuiz(${level.id})" class="btn-start-quiz">Mulai Kuis</a>
+                    </div>
+                    <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function startQuiz(levelId) {
             const loggedIn = {{ session.get('user_logged_in', False)|tojson }};
             if (!loggedIn) {
                 alert('Silakan login terlebih dahulu untuk menggunakan fitur quiz.');
                 window.location.href = '{{ url_for("web.login_user") }}';
                 return;
             }
-            // Redirect ke halaman quiz_play (pastikan route Flask snake_case)
-            window.location.href = '{{ url_for("web.quiz_play") }}';
+            // Redirect ke halaman quiz_play dengan level parameter
+            window.location.href = '{{ url_for("web.quiz_play") }}?level=' + levelId;
         }
+
+        // Load levels when page loads
+        document.addEventListener('DOMContentLoaded', loadQuizLevels);
     </script>
 </body>
 </html>

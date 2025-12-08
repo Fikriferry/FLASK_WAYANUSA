@@ -1,0 +1,124 @@
+{% extends "admin/layout_admin.html" %}
+
+{% block title %}{% if question %}Edit Soal{% else %}Tambah Soal{% endif %} - WAYANUSA{% endblock %}
+
+{% block content %}
+
+<!-- Content Header -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">{% if question %}Edit Soal{% else %}Tambah Soal{% endif %}</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url_for('web.admin_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('web.quiz_list') }}">Kelola Quiz</a></li>
+                    <li class="breadcrumb-item active">{% if question %}Edit{% else %}Tambah{% endif %}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Form Soal Quiz</h3>
+                    </div>
+
+                    <form method="POST">
+                        <div class="card-body">
+
+                            <!-- Level Selection -->
+                            <div class="form-group">
+                                <label for="level_id">Level Quiz</label>
+                                <select class="form-control" id="level_id" name="level_id" required>
+                                    <option value="">Pilih Level</option>
+                                    {% for level in levels %}
+                                    <option value="{{ level.id }}" {% if question and question.level_id == level.id %}selected{% endif %}>
+                                        {{ level.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Question -->
+                            <div class="form-group">
+                                <label for="question">Pertanyaan</label>
+                                <textarea class="form-control" id="question" name="question" rows="3" required
+                                          placeholder="Masukkan pertanyaan quiz">{{ question.question if question else '' }}</textarea>
+                            </div>
+
+                            <!-- Options -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="option_a">Opsi A</label>
+                                        <input type="text" class="form-control" id="option_a" name="option_a" required
+                                               value="{{ question.option_a if question else '' }}" placeholder="Jawaban A">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="option_b">Opsi B</label>
+                                        <input type="text" class="form-control" id="option_b" name="option_b" required
+                                               value="{{ question.option_b if question else '' }}" placeholder="Jawaban B">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="option_c">Opsi C</label>
+                                        <input type="text" class="form-control" id="option_c" name="option_c" required
+                                               value="{{ question.option_c if question else '' }}" placeholder="Jawaban C">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="option_d">Opsi D</label>
+                                        <input type="text" class="form-control" id="option_d" name="option_d" required
+                                               value="{{ question.option_d if question else '' }}" placeholder="Jawaban D">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Correct Answer -->
+                            <div class="form-group">
+                                <label for="correct_answer">Jawaban Benar</label>
+                                <select class="form-control" id="correct_answer" name="correct_answer" required>
+                                    <option value="">Pilih Jawaban Benar</option>
+                                    <option value="A" {% if question and question.correct_answer == 'A' %}selected{% endif %}>A</option>
+                                    <option value="B" {% if question and question.correct_answer == 'B' %}selected{% endif %}>B</option>
+                                    <option value="C" {% if question and question.correct_answer == 'C' %}selected{% endif %}>C</option>
+                                    <option value="D" {% if question and question.correct_answer == 'D' %}selected{% endif %}>D</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% if question %}Simpan Perubahan{% else %}Tambah Soal{% endif %}
+                            </button>
+                            <a href="{{ url_for('web.quiz_list') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

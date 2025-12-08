@@ -1,0 +1,94 @@
+{% extends "admin/layout_admin.html" %}
+
+{% block title %}Kelola Quiz - WAYANUSA{% endblock %}
+
+{% block content %}
+
+<!-- Content Header -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Kelola Quiz</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url_for('web.admin_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Kelola Quiz</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Daftar Soal Quiz</h3>
+                        <div class="card-tools">
+                            <a href="{{ url_for('web.quiz_add') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Tambah Soal
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Level</th>
+                                    <th>Pertanyaan</th>
+                                    <th>Jawaban Benar</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for question in questions %}
+                                <tr>
+                                    <td>{{ question.id }}</td>
+                                    <td>{{ question.level_name }}</td>
+                                    <td>{{ question.question[:50] }}{% if question.question|length > 50 %}...{% endif %}</td>
+                                    <td>
+                                        <span class="badge badge-success">{{ question.correct_answer }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('web.quiz_edit', id=question.id) }}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{{ url_for('web.quiz_delete', id=question.id) }}"
+                                           class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Apakah Anda yakin ingin menghapus soal ini?')">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if not questions %}
+                    <div class="card-body">
+                        <p class="text-center text-muted">Belum ada soal quiz yang dibuat.</p>
+                        <div class="text-center">
+                            <a href="{{ url_for('web.quiz_add') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Tambah Soal Pertama
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
