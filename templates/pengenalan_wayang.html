@@ -5,13 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengenalan Wayang - WAYANUSA</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
@@ -21,15 +20,17 @@
             <div class="navbar-content">
                 <div class="navbar-logo">
                     <a href="{{ url_for('web.home') }}" class="logo-link">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo"
+                            class="logo-image">
                     </a>
                 </div>
                 <div class="navbar-menu">
                     <ul class="nav-links">
-                        <li><a href="{{ url_for('web.pengenalan_wayang') }}" class="active">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
                         <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
                         <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
                         <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                        <li><a href="{{ url_for('web.artikel') }}" class="active">Artikel</a></li>
                     </ul>
                 </div>
                 <div class="navbar-actions">
@@ -54,25 +55,36 @@
                     </button>
                 </div>
                 <h1 class="recognition-title">Identifikasi Wayang AI</h1>
-                <p style="color: #bbb; margin-top: 10px;">Gunakan teknologi AI untuk mengenali tokoh wayang favoritmu</p>
+                <p style="color: #bbb; margin-top: 10px;">Gunakan teknologi AI untuk mengenali tokoh wayang favoritmu
+                </p>
             </div>
 
             <div class="recognition-card" id="recognitionCard">
                 <div class="progress-indicator">
-                    <div class="progress-step"><div class="step-circle" id="step1">1</div></div>
+                    <div class="progress-step">
+                        <div class="step-circle" id="step1">1</div>
+                    </div>
                     <div class="step-line" id="line1"></div>
 
-                    <div class="progress-step"><div class="step-circle" id="step2">2</div></div>
+                    <div class="progress-step">
+                        <div class="step-circle" id="step2">2</div>
+                    </div>
                     <div class="step-line" id="line2"></div>
 
-                    <div class="progress-step"><div class="step-circle" id="step3">3</div></div>
+                    <div class="progress-step">
+                        <div class="step-circle" id="step3">3</div>
+                    </div>
                     <div class="step-line" id="line3"></div>
 
-                    <div class="progress-step"><div class="step-circle" id="step4">4</div></div>
+                    <div class="progress-step">
+                        <div class="step-circle" id="step4">4</div>
+                    </div>
                 </div>
 
                 <div class="stage-content" id="stageContent">
-                    <div id="stage1" class="fade-in-up" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+
+                    <div id="stage1" class="fade-in-up"
+                        style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                         <h3 style="margin-bottom: 30px; color: #6B4226;">Pilih Metode Pengambilan Gambar</h3>
                         <div class="selection-grid">
                             <div class="selection-card" onclick="selectMethod('camera')">
@@ -87,6 +99,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -132,28 +145,29 @@
         // --- 3. PILIH METODE & UPDATE UI ---
         function selectMethod(method) {
             // Cek Login Session (Template Jinja)
-            const isLoggedIn = {{ session.get('user_logged_in', False)|tojson }};
-            if (!isLoggedIn) {
-                alert('Silakan login terlebih dahulu untuk menggunakan fitur ini.');
-                window.location.href = "{{ url_for('web.login_user') }}";
-                return;
-            }
+            const isLoggedIn = {{ session.get('user_logged_in', False) | tojson
+        }};
+        if (!isLoggedIn) {
+            alert('Silakan login terlebih dahulu untuk menggunakan fitur ini.');
+            window.location.href = "{{ url_for('web.login_user') }}";
+            return;
+        }
 
-            selectedMethod = method;
-            selectedFile = null;
+        selectedMethod = method;
+        selectedFile = null;
 
-            if (selectedMethod === 'camera') {
-                showStage2();
-            } else if (selectedMethod === 'upload') {
-                showStage3();
-            }
+        if (selectedMethod === 'camera') {
+            showStage2();
+        } else if (selectedMethod === 'upload') {
+            showStage3();
+        }
         }
 
         function updateProgress(stage) {
             currentStage = stage;
             for (let i = 1; i <= 4; i++) {
-                const step = document.getElementById(`step${i}`);
-                const line = document.getElementById(`line${i}`);
+                const step = document.getElementById(step${i});
+                const line = document.getElementById(line${i});
 
                 step.className = 'step-circle';
                 if (line) line.className = 'step-line';
@@ -200,42 +214,59 @@
                 });
         }
 
-        // --- STAGE 3: UPLOAD UI (FIXED) ---
+        // --- STAGE 3: UPLOAD UI ---
+        // --- REVISI: STAGE 3 (FIX BUG UPLOAD) ---
         function showStage3() {
             updateProgress(3);
+
             const stageContent = document.getElementById('stageContent');
+
+            // PERBAIKAN:
+            // 1. Mengganti <div> menjadi <label>
+            // 2. Menambahkan atribut 'for="fileInput"'
+            // 3. Menghapus 'onclick="..."' karena <label> otomatis memicu input di dalamnya
+
             stageContent.innerHTML = `
                 <div class="fade-in-up" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                    
                     <label class="upload-zone" for="fileInput">
                         <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                         <div class="upload-text">Klik untuk Upload Foto</div>
                         <div class="upload-subtext">JPG, PNG (Max 5MB)</div>
+                        
                         <input type="file" id="fileInput" class="file-input" accept="image/*" 
                                onclick="this.value=null" 
                                onchange="handleFileUpload(event)">
                     </label>
+
                     <button onclick="resetToStage1()" class="action-btn btn-secondary" style="margin-top:20px;">Kembali</button>
                 </div>
             `;
         }
 
-        // --- HANDLE FILE ---
+        // --- REVISI: HANDLE FILE (LEBIH AMAN) ---
         function handleFileUpload(event) {
+            // Cek apakah ada file yang dipilih
             if (event.target.files && event.target.files.length > 0) {
                 const file = event.target.files[0];
+
+                // Validasi tipe file (Opsional tapi disarankan)
                 if (!file.type.startsWith('image/')) {
                     alert('Mohon upload file gambar (JPG/PNG).');
                     return;
                 }
+
                 selectedFile = file;
                 previewUrl = URL.createObjectURL(file);
+
+                // Langsung lanjut ke preview
                 showPreviewStage();
             }
         }
 
         // --- PREVIEW / CONFIRMATION ---
         function showPreviewStage() {
-            updateProgress(3);
+            updateProgress(3); // Dianggap tahap konfirmasi
             const stageContent = document.getElementById('stageContent');
             stageContent.innerHTML = `
                 <div class="fade-in-up" style="display:flex; flex-direction:column; align-items:center;">
@@ -337,6 +368,11 @@
                 </div>
             `;
         }
+
+        // Add Spin Animation
+        const style = document.createElement('style');
+        style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+        document.head.appendChild(style);
     </script>
 </body>
 

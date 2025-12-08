@@ -13,9 +13,7 @@ body {
     overflow-x: hidden;
 }
 
-/* =========================================
-   1. NAVBAR STYLES
-   ========================================= */
+/* Navbar */
 .navbar {
     position: fixed;
     top: 0;
@@ -61,8 +59,7 @@ body {
     border-radius: 4px;
 }
 
-.nav-links li a:hover,
-.nav-links li a.active {
+.nav-links li a:hover {
     color: #d4af37;
     background: rgba(212, 175, 55, 0.1);
 }
@@ -109,9 +106,7 @@ body {
     padding: 0 20px;
 }
 
-/* =========================================
-   2. HERO SECTION
-   ========================================= */
+/* Hero Section */
 .hero {
     min-height: 100vh;
     display: flex;
@@ -172,9 +167,15 @@ body {
 }
 
 @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .hero-description {
@@ -241,9 +242,7 @@ body {
     filter: drop-shadow(0 10px 30px rgba(255, 215, 0, 0.2));
 }
 
-/* =========================================
-   3. ABOUT SECTION
-   ========================================= */
+/* About Section */
 .about {
     background-color: #1A140B;
     padding: 100px 0;
@@ -270,6 +269,13 @@ body {
     opacity: 0;
     transform: translateY(30px);
     animation: fadeInUp 1s ease-out 0.3s forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .about-tag {
@@ -337,8 +343,13 @@ body {
     animation: fadeInUp 1s ease-out 0.6s forwards;
 }
 
-.stat-card:nth-child(2) { animation-delay: 0.8s; }
-.stat-card:nth-child(3) { animation-delay: 1s; }
+.stat-card:nth-child(2) {
+    animation-delay: 0.8s;
+}
+
+.stat-card:nth-child(3) {
+    animation-delay: 1s;
+}
 
 .stat-card:hover {
     transform: translateY(-10px) scale(1.05);
@@ -363,9 +374,62 @@ body {
     letter-spacing: 1px;
 }
 
-/* =========================================
-   4. FEATURES SECTION
-   ========================================= */
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 40px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .btn {
+        min-width: 180px;
+    }
+
+    .wayang-image {
+        max-width: 80%;
+    }
+
+    .about {
+        padding: 80px 0;
+    }
+
+    .about-title {
+        font-size: 2.5rem;
+    }
+
+    .about-description {
+        font-size: 1rem;
+        margin-bottom: 50px;
+    }
+
+    .stats {
+        gap: 20px;
+    }
+
+    .stat-card {
+        min-width: 150px;
+        padding: 30px 20px;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+    }
+}
+
+/* Features Section */
 .features {
     background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
     padding: 100px 0;
@@ -446,9 +510,17 @@ body {
     animation: fadeInUp 1s ease-out 0.6s forwards;
 }
 
-.feature-card:nth-child(2) { animation-delay: 0.8s; }
-.feature-card:nth-child(3) { animation-delay: 1s; }
-.feature-card:nth-child(4) { animation-delay: 1.2s; }
+.feature-card:nth-child(2) {
+    animation-delay: 0.8s;
+}
+
+.feature-card:nth-child(3) {
+    animation-delay: 1s;
+}
+
+.feature-card:nth-child(4) {
+    animation-delay: 1.2s;
+}
 
 .feature-card:hover {
     transform: translateY(-10px) scale(1.03);
@@ -508,9 +580,190 @@ body {
     line-height: 1.6;
 }
 
-/* =========================================
-   5. LOGIN & REGISTER PAGE
-   ========================================= */
+.feature-details p {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.feature-details strong {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+.feature-details p:last-child strong {
+    color: #ccc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 40px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .btn {
+        min-width: 180px;
+    }
+
+    .wayang-image {
+        max-width: 80%;
+    }
+
+    .about {
+        padding: 80px 0;
+    }
+
+    .about-title {
+        font-size: 2.5rem;
+    }
+
+    .about-description {
+        font-size: 1rem;
+        margin-bottom: 50px;
+    }
+
+    .stats {
+        gap: 20px;
+    }
+
+    .stat-card {
+        min-width: 150px;
+        padding: 30px 20px;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+    }
+
+    .features {
+        padding: 80px 0;
+    }
+
+    .features-title {
+        font-size: 2.5rem;
+    }
+
+    .features-description {
+        font-size: 1rem;
+        margin-bottom: 50px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .feature-card {
+        max-width: 100%;
+    }
+}
+
+/* Navbar Responsive */
+@media (max-width: 768px) {
+    .navbar-content {
+        padding: 0 10px;
+    }
+
+    .navbar-menu {
+        display: none;
+    }
+
+    .logo-text {
+        font-size: 1.5rem;
+    }
+
+    .navbar-actions .btn-login {
+        padding: 8px 20px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .navbar-menu {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-tag {
+        font-size: 16px;
+    }
+
+    .hero-description {
+        font-size: 0.95rem;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        min-width: 160px;
+    }
+
+    .wayang-image {
+        max-width: 90%;
+    }
+
+    .about-title {
+        font-size: 2rem;
+    }
+
+    .about-description {
+        font-size: 0.9rem;
+    }
+
+    .stats {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-card {
+        min-width: 200px;
+    }
+
+    .features-title {
+        font-size: 2rem;
+    }
+
+    .features-description {
+        font-size: 0.9rem;
+    }
+
+    .feature-content {
+        padding: 20px;
+    }
+
+    .feature-title {
+        font-size: 1.3rem;
+    }
+
+    .logo-text {
+        font-size: 1.3rem;
+    }
+
+    .navbar-actions .btn-login {
+        padding: 6px 16px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Login Page Styles */
 .login-page {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
@@ -784,9 +1037,67 @@ body {
     background-color: #365899;
 }
 
-/* =========================================
-   6. DALANG SECTION (LIST & SHOWCASE)
-   ========================================= */
+/* Responsive Design for Login */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+
+    .login-text h2 {
+        font-size: 16px;
+    }
+
+    .logo-capsule {
+        padding: 15px 30px;
+    }
+
+    .logo-image {
+        height: 40px;
+    }
+
+    .form-input {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .btn-login {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .social-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+}
+
+/* Dalang List Styles */
+.dalang-list {
+    margin-top: 20px;
+}
+
+.dalang-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.dalang-list li {
+    background: #f8f9fa;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.dalang-list li img {
+    margin-left: 10px;
+    border-radius: 4px;
+}
+
+/* Dalang Grid Styles for mencari_dalang.html and index.html */
 .dalang-list-section {
     margin-bottom: 40px;
 }
@@ -851,6 +1162,12 @@ body {
     line-height: 1.4;
 }
 
+.dalang-info strong {
+    color: #d4af37;
+    font-weight: 500;
+}
+
+/* Dalang Showcase Section */
 .dalang-showcase {
     background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
     padding: 100px 0;
@@ -911,144 +1228,262 @@ body {
     margin-right: auto;
 }
 
-/* =========================================
-   7. CHATBOT STYLES
-   ========================================= */
+/* Chatbot Styles */
 .chatbot-button {
     position: fixed;
     bottom: 30px;
     right: 30px;
     width: 60px;
     height: 60px;
-    background-color: #D4A373;
+    background-color: #A3683C;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 10000;
-    transition: transform 0.3s ease;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .chatbot-button:hover {
     transform: scale(1.1);
-    background-color: #c28e5e;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
 }
 
 .chatbot-icon {
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
     object-fit: contain;
-    pointer-events: none;
 }
 
-/* POPUP CHAT */
 .chat-popup {
     position: fixed;
     bottom: 100px;
     right: 30px;
-    width: 350px;
+    width: 400px;
     height: 500px;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-    z-index: 10000;
-    display: none; /* Default Hilang */
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
     font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
 }
 
-/* KELAS PENTING UNTUK MENAMPILKAN POPUP */
 .chat-popup.show {
-    display: flex !important; /* Paksa muncul */
-    animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 .chat-popup-header {
-    background-color: #D4A373;
-    color: white;
-    padding: 15px;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: linear-gradient(135deg, #A3683C, #8B4513);
+    color: white;
+    border-radius: 20px 20px 0 0;
 }
 
 .chat-popup-header h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
 }
 
 .chat-close {
     background: none;
     border: none;
+    font-size: 24px;
     color: white;
-    font-size: 1.5rem;
     cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.chat-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .chat-messages {
     flex: 1;
-    padding: 15px;
+    padding: 20px;
     overflow-y: auto;
-    background-color: #f9f9f9;
+    max-height: 350px;
+    background-color: #f8f9fa;
 }
 
 .message {
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 0.9rem;
+    margin-bottom: 15px;
+    padding: 12px 16px;
+    border-radius: 18px;
     max-width: 80%;
     word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.message p {
+    margin: 0;
+    font-size: 0.95rem;
 }
 
 .bot-message {
-    background-color: #e0e0e0;
+    background-color: #e3f2fd;
+    color: #1565c0;
     align-self: flex-start;
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
 }
 
 .user-message {
-    background-color: #D4A373;
+    background-color: #A3683C;
     color: white;
+    align-self: flex-end;
     margin-left: auto;
+    border-bottom-right-radius: 4px;
 }
 
 .chat-input-area {
-    padding: 10px;
-    border-top: 1px solid #ddd;
+    padding: 20px;
+    border-top: 1px solid #eee;
+    background-color: white;
+    border-radius: 0 0 20px 20px;
     display: flex;
-    gap: 5px;
-    background: white;
+    gap: 10px;
+    align-items: center;
 }
 
 .chat-input-area input {
     flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 25px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
     outline: none;
+    transition: all 0.3s ease;
+}
+
+.chat-input-area input:focus {
+    border-color: #A3683C;
+    box-shadow: 0 0 0 2px rgba(163, 104, 60, 0.1);
 }
 
 .chat-input-area button {
-    background-color: #D4A373;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #A3683C, #8B4513);
     color: white;
     border: none;
-    padding: 10px 15px;
-    border-radius: 20px;
+    border-radius: 25px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
     cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 70px;
 }
 
-/* =========================================
-   8. HALAMAN PENGENALAN WAYANG (MERGED)
-   ========================================= */
+.chat-input-area button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(163, 104, 60, 0.3);
+}
+
+/* Responsive Chatbot */
+@media (max-width: 768px) {
+    .chatbot-button {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+
+    .chatbot-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    .chat-popup {
+        bottom: 80px;
+        right: 20px;
+        width: 320px;
+        height: 400px;
+    }
+
+    .chat-messages {
+        max-height: 280px;
+    }
+
+    .chat-popup-header h3 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .chatbot-button {
+        bottom: 15px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+    }
+
+    .chatbot-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .chat-popup {
+        bottom: 70px;
+        right: 15px;
+        width: 280px;
+        height: 350px;
+    }
+
+    .chat-messages {
+        max-height: 230px;
+        padding: 15px;
+    }
+
+    .message {
+        max-width: 85%;
+        padding: 10px 14px;
+    }
+
+    .chat-input-area {
+        padding: 15px;
+    }
+
+    .chat-input-area input {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+
+    .chat-input-area button {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+        min-width: 60px;
+    }
+}
+
+/* --- WAYANG RECOGNITION STYLES --- */
+/* --- GLOBAL & BACKGROUND --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #121212;
+}
 
 .wayang-recognition {
     min-height: 100vh;
@@ -1060,6 +1495,7 @@ body {
     justify-content: center;
 }
 
+/* --- CONTAINER UTAMA --- */
 .recognition-wrapper {
     width: 100%;
     max-width: 900px;
@@ -1068,6 +1504,7 @@ body {
     z-index: 2;
 }
 
+/* --- HEADER SECTION --- */
 .recognition-header {
     text-align: center;
     margin-bottom: 40px;
@@ -1106,13 +1543,14 @@ body {
     font-family: 'Playfair Display', serif;
     font-size: 2.5rem;
     background: linear-gradient(to right, #D4A373, #F3E5AB, #D4A373);
-    /* -webkit-background-clip: text; */
+    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
     font-weight: 700;
     letter-spacing: 1px;
 }
 
+/* --- MAIN CARD --- */
 .recognition-card {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 24px;
@@ -1126,6 +1564,7 @@ body {
     flex-direction: column;
 }
 
+/* Hiasan Batik Halus di Header Card */
 .recognition-card::before {
     content: '';
     position: absolute;
@@ -1136,7 +1575,7 @@ body {
     background: linear-gradient(90deg, #6B4226, #D4A373, #6B4226);
 }
 
-/* Progress Indicator */
+/* --- PROGRESS BAR --- */
 .progress-indicator {
     display: flex;
     justify-content: center;
@@ -1145,7 +1584,9 @@ body {
     position: relative;
 }
 
-.progress-step { z-index: 2; }
+.progress-step {
+    z-index: 2;
+}
 
 .step-circle {
     width: 35px;
@@ -1185,10 +1626,12 @@ body {
     border-radius: 2px;
 }
 
-.step-line.active, .step-line.completed {
+.step-line.active,
+.step-line.completed {
     background: linear-gradient(90deg, #6B4226, #D4A373);
 }
 
+/* --- STAGE CONTENT AREA --- */
 .stage-content {
     flex-grow: 1;
     display: flex;
@@ -1198,7 +1641,7 @@ body {
     width: 100%;
 }
 
-/* Selection Cards */
+/* --- STAGE 1: SELECTION CARDS --- */
 .selection-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1241,7 +1684,7 @@ body {
     color: #777;
 }
 
-/* Camera UI */
+/* --- STAGE 2: CAMERA UI --- */
 .camera-frame {
     width: 100%;
     max-width: 450px;
@@ -1251,9 +1694,10 @@ body {
     position: relative;
     overflow: hidden;
     border: 4px solid #333;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
+/* Scanner Animation */
 .scanner-line {
     position: absolute;
     top: 0;
@@ -1280,7 +1724,7 @@ body {
     height: 60px;
     background: white;
     border-radius: 50%;
-    border: 4px solid rgba(255,255,255,0.3);
+    border: 4px solid rgba(255, 255, 255, 0.3);
     cursor: pointer;
     transition: transform 0.2s;
 }
@@ -1290,7 +1734,7 @@ body {
     background: #ddd;
 }
 
-/* Upload UI */
+/* --- STAGE 3: UPLOAD UI --- */
 .upload-zone {
     width: 100%;
     max-width: 500px;
@@ -1311,33 +1755,15 @@ body {
     transform: scale(1.02);
 }
 
-.upload-icon {
-    font-size: 3rem;
-    color: #D4A373;
-    margin-bottom: 15px;
-}
-
-.upload-text {
-    color: #6B4226;
-    font-weight: 500;
-    margin-bottom: 10px;
-}
-
-.upload-subtext {
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.file-input { display: none; }
-
-/* Preview */
+/* --- PREVIEW IMAGE --- */
 .preview-container {
     position: relative;
     padding: 10px;
     background: #fff;
     border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     transform: rotate(-2deg);
+    /* Artistic tilt */
 }
 
 .image-preview {
@@ -1348,7 +1774,7 @@ body {
     border: 1px solid #ddd;
 }
 
-/* Result */
+/* --- STAGE 4: RESULT --- */
 .result-layout {
     display: flex;
     flex-direction: row;
@@ -1358,16 +1784,20 @@ body {
     align-items: flex-start;
 }
 
-.result-img-wrapper { flex: 0 0 150px; }
+.result-img-wrapper {
+    flex: 0 0 150px;
+}
 
 .result-img {
     width: 100%;
     border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     border: 3px solid #D4A373;
 }
 
-.result-info { flex: 1; }
+.result-info {
+    flex: 1;
+}
 
 .confidence-badge {
     display: inline-block;
@@ -1399,8 +1829,8 @@ body {
     border-left: 4px solid #D4A373;
 }
 
-/* Wayang Specific Buttons (Overrides global button if inside recognition card) */
-.recognition-card .action-btn {
+/* --- BUTTONS --- */
+.action-btn {
     padding: 12px 30px;
     border-radius: 30px;
     border: none;
@@ -1414,32 +1844,45 @@ body {
     gap: 8px;
 }
 
-.recognition-card .btn-primary {
-    background: linear-gradient(135deg, #D4A373 0%, #B88656 100%); /* Bronze Color */
+.btn-primary {
+    background: linear-gradient(135deg, #D4A373 0%, #B88656 100%);
     color: white;
     box-shadow: 0 5px 15px rgba(212, 163, 115, 0.4);
 }
 
-.recognition-card .btn-primary:hover {
+.btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(212, 163, 115, 0.6);
 }
 
-.recognition-card .btn-secondary {
+.btn-secondary {
     background: #f0f0f0;
     color: #666;
 }
 
-.recognition-card .btn-secondary:hover {
+.btn-secondary:hover {
     background: #e0e0e0;
 }
 
-/* Animations */
+/* --- ANIMATIONS --- */
 @keyframes scan {
-    0% { top: 0; opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { top: 100%; opacity: 0; }
+    0% {
+        top: 0;
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
 }
 
 .fade-in-up {
@@ -1447,37 +1890,51 @@ body {
 }
 
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Responsive Wayang */
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
-    .selection-grid { grid-template-columns: 1fr; }
-    .result-layout { flex-direction: column; text-align: center; align-items: center; }
-    .result-img-wrapper { width: 150px; margin-bottom: 20px; }
-    .wayang-desc { text-align: left; }
-    .step-line { width: 30px; }
-    .recognition-title { font-size: 1.8rem; }
-    .back-btn-wrapper { position: static; margin-bottom: 20px; display: flex; justify-content: center; transform: none; }
-}
+    .selection-grid {
+        grid-template-columns: 1fr;
+    }
 
-/* GLOBAL RESPONSIVE RULES (SAFEGUARD) */
-@media (max-width: 768px) {
-    .navbar-menu { display: none; }
-    .logo-text { font-size: 1.5rem; }
-    .navbar-actions .btn-login { padding: 8px 20px; font-size: 0.8rem; }
-}
+    .result-layout {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
 
-@media (max-width: 480px) {
-    .hero-title { font-size: 2rem; }
-    .hero-description { font-size: 0.95rem; }
-    .btn { padding: 12px 24px; min-width: 160px; }
-    .about-title { font-size: 2rem; }
-    .features-title { font-size: 2rem; }
+    .result-img-wrapper {
+        width: 150px;
+        margin-bottom: 20px;
+    }
+
+    .wayang-desc {
+        text-align: left;
+    }
+
+    .step-line {
+        width: 30px;
+    }
+
+    .recognition-title {
+        font-size: 1.8rem;
+    }
+
+    .back-btn-wrapper {
+        position: static;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        transform: none;
+    }
 }
