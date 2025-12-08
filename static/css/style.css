@@ -1272,7 +1272,7 @@ body {
     transform: translateY(20px);
     transition: all 0.3s ease;
     font-family: 'Inter', sans-serif;
-    display: flex;
+    display: none;
     flex-direction: column;
 }
 
@@ -1280,6 +1280,8 @@ body {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    display: flex !important; /* Paksa Muncul */
+    animation: slideUp 0.3s ease-out;
 }
 
 .chat-popup-header {

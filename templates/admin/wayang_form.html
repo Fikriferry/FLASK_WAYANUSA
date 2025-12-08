@@ -1,0 +1,49 @@
+{% extends "admin/layout_admin.html" %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 800px;">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                {% if wayang %}
+                    Edit Data: {{ wayang.nama }}
+                {% else %}
+                    Tambah Wayang Baru
+                {% endif %}
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold">Nama Wayang</label>
+                    <input type="text" name="nama" class="form-control" 
+                           value="{{ wayang.nama if wayang else '' }}" 
+                           placeholder="Contoh: Arjuna"
+                           required
+                           {% if wayang %} readonly style="background-color: #e9ecef;" {% endif %}>
+                    
+                    {% if wayang %}
+                        <small class="text-danger">*Nama tidak bisa diubah pada mode Edit agar tetap sinkron dengan Model AI.</small>
+                    {% else %}
+                        <small class="text-muted">Pastikan ejaan nama sesuai.</small>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold">Deskripsi / Sejarah</label>
+                    <textarea name="deskripsi" class="form-control" rows="10" placeholder="Tuliskan deskripsi lengkap wayang di sini..." required>{{ wayang.deskripsi if wayang else '' }}</textarea>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('web.admin_wayang_list') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Simpan Data
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+<div id="chatbot-wrapper" 
+     data-user-logged-in="{{ session.get('user_logged_in', False)|tojson }}" 
+     data-login-url="{{ url_for('web.login_user') }}">
+
+    <div class="chatbot-button" id="chatbotButton">
+        <img src="{{ url_for('static', filename='images/icon_robot.png') }}" 
+             alt="Chatbot" class="chatbot-icon"
+             onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'"> 
+    </div>
+
+    <div class="chat-popup" id="chatPopup">
+        <div class="chat-popup-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <img src="https://via.placeholder.com/30?text=C" style="border-radius:50%; background:white;">
+                <h3>Cepot AI (Ngapak)</h3>
+            </div>
+            <button class="chat-close" id="chatClose">&times;</button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <p>👋 Halo Jang! Kenalin inyong Cepot. Ana sing bisa dibantu?</p>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Ketik pesan..." autocomplete="off">
+            <button id="sendButton">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
