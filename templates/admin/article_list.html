@@ -57,7 +57,12 @@
                                     <td>{{ artikel.id }}</td>
                                     <td>
                                         {% if artikel.thumbnail %}
-                                            <img src="{{ url_for('web.uploaded_file', filename='thumbnails/' + artikel.thumbnail) }}" alt="Thumbnail {{ artikel.title }}" class="img-circle elevation-2" width="80" height="80" style="object-fit: cover;">
+                                            <!-- <img src="{{ url_for('web.uploaded_file', filename='thumbnails/' + artikel.thumbnail) }}" alt="Thumbnail {{ artikel.title }}" class="img-circle elevation-2" width="80" height="80" style="object-fit: cover;"> -->
+                                             <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}"
+                                                    alt="Thumbnail {{ artikel.title }}"
+                                                    class="img-circle elevation-2"
+                                                    width="80" height="80"
+                                                    style="object-fit: cover;">
                                         {% else %}
                                             <div class="text-center">
                                                 <i class="fas fa-image text-secondary" style="font-size: 50px;"></i>

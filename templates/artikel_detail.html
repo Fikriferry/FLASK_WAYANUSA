@@ -12,7 +12,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/artikeldetail.css') }}">
 
     <!-- AOS -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
@@ -23,32 +23,27 @@
     {% include "partials/navbar.html" %}
 
     <!-- ARTICLE DETAIL -->
-    <section class="quiz-section">
-        <div class="container">
-            <div class="quiz-content">
-                <a href="{{ url_for('web.artikel') }}" class="btn-login" style="margin-bottom: 20px;">← Kembali ke Daftar Artikel</a>
-                <h2 class="quiz-title">{{ artikel.title }}</h2>
-                <p class="quiz-description">Diterbitkan pada {{ artikel.created_at.strftime('%d %B %Y') }}</p>
+    <section class="article-detail-section">
+        <div class="article-detail-container">
+            <a href="{{ url_for('web.artikel') }}" class="article-back-btn">← Kembali ke Daftar Artikel</a>
+            <h1 class="article-title">{{ artikel.title }}</h1>
+            <p class="article-meta">Diterbitkan pada {{ artikel.created_at.strftime('%d %B %Y') }}</p>
 
-                {% if artikel.thumbnail %}
-                <!-- <img src="{{ url_for('web.uploaded_file', filename='thumbnails/' + artikel.thumbnail) }}" 
-                     alt="{{ artikel.title }}" 
-                     style="width: 100%; max-width: 600px; height: auto; margin: 20px 0; border-radius: 8px;"> -->
-                <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}" 
-                    alt="{{ artikel.title }}" 
-                    style="width: 100%; max-width: 600px; height: auto; margin: 20px 0; border-radius: 8px;">
-                     {% endif %}
+            {% if artikel.thumbnail %}
+            <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}"
+                alt="{{ artikel.title }}"
+                class="article-thumbnail">
+            {% endif %}
 
-                <div class="artikel-content" style="line-height: 1.6; font-size: 18px; color: #333;">
-                    {{ artikel.content | safe }}
-                </div>
-
-                {% if artikel.source_link %}
-                <p style="margin-top: 20px;">
-                    <strong>Sumber:</strong> <a href="{{ artikel.source_link }}" target="_blank">{{ artikel.source_link }}</a>
-                </p>
-                {% endif %}
+            <div class="article-content">
+                {{ artikel.content | safe }}
             </div>
+
+            {% if artikel.source_link %}
+            <div class="article-source">
+                <strong>Sumber:</strong> <a href="{{ artikel.source_link }}" target="_blank">{{ artikel.source_link }}</a>
+            </div>
+            {% endif %}
         </div>
     </section>
 

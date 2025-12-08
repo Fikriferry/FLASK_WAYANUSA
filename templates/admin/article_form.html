@@ -36,7 +36,12 @@
                         {% if artikel and artikel.thumbnail %}
                             <div class="mt-2">
                                 <small class="text-muted">Thumbnail saat ini:</small><br>
-                                <img src="{{ url_for('web.uploaded_file', filename='thumbnails/' + artikel.thumbnail) }}" alt="Thumbnail" width="150" class="mt-1 border">
+                                <!-- <img src="{{ url_for('web.uploaded_file', filename='thumbnails/' + artikel.thumbnail) }}" alt="Thumbnail" width="150" class="mt-1 border"> -->
+                                 <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}"
+                                    alt="Thumbnail {{ artikel.title }}"
+                                    class="img-circle elevation-2"
+                                    width="80" height="80"
+                                    style="object-fit: cover;">
                             </div>
                         {% endif %}
                     </div>
