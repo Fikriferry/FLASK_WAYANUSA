@@ -14,7 +14,9 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/wayang.css') }}">
+    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
 </head>
 
 <body>
@@ -39,8 +41,14 @@
                     </div>
                 </div>
                 <div class="hero-image">
-                    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Siluet Wayang Kulit"
-                        class="wayang-image">
+                    <div class="slideshow-container">
+                        <div class="slideshow">
+                            <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Siluet Wayang Kulit" class="wayang-image">
+                            <img src="{{ url_for('static', filename='images/wayang1.jpg') }}" alt="Wayang Kulit 1" class="wayang-image">
+                            <img src="{{ url_for('static', filename='images/wayang2.jpg') }}" alt="Wayang Kulit 2" class="wayang-image">
+                            <img src="{{ url_for('static', filename='images/wayang3.jpg') }}" alt="Wayang Kulit 3" class="wayang-image">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
