@@ -158,6 +158,10 @@ def artikel_detail(id):
     artikel = Article.query.get_or_404(id)
     return render_template('artikel_detail.html', artikel=artikel)
 
+@web_routes.route('/v-dalang')
+def v_dalang():
+    return render_template('simulasi_dalang.html')
+
 # -------------------------
 # ADMIN ROUTES
 # -------------------------

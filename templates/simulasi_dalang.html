@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Panggung Dalang</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            font-family: sans-serif;
+            overflow: hidden;
+        }
+
+        .panggung {
+            position: absolute;
+            inset: 0;
+            background: url("static/images/panggung.jpg") center/cover no-repeat;
+            filter: brightness(0.85);
+            z-index: 1;
+        }
+
+        /* === AREA STAGE === */
+        .stage-area {
+            position: absolute;
+            top: 12vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70vw;
+            height: 55vh;
+            background: rgba(255, 240, 200, 0.7);
+            border: 4px solid #b88a33;
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 3;
+            box-shadow:
+                0 0 40px rgba(0, 0, 0, 0.6) inset,
+                0 0 25px rgba(255, 200, 150, 0.4);
+        }
+
+        .tirai-area {
+            position: absolute;
+            inset: 0;
+            background: url("static/images/tirai2.png") center/cover no-repeat;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* === AREA DALANG === */
+        .dalang-area {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85vw;
+            height: 25vh;
+            background: rgba(0, 0, 0, 0.85);
+            border-top: 4px solid #b88a33;
+            z-index: 4;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-add {
+            margin-left: auto;
+            background: #d4a23a;
+            border: none;
+            padding: 10px 20px;
+            font-size: 22px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .wayang-list {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            overflow-x: auto;
+
+            /* ANIMASI SLIDE */
+            transform: translateX(120%);   /* posisinya di luar kanan */
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        .wayang-list.show {
+            transform: translateX(0);     /* posisinya normal */
+            opacity: 1;
+        }
+
+        .wayang-slot {
+            width: 80px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #d4a23a;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: grab;
+        }
+
+        .wayang-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .wayang {
+            position: absolute;
+            width: 90px;
+            height: 140px;
+            pointer-events: none;
+        }
+
+        .trash-bin {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            width: 60px;
+            height: 60px;
+            background: rgba(200, 0, 0, 0.7);
+            border: 3px solid #ffaaaa;
+            border-radius: 12px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            pointer-events: none;
+            /* supaya tidak mengganggu drag */
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="panggung"></div>
+
+    <!-- === FIXED VERSION === -->
+    <div class="stage-area" id="stageArea">
+        <div class="tirai-area"></div>
+        <div class="trash-bin" id="trashBin">🗑️</div>
+    </div>
+
+    <div class="dalang-area">
+        <div class="wayang-list" id="wayangList">
+
+            <div class="wayang-slot" draggable="true" data-src="static/wayang/arjuna.png">
+                <img src="static/wayang/arjuna.png">
+            </div>
+
+            <div class="wayang-slot" draggable="true" data-src="static/wayang/semar.png">
+                <img src="static/wayang/semar.png">
+            </div>
+
+            <div class="wayang-slot" draggable="true" data-src="static/wayang/bima.png">
+                <img src="static/wayang/bima.png">
+            </div>
+
+        </div>
+
+        <button class="btn-add" id="btnAdd">+</button>
+    </div>
+
+    <script>
+        /* === TOMBOL + === */
+        document.getElementById("btnAdd").addEventListener("click", () => {
+            const list = document.getElementById("wayangList");
+            list.classList.toggle("show");
+        });
+
+
+        /* === DRAG WAYANG DARI LIST === */
+        const stage = document.getElementById("stageArea");
+        let draggedSrc = null;
+
+        document.querySelectorAll(".wayang-slot").forEach(slot => {
+            slot.addEventListener("dragstart", () => {
+                draggedSrc = slot.getAttribute("data-src");
+            });
+        });
+
+        /* DROP KE STAGE */
+        stage.addEventListener("dragover", e => e.preventDefault());
+
+        stage.addEventListener("drop", e => {
+            const img = document.createElement("img");
+            img.src = draggedSrc;
+            img.className = "wayang";
+
+            img.style.left = e.offsetX + "px";
+            img.style.top = e.offsetY + "px";
+
+            stage.appendChild(img);
+
+            enableDrag(img);
+            fallDown(img);
+        });
+
+        /* === DRAG DI DALAM STAGE === */
+        function enableDrag(el) {
+            let offsetX, offsetY, isDown = false;
+
+            el.style.pointerEvents = "auto";
+            el.style.cursor = "grab";
+
+            el.addEventListener("mousedown", (e) => {
+                isDown = true;
+                el.style.cursor = "grabbing";
+                offsetX = e.offsetX;
+                offsetY = e.offsetY;
+            });
+
+            document.addEventListener("mouseup", () => {
+                if (!isDown) return;
+
+                // cek apakah wayang masuk kotak sampah
+                if (isOverTrash(el)) {
+                    el.remove();
+                    isDown = false;
+                    return;
+                }
+
+                // kalau tidak masuk sampah → jatuh seperti biasa
+                fallDown(el);
+                isDown = false;
+                el.style.cursor = "grab";
+            });
+
+
+            document.addEventListener("mousemove", (e) => {
+                if (!isDown) return;
+
+                const rect = stage.getBoundingClientRect();
+
+                let x = e.clientX - rect.left - offsetX;
+                let y = e.clientY - rect.top - offsetY;
+
+                x = Math.max(0, Math.min(rect.width - el.clientWidth, x));
+                y = Math.max(0, Math.min(rect.height - el.clientHeight, y));
+
+                el.style.left = x + "px";
+                el.style.top = y + "px";
+            });
+
+
+        }
+
+        /* === DETEKSI JIKA DIJATUHKAN KE TEMPAT SAMPAH === */
+        const trash = document.getElementById("trashBin");
+
+        function isOverTrash(el) {
+            const wRect = el.getBoundingClientRect();
+            const tRect = trash.getBoundingClientRect();
+
+            return !(
+                wRect.right < tRect.left ||
+                wRect.left > tRect.right ||
+                wRect.bottom < tRect.top ||
+                wRect.top > tRect.bottom
+            );
+        }
+
+
+        /* === GRAVITY: WAYANG JATUH === */
+        function fallDown(el) {
+            const rect = stage.getBoundingClientRect();
+            const bottom = rect.height - el.clientHeight;
+            let current = parseInt(el.style.top);
+
+            let fall = setInterval(() => {
+                current += 3;
+
+                if (current >= bottom) {
+                    current = bottom;
+                    clearInterval(fall);
+                }
+
+                el.style.top = current + "px";
+            }, 10);
+        }
+    </script>
+
+</body>
+
+</html>
