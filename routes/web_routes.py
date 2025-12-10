@@ -125,13 +125,13 @@ def quiz_play():
 def mencari_dalang():
     return render_template('mencari_dalang.html')
 
-@web_routes.route("/pertunjukan_wayang/video/<youtube_id>")
-def video_detail(youtube_id):
+@web_routes.route("/pertunjukan_wayang/video/<int:id>")
+def video_detail(id):
     if not session.get("user_logged_in"):
         return redirect(url_for("web.login_user"))
 
-    video = Video.query.filter_by(youtube_id=youtube_id).first_or_404()
-    related_videos = Video.query.filter(Video.youtube_id != youtube_id).all()
+    video = Video.query.get_or_404(id)
+    related_videos = Video.query.filter(Video.id != id).all()
     return render_template("video_detail.html", video=video, related_videos=related_videos)
 
 @web_routes.route('/search')
@@ -275,13 +275,13 @@ def video_list():
 def video_add():
     if request.method == 'POST':
         judul = request.form.get('judul')
-        youtube_id = request.form.get('youtube_id')
+        youtube_link = request.form.get('youtube_link')
 
-        if not judul or not youtube_id:
-            flash("Judul dan YouTube ID wajib diisi!", "error")
+        if not judul or not youtube_link:
+            flash("Judul dan YouTube Link wajib diisi!", "error")
             return redirect(url_for('web.video_add'))
 
-        video = Video(judul=judul, youtube_id=youtube_id)
+        video = Video(judul=judul, youtube_link=youtube_link)
         db.session.add(video)
         db.session.commit()
         flash("Video berhasil ditambahkan!", "success")

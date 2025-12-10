@@ -65,8 +65,19 @@ class Video(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     judul = db.Column(db.String(255), nullable=False)
-    youtube_id = db.Column(db.String(50), nullable=False)
+    youtube_link = db.Column(db.String(255), nullable=False)
     tampil = db.Column(db.Boolean, default=True)
+
+    @property
+    def youtube_id(self):
+        # Extract YouTube ID from the link
+        if 'youtube.com/watch?v=' in self.youtube_link:
+            return self.youtube_link.split('v=')[1].split('&')[0]
+        elif 'youtu.be/' in self.youtube_link:
+            return self.youtube_link.split('youtu.be/')[1].split('?')[0]
+        elif self.youtube_link and len(self.youtube_link) == 11:  # Direct video ID
+            return self.youtube_link
+        return None
 
 
 # ---------------------------------------------------

@@ -89,7 +89,7 @@
 
             {% if related_videos %}
             {% for v in related_videos %}
-            <a href="{{ url_for('web.video_detail', youtube_id=v.youtube_id) }}" style="text-decoration:none;">
+            <a href="{{ url_for('web.video_detail', id=v.id) }}" style="text-decoration:none;">
                 <div class="related-item">
                     <img class="related-thumbnail" src="https://img.youtube.com/vi/{{ v.youtube_id }}/mqdefault.jpg"
                         alt="thumbnail">

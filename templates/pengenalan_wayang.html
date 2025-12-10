@@ -166,8 +166,8 @@
         function updateProgress(stage) {
             currentStage = stage;
             for (let i = 1; i <= 4; i++) {
-                const step = document.getElementById(`step${i}`);
-                const line = document.getElementById(`line${i}`);
+                const step = document.getElementById(step${i});
+                const line = document.getElementById(line${i});
 
                 step.className = 'step-circle';
                 if (line) line.className = 'step-line';
@@ -371,7 +371,7 @@
 
         // Add Spin Animation
         const style = document.createElement('style');
-        style.textContent = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+        style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
         document.head.appendChild(style);
     </script>
 </body>

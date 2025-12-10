@@ -11,6 +11,7 @@ from routes.web_routes import web_routes
 from routes.api_routes import api, auth_api
 from routes.auth_routes import auth_routes, init_oauth
 from routes.quiz_routes import quiz_routes  # <<--- Tambahkan ini
+from routes.leaderboard_wayang_routes import leaderboard_wayang_bp  # <<--- Tambahkan ini
 
 # ================================ #
 #          LOAD ENV FILE           #
@@ -59,6 +60,7 @@ app.register_blueprint(api, url_prefix="/api")
 app.register_blueprint(auth_api, url_prefix="/api/auth")
 app.register_blueprint(auth_routes)
 app.register_blueprint(quiz_routes, url_prefix="/api/quiz")  # <<--- Tambahkan ini
+app.register_blueprint(leaderboard_wayang_bp)  # <<--- Tambahkan ini
 
 # ================================ #
 #             RUN APP              #
