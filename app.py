@@ -4,6 +4,7 @@ import os
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
+from flask_migrate import Migrate
 from ai_manager import init_ai_model
 
 # Routes
@@ -43,6 +44,7 @@ init_oauth(app)
 
 # Init DB
 db.init_app(app)
+migrate = Migrate(app, db)
 with app.app_context():
     db.create_all()
 

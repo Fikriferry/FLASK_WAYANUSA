@@ -23,6 +23,7 @@ body {
     background-color: #000;
     color: #333;
     overflow-x: hidden;
+    padding-top: 80px;
 }
 
 /* Navbar */

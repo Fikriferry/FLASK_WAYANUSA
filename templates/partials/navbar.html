@@ -6,17 +6,10 @@
             <!-- Logo -->
             <div class="navbar-logo">
                 <a href="/" class="logo-link">
-                    <img src="/static/images/logo.png" alt="dasbosrad" class="logo-image">
-                    <!-- <span class="logo-text">dasbosrad</span> -->
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
+                    <!-- <span class="logo-text">WAYANUSA</span> -->
                 </a>
             </div>
-
-            <!-- Burger Menu Button -->
-            <button class="burger-menu" id="burgerMenu">
-                <span class="burger-line"></span>
-                <span class="burger-line"></span>
-                <span class="burger-line"></span>
-            </button>
 
             <!-- Menu -->
             <div class="navbar-menu" id="navbarMenu">
@@ -41,7 +34,7 @@
                     <div class="profile-dropdown">
                         <div class="profile-toggle" id="profileToggle">
                             <!-- <img src="{{ url_for('static', filename='images/default-profile.png') }}" alt="Profile Photo" class="profile-photo"> -->
-                            <img src="/static/images/profile.png" alt="dasbosrad" class="logo-image">
+                            <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Profile Photo" class="profile-photo">
                             <span class="profile-name">{{ session.get('user_name', 'User') }}</span>
                         </div>
                         <ul class="profile-menu" id="profileMenu">
