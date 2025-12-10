@@ -65,8 +65,19 @@ class Video(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     judul = db.Column(db.String(255), nullable=False)
-    youtube_id = db.Column(db.String(50), nullable=False)
+    youtube_link = db.Column(db.String(255), nullable=False)
     tampil = db.Column(db.Boolean, default=True)
+
+    @property
+    def youtube_id(self):
+        # Extract YouTube ID from the link
+        if 'youtube.com/watch?v=' in self.youtube_link:
+            return self.youtube_link.split('v=')[1].split('&')[0]
+        elif 'youtu.be/' in self.youtube_link:
+            return self.youtube_link.split('youtu.be/')[1].split('?')[0]
+        elif self.youtube_link and len(self.youtube_link) == 11:  # Direct video ID
+            return self.youtube_link
+        return None
 
 
 # ---------------------------------------------------
@@ -81,6 +92,7 @@ class AIModel(db.Model):
     accuracy = db.Column(db.String(50))
     is_active = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    labels = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
         return f'<AIModel {self.version_name}>'
@@ -152,3 +164,12 @@ class Article(db.Model):
     thumbnail = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Wayang(db.Model):
+    __tablename__ = 'wayang_info'
+    id = db.Column(db.Integer, primary_key=True)
+    nama = db.Column(db.String(100), unique=True, nullable=False) # Kunci utama (misal: "Arjuna")
+    deskripsi = db.Column(db.Text, nullable=False) # Deskripsi panjang
+    
+    def __repr__(self):
+        return f'<Wayang {self.nama}>'

@@ -100,7 +100,7 @@ body {
     color: #333;
     cursor: pointer;
     transition: all 0.3s ease;
-    text-align: left;
+    text-align: center;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -359,11 +359,6 @@ body {
 
     .question-card h2 {
         font-size: 1.3rem;
-    }
-
-    .answers-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
     }
 
     .answer-btn {

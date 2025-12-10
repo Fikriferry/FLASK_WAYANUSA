@@ -1,0 +1,58 @@
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+    <div class="container">
+        <div class="navbar-content">
+
+            <!-- Logo -->
+            <div class="navbar-logo">
+                <a href="/" class="logo-link">
+                    <img src="/static/images/logo.png" alt="dasbosrad" class="logo-image">
+                    <!-- <span class="logo-text">dasbosrad</span> -->
+                </a>
+            </div>
+
+            <!-- Burger Menu Button -->
+            <button class="burger-menu" id="burgerMenu">
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+            </button>
+
+            <!-- Menu -->
+            <div class="navbar-menu" id="navbarMenu">
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('web.home') }}">Beranda</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">Fitur <i class="fas fa-chevron-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                            <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
+                            <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
+                            <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                            <li><a href="{{ url_for('web.artikel') }}">Artikel</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Profile Menu -->
+            <div class="navbar-profile">
+                {% if session.get('user_logged_in') %}
+                    <div class="profile-dropdown">
+                        <div class="profile-toggle" id="profileToggle">
+                            <!-- <img src="{{ url_for('static', filename='images/default-profile.png') }}" alt="Profile Photo" class="profile-photo"> -->
+                            <img src="/static/images/profile.png" alt="dasbosrad" class="logo-image">
+                            <span class="profile-name">{{ session.get('user_name', 'User') }}</span>
+                        </div>
+                        <ul class="profile-menu" id="profileMenu">
+                            <li><a href="{{ url_for('web.logout_user') }}">Logout</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</nav>

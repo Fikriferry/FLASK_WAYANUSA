@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 from functools import wraps
 import os
-from models import Video, db, AIModel, Dalang, User, Admin, QuizLevel, QuizQuestion, Article
+from models import Video, db, AIModel, Dalang, User, Admin, QuizLevel, QuizQuestion, Article, QuizResult, Wayang
 from ai_manager import reload_model
 
 web_routes = Blueprint("web", __name__)
@@ -125,13 +125,13 @@ def quiz_play():
 def mencari_dalang():
     return render_template('mencari_dalang.html')
 
-@web_routes.route("/pertunjukan_wayang/video/<youtube_id>")
-def video_detail(youtube_id):
+@web_routes.route("/pertunjukan_wayang/video/<int:id>")
+def video_detail(id):
     if not session.get("user_logged_in"):
         return redirect(url_for("web.login_user"))
 
-    video = Video.query.filter_by(youtube_id=youtube_id).first_or_404()
-    related_videos = Video.query.filter(Video.youtube_id != youtube_id).all()
+    video = Video.query.get_or_404(id)
+    related_videos = Video.query.filter(Video.id != id).all()
     return render_template("video_detail.html", video=video, related_videos=related_videos)
 
 @web_routes.route('/search')
@@ -279,13 +279,13 @@ def video_list():
 def video_add():
     if request.method == 'POST':
         judul = request.form.get('judul')
-        youtube_id = request.form.get('youtube_id')
+        youtube_link = request.form.get('youtube_link')
 
-        if not judul or not youtube_id:
-            flash("Judul dan YouTube ID wajib diisi!", "error")
+        if not judul or not youtube_link:
+            flash("Judul dan YouTube Link wajib diisi!", "error")
             return redirect(url_for('web.video_add'))
 
-        video = Video(judul=judul, youtube_id=youtube_id)
+        video = Video(judul=judul, youtube_link=youtube_link)
         db.session.add(video)
         db.session.commit()
         flash("Video berhasil ditambahkan!", "success")
@@ -330,38 +330,57 @@ def save_thumbnail(file):
     return None, "Format file tidak didukung! Hanya JPG, JPEG, PNG."
 
 @web_routes.route('/admin/models', methods=['GET', 'POST'])
-@admin_login_required
 def admin_models():
     if request.method == 'POST':
-        if 'model_file' not in request.files:
-            flash('Tidak ada file', 'danger')
-            return redirect(request.url)
+        file_model = request.files.get('model_file')
+        file_labels = request.files.get('labels_file') # <-- Ambil file label
         
-        file = request.files['model_file']
         version_name = request.form.get('version_name')
         accuracy = request.form.get('accuracy')
 
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+        if file_model and file_labels:
+            # 1. Simpan File Model (Seperti Biasa)
+            filename = secure_filename(file_model.filename)
             save_dir = os.path.join(current_app.root_path, UPLOAD_FOLDER)
             os.makedirs(save_dir, exist_ok=True)
-            
             file_path = os.path.join(UPLOAD_FOLDER, filename)
             full_path = os.path.join(save_dir, filename)
-            
-            file.save(full_path)
+            file_model.save(full_path)
 
+            # 2. BACA File Labels.txt dan ubah jadi String
+            # Anggap isi txt:
+            # Arjuna
+            # Bima
+            # Semar
+            
+            try:
+                # Baca isi file, decode bytes ke string
+                labels_content = file_labels.read().decode('utf-8')
+                
+                # Ubah menjadi list, hilangkan spasi/enter
+                labels_list = [line.strip() for line in labels_content.splitlines() if line.strip()]
+                
+                # Gabungkan kembali dengan koma: "Arjuna,Bima,Semar"
+                labels_string = ",".join(labels_list)
+                
+            except Exception as e:
+                flash(f'Gagal membaca file label: {e}', 'danger')
+                return redirect(request.url)
+
+            # 3. Simpan ke Database
             new_model = AIModel(
                 version_name=version_name,
                 file_path=file_path,
                 accuracy=accuracy,
+                labels=labels_string, # <-- SIMPAN DI SINI
                 is_active=False
             )
             db.session.add(new_model)
             db.session.commit()
-            flash('Model berhasil diupload!', 'success')
+            
+            flash('Model dan Label berhasil diupload!', 'success')
         else:
-            flash('Format file salah. Harap upload .keras atau .h5', 'danger')
+            flash('Harap upload kedua file (Model dan Labels)!', 'danger')
 
     models = AIModel.query.order_by(AIModel.created_at.desc()).all()
     return render_template('admin/model_list.html', models=models)
@@ -587,3 +606,63 @@ def artikel_delete(id):
     db.session.commit()
     flash('Artikel berhasil dihapus!', 'success')
     return redirect(url_for('web.artikel_list'))
+
+# --- HALAMAN LIST WAYANG (ADMIN) ---
+@web_routes.route('/admin/wayang')
+@admin_login_required # Pastikan pakai decorator login admin
+def admin_wayang_list():
+    wayangs = Wayang.query.order_by(Wayang.nama).all()
+    return render_template('admin/wayang_list.html', wayangs=wayangs)
+
+# --- HALAMAN EDIT WAYANG (ADMIN) ---
+@web_routes.route('/admin/wayang/edit/<int:id>', methods=['GET', 'POST'])
+@admin_login_required
+def admin_wayang_edit(id):
+    wayang = Wayang.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        # Admin mengedit deskripsi
+        wayang.deskripsi = request.form['deskripsi']
+        
+        # Admin juga bisa upload foto referensi baru jika mau (opsional)
+        # ... kode upload foto ...
+        
+        db.session.commit()
+        flash(f'Deskripsi {wayang.nama} berhasil diperbarui!', 'success')
+        return redirect(url_for('web.admin_wayang_list'))
+        
+    return render_template('admin/wayang_form.html', wayang=wayang)
+
+# --- ROUTE TAMBAH WAYANG ---
+@web_routes.route('/admin/wayang/add', methods=['GET', 'POST'])
+@admin_login_required
+def admin_wayang_add():
+    if request.method == 'POST':
+        nama = request.form['nama']
+        deskripsi = request.form['deskripsi']
+        
+        # Cek apakah nama sudah ada (Mencegah duplikat)
+        existing = Wayang.query.filter_by(nama=nama).first()
+        if existing:
+            flash('Gagal! Nama wayang tersebut sudah ada.', 'danger')
+            return redirect(url_for('web.admin_wayang_add'))
+            
+        new_wayang = Wayang(nama=nama, deskripsi=deskripsi)
+        db.session.add(new_wayang)
+        db.session.commit()
+        
+        flash('Data wayang berhasil ditambahkan!', 'success')
+        return redirect(url_for('web.admin_wayang_list'))
+        
+    # Render form kosong (pass wayang=None untuk menandakan mode tambah)
+    return render_template('admin/wayang_form.html', wayang=None)
+
+# --- ROUTE HAPUS WAYANG (Opsional) ---
+@web_routes.route('/admin/wayang/delete/<int:id>')
+@admin_login_required
+def admin_wayang_delete(id):
+    wayang = Wayang.query.get_or_404(id)
+    db.session.delete(wayang)
+    db.session.commit()
+    flash('Data wayang berhasil dihapus.', 'success')
+    return redirect(url_for('web.admin_wayang_list'))

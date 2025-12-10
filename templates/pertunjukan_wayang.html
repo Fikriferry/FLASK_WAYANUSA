@@ -72,7 +72,7 @@
                     {% for v in videos %}
                     <div class="quiz-card"
                          data-title="{{ v.judul }}"
-                         onclick="goToVideo('{{ v.youtube_id }}')"
+                         onclick="goToVideo({{ v.id }})"
                          data-aos="fade-up">
 
                         <div class="quiz-card-content">
@@ -98,14 +98,14 @@
     <script>
         AOS.init();
 
-        function goToVideo(youtubeId) {
+        function goToVideo(videoId) {
             if (!{{ session.get('user_logged_in', False)|tojson }}) {
                 alert("Silakan login terlebih dahulu untuk menonton video.");
                 window.location.href = "{{ url_for('web.login_user') }}";
                 return;
             }
 
-            window.location.href = "/pertunjukan_wayang/video/" + youtubeId;
+            window.location.href = "/pertunjukan_wayang/video/" + videoId;
         }
 
         function searchVideo() {

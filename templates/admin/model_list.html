@@ -5,23 +5,53 @@
     <h1 class="h3 mb-4 text-gray-800">Manajemen Model AI</h1>
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Upload Model Baru (.keras / .h5)</h6>
+        <div class="card-header py-3 bg-primary">
+            <h6 class="m-0 font-weight-bold text-white">
+                <i class="fas fa-upload mr-2"></i>Upload Model Baru
+            </h6>
         </div>
         <div class="card-body">
             <form method="POST" enctype="multipart/form-data">
                 <div class="row">
-                    <div class="col-md-4">
-                        <input type="text" name="version_name" class="form-control" placeholder="Nama Versi (cth: V2 MobileNet)" required>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="font-weight-bold">Nama Versi</label>
+                            <input type="text" name="version_name" class="form-control" placeholder="Contoh: V2 MobileNet (22 Kelas)" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-bold">Akurasi (%)</label>
+                            <input type="number" step="0.01" name="accuracy" class="form-control" placeholder="Contoh: 95.5">
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <input type="text" name="accuracy" class="form-control" placeholder="Akurasi (cth: 92%)">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="font-weight-bold">File Model AI (.h5 / .keras)</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="model_file" id="modelFile" accept=".h5,.keras" required>
+                                <label class="custom-file-label" for="modelFile">Pilih file model...</label>
+                            </div>
+                            <small class="text-muted">Maksimal ukuran file disesuaikan dengan server.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="font-weight-bold">File Label (labels.txt)</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="labels_file" id="labelFile" accept=".txt" required>
+                                <label class="custom-file-label" for="labelFile">Pilih file labels.txt...</label>
+                            </div>
+                            <small class="text-danger">*Wajib: File txt berisi nama wayang urut abjad (sesuai training).</small>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <input type="file" name="model_file" class="form-control" accept=".keras,.h5" required>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary btn-block">Upload</button>
+                </div>
+
+                <hr>
+                
+                <div class="row justify-content-end">
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <i class="fas fa-cloud-upload-alt mr-2"></i> Upload Model
+                        </button>
                     </div>
                 </div>
             </form>
@@ -30,15 +60,18 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Model Tersedia</h6>
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-list mr-2"></i>Daftar Model Tersedia
+            </h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" width="100%" cellspacing="0">
-                    <thead>
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-light">
                         <tr>
                             <th>Versi</th>
-                            <th>File</th>
+                            <th>File Path</th>
+                            <th>Label Data</th>
                             <th>Akurasi</th>
                             <th>Tanggal Upload</th>
                             <th>Status</th>
@@ -48,29 +81,42 @@
                     <tbody>
                         {% for model in models %}
                         <tr class="{{ 'table-success' if model.is_active else '' }}">
-                            <td>{{ model.version_name }}</td>
-                            <td>{{ model.file_path }}</td>
-                            <td>{{ model.accuracy }}</td>
+                            <td class="font-weight-bold">{{ model.version_name }}</td>
+                            <td><small>{{ model.file_path }}</small></td>
+                            <td>
+                                {% if model.labels %}
+                                    <span class="badge badge-info" title="{{ model.labels }}">Ada ({{ model.labels.split(',')|length }} Kelas)</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Tidak Ada Label</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ model.accuracy }}%</td>
                             <td>{{ model.created_at.strftime('%d-%m-%Y') }}</td>
                             <td>
                                 {% if model.is_active %}
-                                    <span class="badge badge-success">AKTIF (Sedang Digunakan)</span>
+                                    <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> AKTIF</span>
                                 {% else %}
-                                    <span class="badge badge-secondary">Tidak Aktif</span>
+                                    <span class="badge badge-secondary">Non-Aktif</span>
                                 {% endif %}
                             </td>
                             <td>
                                 {% if not model.is_active %}
-                                    <a href="{{ url_for('web.activate_model', id=model.id) }}" class="btn btn-sm btn-success">
-                                        <i class="fas fa-check"></i> Gunakan
+                                    <a href="{{ url_for('web.activate_model', id=model.id) }}" class="btn btn-sm btn-success mb-1" title="Aktifkan Model Ini">
+                                        <i class="fas fa-power-off"></i> Gunakan
                                     </a>
-                                    <a href="{{ url_for('web.delete_model', id=model.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Hapus model ini?')">
+                                    <a href="{{ url_for('web.delete_model', id=model.id) }}" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Yakin ingin menghapus model ini beserta filenya?')" title="Hapus Model">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 {% else %}
-                                    <button class="btn btn-sm btn-secondary" disabled>Aktif</button>
+                                    <button class="btn btn-sm btn-secondary" disabled title="Model sedang digunakan">
+                                        <i class="fas fa-lock"></i> Terkunci
+                                    </button>
                                 {% endif %}
                             </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Belum ada model AI yang diupload.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -79,4 +125,21 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ambil semua input file custom
+        var fileInputs = document.querySelectorAll('.custom-file-input');
+        
+        fileInputs.forEach(function(input) {
+            input.addEventListener('change', function(e) {
+                // Ambil nama file
+                var fileName = e.target.files[0].name;
+                // Ganti label dengan nama file
+                var nextSibling = e.target.nextElementSibling;
+                nextSibling.innerText = fileName;
+            });
+        });
+    });
+</script>
 {% endblock %}

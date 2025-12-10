@@ -17,7 +17,7 @@
             <tr>
                 <th>#</th>
                 <th>Judul</th>
-                <th>YouTube ID</th>
+                <th>YouTube Link</th>
                 <th>Preview</th>
                 <th>Aksi</th>
             </tr>
@@ -27,7 +27,7 @@
             <tr>
                 <td>{{ loop.index }}</td>
                 <td>{{ v.judul }}</td>
-                <td>{{ v.youtube_id }}</td>
+                <td>{{ v.youtube_link }}</td>
                 <td>
                     <iframe width="200" height="100"
                         src="https://www.youtube.com/embed/{{ v.youtube_id }}">
