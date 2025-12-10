@@ -12,7 +12,9 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/wayang.css') }}">
+    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
 </head>
 
 <body>
@@ -50,6 +52,7 @@
         </div>
     </nav>
 
+    <!-- ================= HERO ================= -->
     <main class="hero">
         <div class="container">
             <div class="hero-content">
@@ -72,7 +75,8 @@
                 </div>
 
                 <div class="hero-image">
-                    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Siluet Wayang Kulit" class="wayang-image">
+                    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Siluet Wayang Kulit"
+                        class="wayang-image">
                 </div>
 
             </div>
@@ -114,9 +118,9 @@
                 <div class="features-grid">
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_ai.jpg') }}" 
-                                 onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Pengenalan+Wayang'" 
-                                 alt="Pengenalan Wayang">
+                            <img src="{{ url_for('static', filename='images/feature_ai.jpg') }}"
+                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Pengenalan+Wayang'"
+                                alt="Pengenalan Wayang">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Pengenalan Wayang</h3>
@@ -129,9 +133,9 @@
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_quiz.jpg') }}" 
-                                 onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Kuis+Edukatif'" 
-                                 alt="Kuis Edukatif">
+                            <img src="{{ url_for('static', filename='images/feature_quiz.jpg') }}"
+                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Kuis+Edukatif'"
+                                alt="Kuis Edukatif">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Kuis Edukatif</h3>
@@ -144,15 +148,45 @@
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_dalang.jpg') }}" 
-                                 onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Mencari+Dalang'" 
-                                 alt="Mencari Dalang">
+                            <img src="{{ url_for('static', filename='images/feature_dalang.jpg') }}"
+                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Mencari+Dalang'"
+                                alt="Mencari Dalang">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Mencari Dalang</h3>
                             <div class="feature-badge">📍 Lokasi & Profil</div>
                             <p class="feature-description">
                                 Temukan profil dalang dan sanggar seni terdekat di sekitarmu.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="{{ url_for('static', filename='images/PertunukanWayang.jpeg') }}"
+                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Pertunjukan+Wayang'"
+                                alt="Pertunjukan Wayang">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Pertunjukan Wayang</h3>
+                            <div class="feature-badge">🎭 Acara & Jadwal</div>
+                            <p class="feature-description">
+                                Temukan vidio pertunjukan wayang kulit yang spektakuler.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="{{ url_for('static', filename='images/Artikel.jpeg') }}"
+                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Artikel'"
+                                alt="Artikel">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Artikel</h3>
+                            <div class="feature-badge">📖 Edukasi & Informasi</div>
+                            <p class="feature-description">
+                                Baca artikel menarik tentang budaya wayang kulit.
                             </p>
                         </div>
                     </div>

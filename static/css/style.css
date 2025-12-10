@@ -25,27 +25,18 @@ body {
     overflow-x: hidden;
 }
 
-a { text-decoration: none; color: inherit; }
-ul { list-style: none; }
-
-/* =========================================
-   2. NAVBAR
-   ========================================= */
+/* Navbar */
 .navbar {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(212, 163, 115, 0.2);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
     z-index: 1000;
     padding: 15px 0;
     transition: all 0.3s ease;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
 }
 
 .navbar-content {
@@ -249,6 +240,42 @@ ul { list-style: none; }
                 0 0 0 1px rgba(255, 215, 0, 0.1);
     filter: drop-shadow(0 10px 30px rgba(255, 215, 0, 0.2));
 }
+
+.slideshow-container {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 215, 0, 0.1);
+    filter: drop-shadow(0 10px 30px rgba(255, 215, 0, 0.2));
+}
+
+.slideshow {
+    display: flex;
+    width: 400%; /* 4 images */
+    animation: slide 16s infinite;
+}
+
+.slideshow img {
+    width: 25%; /* Each image takes 1/4 of the container */
+    height: auto;
+    object-fit: cover;
+}
+
+@keyframes slide {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(0); }
+    30% { transform: translateX(-25%); }
+    55% { transform: translateX(-25%); }
+    60% { transform: translateX(-50%); }
+    85% { transform: translateX(-50%); }
+    90% { transform: translateX(-75%); }
+    100% { transform: translateX(-75%); }
+}
+
+
 
 /* =========================================
    4. ABOUT SECTION
@@ -529,10 +556,178 @@ ul { list-style: none; }
     color: #ccc;
 }
 
-/* =========================================
-   6. DALANG SHOWCASE SECTION
-   ========================================= */
-.dalang-showcase {
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 40px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .btn {
+        min-width: 180px;
+    }
+
+    .wayang-image {
+        max-width: 80%;
+    }
+
+    .about {
+        padding: 80px 0;
+    }
+
+    .about-title {
+        font-size: 2.5rem;
+    }
+
+    .about-description {
+        font-size: 1rem;
+        margin-bottom: 50px;
+    }
+
+    .stats {
+        gap: 20px;
+    }
+
+    .stat-card {
+        min-width: 150px;
+        padding: 30px 20px;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+    }
+
+    .features {
+        padding: 80px 0;
+    }
+
+    .features-title {
+        font-size: 2.5rem;
+    }
+
+    .features-description {
+        font-size: 1rem;
+        margin-bottom: 50px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .feature-card {
+        max-width: 100%;
+    }
+}
+
+/* Navbar Responsive */
+@media (max-width: 768px) {
+    .navbar-content {
+        padding: 0 10px;
+    }
+
+    .navbar-menu {
+        display: none;
+    }
+
+    .logo-text {
+        font-size: 1.5rem;
+    }
+
+    .navbar-actions .btn-login {
+        padding: 8px 20px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .navbar-menu {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-tag {
+        font-size: 16px;
+    }
+
+    .hero-description {
+        font-size: 0.95rem;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        min-width: 160px;
+    }
+
+    .wayang-image {
+        max-width: 90%;
+    }
+
+    .about-title {
+        font-size: 2rem;
+    }
+
+    .about-description {
+        font-size: 0.9rem;
+    }
+
+    .stats {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-card {
+        min-width: 200px;
+    }
+
+    .features-title {
+        font-size: 2rem;
+    }
+
+    .features-description {
+        font-size: 0.9rem;
+    }
+
+    .feature-content {
+        padding: 20px;
+    }
+
+    .feature-title {
+        font-size: 1.3rem;
+    }
+
+    .logo-text {
+        font-size: 1.3rem;
+    }
+
+    .navbar-actions .btn-login {
+        padding: 6px 16px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Login Page Styles */
+.login-page {
+    font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
     padding: 100px 0;
     position: relative;
@@ -995,21 +1190,41 @@ ul { list-style: none; }
    8. RESPONSIVE DESIGN (GLOBAL)
    ========================================= */
 @media (max-width: 768px) {
-    .hero-content { flex-direction: column; text-align: center; gap: 40px; }
-    .hero-title { font-size: 2.5rem; }
-    .btn { min-width: 180px; }
-    .wayang-image { max-width: 80%; }
-    .features-grid, .dalang-grid { grid-template-columns: 1fr; }
-    
-    /* Chatbot Mobile */
-    .chatbot-button { bottom: 20px; right: 20px; width: 50px; height: 50px; }
-    .chatbot-icon { width: 26px; height: 26px; }
-    .chat-popup { bottom: 80px; right: 20px; width: 320px; height: 400px; }
-    .navbar-menu { display: none; }
-}
+    .selection-grid {
+        grid-template-columns: 1fr;
+    }
 
-@media (max-width: 480px) {
-    .chatbot-button { bottom: 15px; right: 15px; width: 45px; height: 45px; }
-    .chatbot-icon { width: 22px; height: 22px; }
-    .chat-popup { bottom: 70px; right: 15px; width: 280px; height: 350px; }
+    .result-layout {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+
+    .result-img-wrapper {
+        width: 150px;
+        margin-bottom: 20px;
+    }
+
+    .wayang-desc {
+        text-align: left;
+    }
+
+    .step-line {
+        width: 30px;
+    }
+
+    .recognition-title {
+        font-size: 1.8rem;
+    }
+
+    .back-btn-wrapper {
+        position: static;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        transform: none;
+    }
 }
+=======
+}
+>>>>>>> ff6ff6293371e492ef8400a90c1e42c668820b26

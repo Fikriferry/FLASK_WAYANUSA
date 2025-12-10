@@ -20,7 +20,34 @@
 
 <body>
 
-    {% include "partials/navbar.html" %}
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-logo">
+                    <a href="{{ url_for('web.home') }}" class="logo-link">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo-image">
+                    </a>
+                </div>
+                <div class="navbar-menu">
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
+                        <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
+                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}" class="active">Pertunjukan Wayang</a></li>
+                    </ul>
+                </div>
+                <div class="navbar-actions">
+                    {% if session.get('user_logged_in') %}
+                        <span class="user-greeting">Halo, {{ session.get('user_name') }}!</span>
+                        <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
 
     <!-- HERO -->
     <section class="quiz-section">
@@ -45,7 +72,7 @@
                     {% for v in videos %}
                     <div class="quiz-card"
                          data-title="{{ v.judul }}"
-                         onclick="goToVideo('{{ v.youtube_id }}')"
+                         onclick="goToVideo({{ v.id }})"
                          data-aos="fade-up">
 
                         <div class="quiz-card-content">
@@ -71,14 +98,14 @@
     <script>
         AOS.init();
 
-        function goToVideo(youtubeId) {
+        function goToVideo(videoId) {
             if (!{{ session.get('user_logged_in', False)|tojson }}) {
                 alert("Silakan login terlebih dahulu untuk menonton video.");
                 window.location.href = "{{ url_for('web.login_user') }}";
                 return;
             }
 
-            window.location.href = "/pertunjukan_wayang/video/" + youtubeId;
+            window.location.href = "/pertunjukan_wayang/video/" + videoId;
         }
 
         function searchVideo() {

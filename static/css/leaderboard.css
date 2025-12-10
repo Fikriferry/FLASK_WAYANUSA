@@ -1,0 +1,61 @@
+/* Leaderboard Sidebar */
+.leaderboard-sidebar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    max-height: 80vh;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 100%);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(107, 66, 38, 0.15);
+    border: 2px solid #D4A373;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.leaderboard-sidebar h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #6B4226;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.leaderboard-item:last-child {
+    border-bottom: none;
+}
+
+.rank {
+    font-weight: bold;
+    color: #007bff;
+    min-width: 30px;
+}
+
+.name {
+    flex: 1;
+    font-weight: 500;
+    color: #333;
+}
+
+.score {
+    font-weight: 600;
+    color: #6B4226;
+}
+
+@media (max-width: 768px) {
+    .leaderboard-sidebar {
+        position: static;
+        width: 100%;
+        margin-top: 20px;
+        max-height: none;
+    }
+}

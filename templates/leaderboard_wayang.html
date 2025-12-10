@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard Quiz Wayang - WAYANUSA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard_wayang.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-logo">
+                    <a href="{{ url_for('web.home') }}" class="logo-link">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
+                    </a>
+                </div>
+                <div class="navbar-menu">
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                        <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
+                        <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
+                        <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                        <li><a href="{{ url_for('web.artikel') }}" class="active">Artikel</a></li>
+                    </ul>
+                </div>
+                <div class="navbar-actions">
+                    {% if session.get('user_logged_in') %}
+                        <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
+                        <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="leaderboard-section">
+        <div class="container">
+            <div class="leaderboard-content">
+                <p class="leaderboard-tag">🏆 LEADERBOARD</p>
+                <h2 class="leaderboard-title">Leaderboard <span class="highlight">Wayang</span></h2>
+                <p class="leaderboard-description">
+                    Lihat peringkat pemain terbaik dalam quiz wayang kulit. Pilih level untuk melihat leaderboard spesifik.
+                </p>
+
+                <div class="level-selector">
+                    <select id="level-select">
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Expert">Expert</option>
+                    </select>
+                </div>
+
+                <div id="podium" class="podium">
+                    <!-- Podium will be rendered here -->
+                </div>
+
+                <div class="leaderboard-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Nama Peserta</th>
+                                <th>Level Quiz</th>
+                                <th>Skor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-tbody">
+                            <!-- Table rows will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="user-position" class="user-position">
+                    <!-- User position text will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+    <script src="{{ url_for('static', filename='js/leaderboard_wayang.js') }}"></script>
+</body>
+</html>
