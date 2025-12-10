@@ -92,6 +92,7 @@ class AIModel(db.Model):
     accuracy = db.Column(db.String(50))
     is_active = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    labels = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
         return f'<AIModel {self.version_name}>'
@@ -163,3 +164,12 @@ class Article(db.Model):
     thumbnail = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Wayang(db.Model):
+    __tablename__ = 'wayang_info'
+    id = db.Column(db.Integer, primary_key=True)
+    nama = db.Column(db.String(100), unique=True, nullable=False) # Kunci utama (misal: "Arjuna")
+    deskripsi = db.Column(db.Text, nullable=False) # Deskripsi panjang
+    
+    def __repr__(self):
+        return f'<Wayang {self.nama}>'

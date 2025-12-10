@@ -1,40 +1,74 @@
 from flask import Blueprint, jsonify, request
-from models import db, User, Dalang
+from models import db, User, Dalang, Wayang, AIModel
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from ai_manager import get_model
 import numpy as np
 import io
-from PIL import Image  # pip install Pillow
+from PIL import Image
+import google.generativeai as genai
 
+# ================================
+# KONFIGURASI BLUEPRINT & AI
+# ================================
 api = Blueprint("api", __name__)
 auth_api = Blueprint("auth_api", __name__)
 
-# ================================
-# 1. DALANG API
-# ================================
-@api.route("/dalang", methods=["GET"])
-def get_dalang():
-    dalangs = Dalang.query.all()
-    data = [{
-        "id": d.id,
-        "nama": d.nama,
-        "alamat": d.alamat,
-        "latitude": d.latitude,
-        "longitude": d.longitude,
-        "foto": d.foto
-    } for d in dalangs]
-    return jsonify({"dalangs": data}), 200
+# --- KONFIGURASI GEMINI AI (CHATBOT) ---
+# Ganti dengan API Key kamu yang valid
+GEMINI_API_KEY = "AIzaSyDmUtu7mZVRVqp88QigLZOra3UUsPkUhJk" 
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Inisialisasi Model Chat
+chat_model = genai.GenerativeModel("gemini-2.5-flash")
+chat_session = chat_model.start_chat(history=[])
+
+# Prompt Kepribadian Cepot Tegal
+SYSTEM_PROMPT = """
+Instruksi: Kamu adalah Cepot, tokoh wayang golek yang lucu dengan dialek Tegal (Ngapak) yang kental.
+Gunakan kata ganti 'Inyong' (Saya) dan 'Rika' atau 'Sampeyan' (Kamu).
+Gaya bicara: Ceplas-ceplos, humoris, tapi tetap sopan, membantu, dan sedikit 'ngegas' yang lucu.
+Jawablah pertanyaan user dengan singkat, padat, dan jelas (maksimal 3-4 kalimat).
+"""
 
 # ================================
-# 2. AUTH API (LOGIN / REGISTER / PROFILE)
+# 1. AUTH API (LOGIN / REGISTER)
 # ================================
+
+@auth_api.route("/register", methods=["POST"])
+def register():
+    """Mendaftarkan user baru."""
+    data = request.get_json()
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")
+
+    if User.query.filter_by(email=email).first():
+        return jsonify({"message": "Email already exists"}), 400
+
+    new_user = User(name=name, email=email)
+    new_user.set_password(password)
+    
+    try:
+        db.session.add(new_user)
+        db.session.commit()
+        token = create_access_token(identity=new_user.id)
+        return jsonify({
+            "access_token": token,
+            "user": {"id": new_user.id, "name": new_user.name, "email": new_user.email}
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
 @auth_api.route("/login", methods=["POST"])
 def login():
+    """Autentikasi user dan memberikan JWT Token."""
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
 
     user = User.query.filter_by(email=email).first()
+    
     if user and user.check_password(password):
         token = create_access_token(identity=user.id)
         return jsonify({
@@ -44,30 +78,10 @@ def login():
 
     return jsonify({"message": "Invalid credentials"}), 401
 
-@auth_api.route("/register", methods=["POST"])
-def register():
-    data = request.get_json()
-    name = data.get("name")
-    email = data.get("email")
-    password = data.get("password")
-
-    if User.query.filter_by(email=email).first():
-        return jsonify({"message": "Email already exists"}), 400
-
-    user = User(name=name, email=email)
-    user.set_password(password)
-    db.session.add(user)
-    db.session.commit()
-
-    token = create_access_token(identity=user.id)
-    return jsonify({
-        "access_token": token,
-        "user": {"id": user.id, "name": user.name, "email": user.email}
-    }), 201
-
 @auth_api.route("/profile", methods=["GET"])
 @jwt_required()
 def profile():
+    """Mengambil profil user yang sedang login."""
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
     if user:
@@ -75,47 +89,127 @@ def profile():
     return jsonify({"message": "User not found"}), 404
 
 # ================================
-# 3. PREDICTION API (WAYANG)
+# 2. DATA API (DALANG)
 # ================================
-@api.route("/predict-wayang", methods=["POST"])
+
+@api.route("/dalang", methods=["GET"])
+def get_dalang():
+    """Mengambil semua data dalang dari database."""
+    try:
+        dalangs = Dalang.query.all()
+        data = [{
+            "id": d.id,
+            "nama": d.nama,
+            "alamat": d.alamat,
+            "latitude": d.latitude,
+            "longitude": d.longitude,
+            "foto": d.foto
+        } for d in dalangs]
+        return jsonify({"dalangs": data}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ================================
+# 3. AI VISION API (PREDIKSI WAYANG)
+# ================================
+
+@api.route('/predict-wayang', methods=['POST'])
 def predict_wayang():
-    model = get_model()
+    """
+    Menerima gambar -> Resize -> Prediksi Model -> Ambil Info Database.
+    """
+    # 1. Cek Model Aktif
+    active_model_db = AIModel.query.filter_by(is_active=True).first()
+    if not active_model_db:
+        return jsonify({'error': 'Belum ada model AI yang diaktifkan Admin.'}), 503
+        
+    model = get_model() # Load dari RAM
     if model is None:
-        return jsonify({"error": "Model AI belum diaktifkan oleh Admin!"}), 503
+        return jsonify({'error': 'Model gagal dimuat di server.'}), 500
 
-    if "image" not in request.files:
-        return jsonify({"error": "Tidak ada file gambar yang diupload (key harus 'image')"}), 400
-
-    file = request.files["image"]
-    if file.filename == "":
-        return jsonify({"error": "Nama file kosong"}), 400
+    # 2. Validasi File
+    if 'image' not in request.files:
+        return jsonify({'error': 'File gambar tidak ditemukan'}), 400
+    
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({'error': 'Nama file kosong'}), 400
 
     try:
-        img = Image.open(io.BytesIO(file.read())).convert("RGB")
-        img = img.resize((150, 150))
-        x = np.array(img) / 255.0
+        # 3. Pre-processing Gambar
+        image_bytes = file.read()
+        img = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+        
+        # Resize sesuai input shape model (150x150)
+        target_size = (150, 150) 
+        img = img.resize(target_size)
+        
+        # Normalisasi Array
+        x = np.array(img)
+        x = x / 255.0  
         processed_img = np.expand_dims(x, axis=0)
 
+        # 4. Prediksi
         prediction = model.predict(processed_img)
-
-        class_names = [
-            "Abimanyu", "Anoman", "Arjuna", "Bagong", "Baladewa",
-            "Bima", "Buta", "Cakil", "Durna", "Dursasana",
-            "Duryudana", "Gareng", "Gatotkaca", "Karna", "Kresna",
-            "Nakula Sadewa", "Patih Sabrang", "Petruk", "Puntadewa", "Semar",
-            "Sengkuni", "Togog"
-        ]
-
-        predicted_index = int(np.argmax(prediction, axis=1)[0])
+        predicted_index = np.argmax(prediction, axis=1)[0]
         confidence = float(np.max(prediction))
-        predicted_label = class_names[predicted_index] if predicted_index < len(class_names) else "Unknown"
+
+        # 5. Mapping Label dari Database
+        if active_model_db.labels:
+            class_names = [label.strip() for label in active_model_db.labels.split(',')]
+        else:
+            return jsonify({'error': 'Model aktif tidak memiliki data label!'}), 500
+
+        if predicted_index < len(class_names):
+            predicted_label = class_names[predicted_index]
+        else:
+            predicted_label = "Unknown"
+
+        # 6. Ambil Deskripsi dari Tabel Wayang
+        deskripsi_text = "Deskripsi belum tersedia di database."
+        if predicted_label != "Unknown":
+            wayang_db = Wayang.query.filter_by(nama=predicted_label).first()
+            if wayang_db:
+                deskripsi_text = wayang_db.deskripsi
 
         return jsonify({
-            "prediksi": predicted_label,
-            "confidence": f"{confidence*100:.2f}%",
-            "raw_prediction": prediction.tolist()
-        })
+            'prediksi': predicted_label,
+            'confidence': f"{confidence * 100:.2f}%",
+            'deskripsi': deskripsi_text,
+        }), 200
 
     except Exception as e:
-        print(f"Prediction error: {e}")
-        return jsonify({"error": str(e)}), 500
+        print(f"Error Vision: {e}")
+        return jsonify({'error': 'Gagal memproses gambar', 'details': str(e)}), 500
+
+# ================================
+# 4. AI CHATBOT API (CEPOT)
+# ================================
+
+@api.route('/chat', methods=['POST'])
+def chat_api():
+    """
+    Menerima pesan teks -> Kirim ke Gemini (dengan persona Cepot) -> Balas.
+    """
+    try:
+        data = request.get_json()
+        user_message = data.get('message')
+
+        if not user_message:
+            return jsonify({'response': "Waduh, kok meneng bae? Ngomong apa kye?"}), 400
+
+        # Gabungkan System Prompt dengan Pesan User
+        final_prompt = f"{SYSTEM_PROMPT}\n\nUser bertanya: {user_message}"
+
+        # Kirim ke Gemini
+        response = chat_session.send_message(final_prompt)
+        bot_reply = response.text
+
+        # Bersihkan Markdown (* atau **) agar tampilan rapi
+        bot_reply = bot_reply.replace("**", "").replace("*", "")
+
+        return jsonify({'response': bot_reply}), 200
+
+    except Exception as e:
+        print(f"Error Chatbot: {e}")
+        return jsonify({'response': "Waduh, sinyal inyong lagi laka (Error Server). Coba maning ya!"}), 500
