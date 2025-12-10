@@ -1,50 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Edukatif - WAYANUSA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
-    <style>
-        /* Leaderboard Header Position */
-        .leaderboard-header {
-            text-align: center;
-            width: fit-content;
-            margin-top: 20px;
-            /* Geser ke bawah */
-            margin-left: auto;
-            margin-right: auto;
-            /* Default: center */
-        }
-
-        /* Untuk geser pakai PX */
-        .leaderboard-header {
-            position: relative;
-            left: 320px;
-            /* Geser ke kanan (+), kiri (-) */
-            top: 0px;
-            /* Geser ke bawah (+), atas (-) */
-        }
-
-        /* Optional: Biar icon & teks lebih rapi */
-        .leaderboard-header img {
-            width: 70px;
-            display: block;
-            margin: 0 auto 5px auto;
-        }
-    </style>
-
 </head>
-
 <body>
     <nav class="navbar">
         <div class="container">
@@ -53,14 +19,7 @@
                     <a href="{{ url_for('web.home') }}" class="logo-link">
                         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
                     </a>
-                </div>
-                <div class="navbar-menu">
-                    <ul class="nav-links">
-                        <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
-                        <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
-                        <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
                         <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
-                        <li><a href="{{ url_for('web.artikel') }}" class="active">Artikel</a></li>
                     </ul>
                 </div>
                 <div class="navbar-actions">
@@ -81,23 +40,45 @@
                 <p class="quiz-tag">🎮 QUIZ EDUKATIF</p>
                 <h2 class="quiz-title">Pilih <span class="highlight">Level</span> Quiz</h2>
                 <p class="quiz-description">
-                    Tantang diri Anda dengan berbagai level quiz wayang kulit. Mulai dari pemula hingga ahli, setiap
-                    level menawarkan pengalaman belajar yang unik.
+                    Tantang diri Anda dengan berbagai level quiz wayang kulit. Mulai dari pemula hingga ahli, setiap level menawarkan pengalaman belajar yang unik.
                 </p>
-
-                <!-- Leaderboard Section -->
-                <div class="leaderboard-section">
-                    <a href="{{ url_for('leaderboard_wayang.leaderboard_page') }}" class="leaderboard-link">
-                        <div class="leaderboard-header">
-                            <img src="{{ url_for('static', filename='images/leaderboard_128.png') }}"
-                                alt="Leaderboard Icon" class="leaderboard-icon-left">
-                            <h3>Leaderboard</h3>
+                <div class="quiz-cards">
+                    <div class="quiz-card" data-aos="fade-up">
+                        <div class="quiz-card-content">
+                            <h3 class="quiz-level">Beginner</h3>
+                            <p class="quiz-name">Pengenalan Tokoh Wayang</p>
+                            <p class="quiz-desc">Dari nama-nama, lahir kisah yang abadi. Kenali tokoh-tokoh utama dalam dunia wayang.</p>
+                            <a href="#" onclick="startQuiz()" class="btn-start-quiz">Mulai Kuis</a>
                         </div>
-                    </a>
-                </div>
-
-                <div class="quiz-cards" id="quiz-cards">
-                    <!-- Levels will be loaded dynamically -->
+                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
+                    </div>
+                    <div class="quiz-card" data-aos="fade-up">
+                        <div class="quiz-card-content">
+                            <h3 class="quiz-level">Intermediate</h3>
+                            <p class="quiz-name">Cerita Mahabharata</p>
+                            <p class="quiz-desc">Pelajari alur cerita dan nilai-nilai dalam epos Mahabharata yang penuh hikmah.</p>
+                            <a href="#" class="btn-start-quiz">Mulai Kuis</a>
+                        </div>
+                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
+                    </div>
+                    <div class="quiz-card" data-aos="fade-up">
+                        <div class="quiz-card-content">
+                            <h3 class="quiz-level">Advanced</h3>
+                            <p class="quiz-name">Filsafat Wayang</p>
+                            <p class="quiz-desc">Eksplorasi makna filosofis dan ajaran moral dalam wayang kulit yang mendalam.</p>
+                            <a href="#" class="btn-start-quiz">Mulai Kuis</a>
+                        </div>
+                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
+                    </div>
+                    <div class="quiz-card" data-aos="fade-up">
+                        <div class="quiz-card-content">
+                            <h3 class="quiz-level">Expert</h3>
+                            <p class="quiz-name">Sejarah & Budaya</p>
+                            <p class="quiz-desc">Uji pengetahuan mendalam tentang sejarah dan budaya wayang kulit Jawa.</p>
+                            <a href="#" class="btn-start-quiz">Mulai Kuis</a>
+                        </div>
+                        <img src="{{ url_for('static', filename='images/icon_wayang.png') }}" alt="Wayang Icon" class="quiz-image">
+                    </div>
                 </div>
             </div>
         </div>
@@ -107,102 +88,16 @@
     <script>
         AOS.init();
 
-        // Load quiz levels from API
-        async function loadQuizLevels() {
-            try {
-                const response = await fetch('/api/quiz/levels');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch levels');
-                }
-                const data = await response.json();
-                displayLevels(data.levels);
-            } catch (error) {
-                console.error('Error loading levels:', error);
-                // Fallback to static levels if API fails
-                displayLevels([
-                    { id: 1, name: 'Beginner' },
-                    { id: 2, name: 'Intermediate' },
-                    { id: 3, name: 'Advanced' },
-                    { id: 4, name: 'Expert' }
-                ]);
-            }
-        }
-
-        function displayLevels(levels) {
-            const container = document.getElementById('quiz-cards');
-            container.innerHTML = '';
-
-            levels.forEach(level => {
-                const card = document.createElement('div');
-                card.className = 'quiz-card';
-                card.setAttribute('data-aos', 'fade-up');
-                card.innerHTML = `
-                    <div class="quiz-card-content">
-                        <h3 class="quiz-level">${level.name}</h3>
-                        <p class="quiz-name">Quiz ${level.name}</p>
-                        <p class="quiz-desc">Klik tombol "Mulai Kuis" untuk memulai quiz ${level.name}.</p>
-                        <a href="#" onclick="startQuiz(${level.id})" class="btn-start-quiz">Mulai Kuis</a>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function startQuiz(levelId) {
-            const loggedIn = {{ session.get('user_logged_in', False) | tojson
-        }};
-        if (!loggedIn) {
-            alert('Silakan login terlebih dahulu untuk menggunakan fitur quiz.');
-            window.location.href = '{{ url_for("web.login_user") }}';
-            return;
-        }
-        // Redirect ke halaman quiz_play dengan level parameter
-        window.location.href = '{{ url_for("web.quiz_play") }}?level=' + levelId;
-        }
-
-        // Load leaderboard
-        async function loadLeaderboard() {
-            try {
-                const response = await fetch('/leaderboard');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch leaderboard');
-                }
-                const data = await response.json();
-                displayLeaderboard(data.leaderboard);
-            } catch (error) {
-                console.error('Error loading leaderboard:', error);
-                document.getElementById('leaderboard-content').innerHTML = '<p>Gagal memuat leaderboard.</p>';
-            }
-        }
-
-        function displayLeaderboard(leaderboard) {
-            const container = document.getElementById('leaderboard-content');
-
-            if (!leaderboard || leaderboard.length === 0) {
-                container.innerHTML = '<p>Belum ada data leaderboard.</p>';
+        function startQuiz() {
+            // Check if user is logged in before proceeding
+            if (!{{ session.get('user_logged_in', False)|tojson }}) {
+                alert('Silakan login terlebih dahulu untuk menggunakan fitur quiz.');
+                window.location.href = '{{ url_for("web.login_user") }}';
                 return;
             }
-
-            let html = '';
-            leaderboard.forEach(item => {
-                html += `
-                    <div class="leaderboard-item">
-                        <span class="rank">#${item.rank}</span>
-                        <span class="name">${item.name}</span>
-                        <span class="score">${item.score}</span>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
+            // If logged in, redirect to quiz play
+            window.location.href = '{{ url_for("web.quiz_play") }}';
         }
-
-        // Load levels and leaderboard when page loads
-        document.addEventListener('DOMContentLoaded', function () {
-            loadQuizLevels();
-            loadLeaderboard();
-        });
     </script>
 </body>
-
 </html>
