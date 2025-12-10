@@ -1218,6 +1218,8 @@ body {
         font-size: 1.8rem;
     }
 
+}
+=======
     .back-btn-wrapper {
         position: static;
         margin-bottom: 20px;
@@ -1226,6 +1228,3 @@ body {
         transform: none;
     }
 }
-=======
-}
->>>>>>> ff6ff6293371e492ef8400a90c1e42c668820b26
