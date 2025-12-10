@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Panggung Dalang</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 
     <style>
         body {
@@ -141,6 +142,8 @@
 </head>
 
 <body>
+
+    {% include 'layouts/navbar.html' %}
 
     <div class="panggung"></div>
 

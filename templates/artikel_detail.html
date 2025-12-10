@@ -12,6 +12,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/artikeldetail.css') }}">
 
     <!-- AOS -->
@@ -20,7 +21,7 @@
 
 <body>
 
-    {% include "partials/navbar.html" %}
+    {% include "layouts/navbar.html" %}
 
     <!-- ARTICLE DETAIL -->
     <section class="article-detail-section">

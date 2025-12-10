@@ -8,13 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz_play.css') }}">
 </head>
 <body data-user-id="{{ session.user_id }}">
 
     <!-- ================= NAVBAR ================= -->
     {% include 'layouts/navbar.html' %}
-    
+
     <div class="quiz-container">
         <!-- Header -->
         <header class="quiz-header">
