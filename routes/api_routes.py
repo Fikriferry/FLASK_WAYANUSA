@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, jsonify, request
 from models import db, User, Dalang, Wayang, AIModel
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -7,6 +8,7 @@ import io
 from PIL import Image
 import google.generativeai as genai
 from cepot_controller import cepot_system
+from dotenv import load_dotenv
 
 # ================================
 # KONFIGURASI BLUEPRINT & AI
@@ -16,7 +18,11 @@ auth_api = Blueprint("auth_api", __name__)
 
 # --- KONFIGURASI GEMINI AI (CHATBOT) ---
 # Ganti dengan API Key kamu yang valid
-GEMINI_API_KEY = "AIzaSyDmUtu7mZVRVqp88QigLZOra3UUsPkUhJk" 
+load_dotenv(override=True)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+print(f"DEBUG: Menggunakan API Key yang berakhiran: ...{GEMINI_API_KEY[-5:] if GEMINI_API_KEY else 'NONE'}")
+if not GEMINI_API_KEY:
+    print("❌ Error: API Key tidak ditemukan di file .env")
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Inisialisasi Model Chat

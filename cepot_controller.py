@@ -7,9 +7,13 @@ import edge_tts
 import pygame
 import os
 import google.generativeai as genai
+from dotenv import load_dotenv
 
 # --- KONFIGURASI ---
-API_KEY = "AIzaSyDmUtu7mZVRVqp88QigLZOra3UUsPkUhJk" # Ganti API Key kamu
+load_dotenv()
+API_KEY = os.getenv("GEMINI_API_KEY")  # Ambil API Key dari .env
+if not API_KEY: 
+    print("❌ Error: API Key tidak ditemukan di file .env") 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
 chat = model.start_chat(history=[])
