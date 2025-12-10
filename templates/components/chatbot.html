@@ -1,33 +1,145 @@
-<div id="chatbot-wrapper" 
-     data-user-logged-in="{{ session.get('user_logged_in', False)|tojson }}" 
-     data-login-url="{{ url_for('web.login_user') }}">
+<div id="chatbot-wrapper" data-user-logged-in="{{ session.get('user_logged_in', False)|tojson }}"
+    data-login-url="{{ url_for('web.login_user') }}">
 
     <div class="chatbot-button" id="chatbotButton">
-        <img src="{{ url_for('static', filename='images/icon_robot.png') }}" 
-             alt="Chatbot" class="chatbot-icon"
-             onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'"> 
+        <img src="{{ url_for('static', filename='images/icon_robot.png') }}" alt="Chatbot" class="chatbot-icon"
+            onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
     </div>
 
     <div class="chat-popup" id="chatPopup">
-        <div class="chat-popup-header">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <img src="https://via.placeholder.com/30?text=C" style="border-radius:50%; background:white;">
-                <h3>Cepot AI (Ngapak)</h3>
+
+        <div class="chat-popup-header" style="flex-direction: column; gap: 10px; padding-bottom: 15px;">
+            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div
+                        style="width: 30px; height: 30px; background: white; border-radius: 50%; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                        <img src="{{ url_for('static', filename='images/icon_robot.png') }}" style="width:20px;">
+                    </div>
+                    <h3 style="margin:0; font-size:1.1rem;">Asisten Wayanusa</h3>
+                </div>
+                <button class="chat-close" id="chatClose">&times;</button>
             </div>
-            <button class="chat-close" id="chatClose">&times;</button>
+
+            <div class="mode-switch-container">
+                <button id="btnModeChat" class="mode-btn active" onclick="switchMode('chat')">
+                    <i class="fas fa-comments"></i> Web Chat
+                </button>
+                <button id="btnModeWayang" class="mode-btn" onclick="switchMode('wayang')">
+                    <i class="fas fa-robot"></i> Smart Wayang
+                </button>
+            </div>
         </div>
 
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot-message">
-                <p>👋 Halo Jang! Kenalin inyong Cepot. Ana sing bisa dibantu?</p>
+        <div id="panelChat" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <p>👋 Halo Jang! Kenalin inyong Cepot. Ana sing bisa dibantu?</p>
+                </div>
             </div>
+        </div>
+
+        <div id="panelWayang"
+            style="display: none; flex: 1; padding: 20px; text-align: center; overflow-y: auto; background: #f8f9fa;">
+            <img src="https://via.placeholder.com/100/D4A373/FFFFFF?text=Cepot+Fisik"
+                style="border-radius: 50%; margin-bottom: 15px; border: 4px solid #D4A373; width: 100px; height: 100px; object-fit: cover;">
+
+            <h4 style="color: #6B4226; margin-bottom: 5px;">Kontrol Fisik</h4>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">
+                Sambungkan kabel USB Arduino untuk menggerakkan wayang secara nyata.
+            </p>
+
+            <div
+                style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px;">
+                <label
+                    style="font-size: 0.8rem; font-weight: bold; color: #666; display: block; text-align: left; margin-bottom: 5px;">Pilih
+                    Port USB:</label>
+                <div style="display: flex; gap: 5px;">
+                    <select id="portSelect" style="flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+                        <option value="">-- Cari Port --</option>
+                    </select>
+                    <button onclick="refreshPorts()"
+                        style="background: #e9ecef; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; padding: 0 10px;"
+                        title="Refresh Port">
+                        <i class="fas fa-sync-alt" style="color: #666;"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button id="btnConnect" onclick="toggleConnect()" class="action-btn btn-primary"
+                style="width: 100%; margin-bottom: 15px; padding: 12px; font-size: 1rem;">
+                HUBUNGKAN
+            </button>
+
+            <div class="status-box">
+                Status: <span id="statusWayang" style="font-weight: bold; color: #dc3545;">Terputus 🔴</span>
+            </div>
+
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            <p style="font-size: 0.8rem; color: #888; font-style: italic;">
+                *Ketik pesan di bawah agar wayang berbicara.
+            </p>
         </div>
 
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="Ketik pesan..." autocomplete="off">
-            <button id="sendButton">
+
+            <button id="micButton" title="Tekan untuk bicara">
+                <i class="fas fa-microphone"></i>
+            </button>
+
+            <button id="sendButton" title="Kirim">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
 </div>
+
+<style>
+    /* Container Tombol Switch */
+    .mode-switch-container {
+        display: flex;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px;
+        border-radius: 25px;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* Tombol Switch Individual */
+    .mode-btn {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.8);
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Efek Hover */
+    .mode-btn:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* State Aktif (Putih) */
+    .mode-btn.active {
+        background: white;
+        color: #D4A373;
+        /* Warna tema utama */
+        font-weight: 700;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Kotak Status */
+    .status-box {
+        background: #fff;
+        padding: 8px;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        border: 1px solid #eee;
+    }
+</style>

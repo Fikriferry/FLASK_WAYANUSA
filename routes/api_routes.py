@@ -6,6 +6,7 @@ import numpy as np
 import io
 from PIL import Image
 import google.generativeai as genai
+from cepot_controller import cepot_system
 
 # ================================
 # KONFIGURASI BLUEPRINT & AI
@@ -213,3 +214,44 @@ def chat_api():
     except Exception as e:
         print(f"Error Chatbot: {e}")
         return jsonify({'response': "Waduh, sinyal inyong lagi laka (Error Server). Coba maning ya!"}), 500
+    
+# ================================
+# 5. SMART WAYANG CONTROL API
+# ================================
+
+@api.route('/cepot/ports', methods=['GET'])
+def get_ports():
+    ports = cepot_system.get_ports()
+    return jsonify({'ports': ports})
+
+@api.route('/cepot/connect', methods=['POST'])
+def connect_cepot():
+    data = request.get_json()
+    port = data.get('port')
+    if not port:
+        return jsonify({'status': 'error', 'message': 'Pilih port dulu!'})
+    
+    success, msg = cepot_system.connect(port)
+    if success:
+        return jsonify({'status': 'success', 'message': msg})
+    else:
+        return jsonify({'status': 'error', 'message': msg})
+
+@api.route('/cepot/disconnect', methods=['POST'])
+def disconnect_cepot():
+    msg = cepot_system.disconnect()
+    return jsonify({'status': 'success', 'message': msg})
+
+@api.route('/cepot/talk', methods=['POST'])
+def cepot_talk():
+    # Endpoint ini dipanggil setelah Browser mendengar perintah suara
+    data = request.get_json()
+    user_message = data.get('message')
+    
+    if not user_message:
+        return jsonify({'response': 'Hah? Ora krungu... (Pesan kosong)'})
+
+    # Panggil Controller Fisik (Gemini + Gerak + Suara)
+    reply = cepot_system.process_physical_interaction(user_message)
+    
+    return jsonify({'response': reply})

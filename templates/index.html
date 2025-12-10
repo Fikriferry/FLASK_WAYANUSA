@@ -8,9 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -19,29 +17,26 @@
 
 <body>
 
-    <!-- ================= NAVBAR ================= -->
     <nav class="navbar">
         <div class="container">
             <div class="navbar-content">
 
-                <!-- Logo -->
                 <div class="navbar-logo">
-                    <a href="/" class="logo-link">
+                    <a href="{{ url_for('web.home') }}" class="logo-link">
                         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
                     </a>
                 </div>
 
-                <!-- Menu -->
                 <div class="navbar-menu">
                     <ul class="nav-links">
                         <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
                         <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
                         <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
                         <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
+                        <li><a href="{{ url_for('web.artikel') }}">Artikel</a></li>
                     </ul>
                 </div>
 
-                <!-- Login / User -->
                 <div class="navbar-actions">
                     {% if session.get('user_logged_in') %}
                         <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
@@ -58,24 +53,28 @@
     <main class="hero">
         <div class="container">
             <div class="hero-content">
+
                 <div class="hero-text">
                     <p class="hero-tag">✨ Melestarikan Budaya Nusantara</p>
+
                     <h1 class="hero-title">
                         Mengenal Budaya <span class="highlight">Wayang Kulit</span> Mahabarata
                     </h1>
+
                     <p class="hero-description">
-                        Belajar, bermain, dan melestarikan budaya Indonesia melalui pengalaman digital interaktif yang
-                        menawan dan penuh makna.
+                        Belajar, bermain, dan melestarikan budaya Indonesia melalui pengalaman digital interaktif yang menawan dan penuh makna.
                     </p>
+
                     <div class="hero-buttons">
                         <a href="{{ url_for('web.pengenalan_wayang') }}" class="btn btn-primary">Mulai Eksplorasi</a>
                         <a href="#about" class="btn btn-secondary">Pelajari Lebih Lanjut →</a>
                     </div>
                 </div>
+
                 <div class="hero-image">
-                    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Siluet Wayang Kulit"
-                        class="wayang-image">
+                    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Siluet Wayang Kulit" class="wayang-image">
                 </div>
+
             </div>
         </div>
     </main>
@@ -86,8 +85,7 @@
                 <p class="about-tag">TENTANG WAYANUSA</p>
                 <h2 class="about-title">Cara Baru Mengenal <span class="highlight">Budaya Wayang</span></h2>
                 <p class="about-description">
-                    WAYANUSA adalah aplikasi edukatif berbasis mobile yang menghadirkan cara baru untuk mengenal budaya
-                    wayang kulit.
+                    WAYANUSA adalah aplikasi edukatif berbasis mobile yang menghadirkan cara baru untuk mengenal budaya wayang kulit.
                 </p>
                 <div class="stats">
                     <div class="stat-card">
@@ -116,9 +114,9 @@
                 <div class="features-grid">
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_ai.jpg') }}"
-                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Pengenalan+Wayang'"
-                                alt="Pengenalan Wayang">
+                            <img src="{{ url_for('static', filename='images/feature_ai.jpg') }}" 
+                                 onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Pengenalan+Wayang'" 
+                                 alt="Pengenalan Wayang">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Pengenalan Wayang</h3>
@@ -131,9 +129,9 @@
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_quiz.jpg') }}"
-                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Kuis+Edukatif'"
-                                alt="Kuis Edukatif">
+                            <img src="{{ url_for('static', filename='images/feature_quiz.jpg') }}" 
+                                 onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Kuis+Edukatif'" 
+                                 alt="Kuis Edukatif">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Kuis Edukatif</h3>
@@ -146,9 +144,9 @@
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_dalang.jpg') }}"
-                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Mencari+Dalang'"
-                                alt="Mencari Dalang">
+                            <img src="{{ url_for('static', filename='images/feature_dalang.jpg') }}" 
+                                 onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Mencari+Dalang'" 
+                                 alt="Mencari Dalang">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Mencari Dalang</h3>
@@ -170,20 +168,24 @@
                 <h2 class="dalang-showcase-title">Dalang <span class="highlight">Terdaftar</span></h2>
                 <div class="dalang-list-section">
                     {% if dalangs %}
-                    <div class="dalang-grid">
-                        {% for dalang in dalangs %}
-                        <div class="dalang-card">
-                            <img src="{{ dalang.foto and url_for('static', filename='uploads/' + dalang.foto) or 'https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo' }}"
-                                alt="Foto {{ dalang.nama }}" class="dalang-photo">
-                            <div class="dalang-info">
-                                <h4>{{ dalang.nama }}</h4>
-                                <p>{{ dalang.alamat }}</p>
+                        <div class="dalang-grid">
+                            {% for dalang in dalangs %}
+                            <div class="dalang-card">
+                                <img src="{{ dalang.foto and url_for('static', filename='uploads/' + dalang.foto) or 'https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo' }}" 
+                                     alt="Foto {{ dalang.nama }}" 
+                                     class="dalang-photo">
+                                <div class="dalang-info">
+                                    <h4>{{ dalang.nama }}</h4>
+                                    <p>{{ dalang.alamat }}</p>
+                                </div>
                             </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
-                    </div>
+                        <div style="text-align: center; margin-top: 30px;">
+                            <a href="{{ url_for('web.mencari_dalang') }}" class="btn btn-secondary">Lihat Semua Dalang</a>
+                        </div>
                     {% else %}
-                    <p style="color:#888;">Belum ada data dalang yang ditampilkan.</p>
+                        <p style="color:#888;">Belum ada data dalang yang ditampilkan.</p>
                     {% endif %}
                 </div>
             </div>
@@ -196,153 +198,9 @@
         </div>
     </footer>
 
-    <div class="chatbot-button" id="chatbotButton">
-        <img src="{{ url_for('static', filename='images/icon_robot.png') }}" alt="Chatbot" class="chatbot-icon"
-            onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
-    </div>
+    {% include 'components/chatbot.html' %}
 
-    <div class="chat-popup" id="chatPopup">
-        <div class="chat-popup-header">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div
-                    style="width: 30px; height: 30px; background: white; border-radius: 50%; display:flex; align-items:center; justify-content:center; overflow:hidden;">
-                    <img src="{{ url_for('static', filename='images/icon_robot.png') }}" style="width:20px;">
-                </div>
-                <h3>Cepot AI (Tegal)</h3>
-            </div>
-            <button class="chat-close" id="chatClose">&times;</button>
-        </div>
-
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot-message">
-                <p>👋 Halo Jang! Kenalin inyong Cepot. Ana sing bisa dibantu?</p>
-            </div>
-        </div>
-
-        <div class="chat-input-area">
-            <input type="text" id="chatInput" placeholder="Ketik pesan..." maxlength="500" autocomplete="off">
-            <button id="sendButton"><i class="fas fa-paper-plane"></i></button>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // 1. Definisikan Elemen
-            const chatbotButton = document.getElementById('chatbotButton');
-            const chatPopup = document.getElementById('chatPopup');
-            const chatClose = document.getElementById('chatClose');
-            const chatInput = document.getElementById('chatInput');
-            const sendButton = document.getElementById('sendButton');
-            const chatMessages = document.getElementById('chatMessages');
-
-            // 2. Ambil Status Login dari Flask (Jinja2)
-            // Menggunakan 'true' string agar aman dari error parsing
-            const isLoggedIn = "{{ session.get('user_logged_in', False) }}" === "True";
-            const loginUrl = "{{ url_for('web.login_user') }}";
-
-            // 3. Toggle Popup Chat
-            if (chatbotButton) {
-                chatbotButton.addEventListener('click', function () {
-                    if (!isLoggedIn) {
-                        alert('Silakan login terlebih dahulu untuk ngobrol dengan Cepot!');
-                        window.location.href = loginUrl;
-                        return;
-                    }
-                    chatPopup.classList.toggle('show');
-                    if (chatPopup.classList.contains('show')) {
-                        setTimeout(() => chatInput.focus(), 300);
-                    }
-                });
-            }
-
-            // 4. Tutup Popup
-            if (chatClose) {
-                chatClose.addEventListener('click', function () {
-                    chatPopup.classList.remove('show');
-                });
-            }
-
-            // 5. Fungsi Kirim Pesan (Ke Backend)
-            async function sendMessage() {
-                if (!isLoggedIn) {
-                    window.location.href = loginUrl;
-                    return;
-                }
-
-                const message = chatInput.value.trim();
-                if (message === '') return;
-
-                // A. Tampilkan Pesan User
-                const userDiv = document.createElement('div');
-                userDiv.className = 'message user-message';
-                userDiv.innerHTML = `<p>${message}</p>`;
-                chatMessages.appendChild(userDiv);
-
-                // Reset Input
-                chatInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                // B. Tampilkan Loading
-                const loadingId = 'loading-' + Date.now();
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'message bot-message';
-                loadingDiv.id = loadingId;
-                loadingDiv.innerHTML = '<em>Cepot lagi mikir...</em>';
-                chatMessages.appendChild(loadingDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                try {
-                    // C. Panggil API Flask
-                    const response = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: message })
-                    });
-
-                    const data = await response.json();
-
-                    // Hapus Loading
-                    const loader = document.getElementById(loadingId);
-                    if (loader) loader.remove();
-
-                    // D. Tampilkan Balasan
-                    const botDiv = document.createElement('div');
-                    botDiv.className = 'message bot-message';
-
-                    // Format teks (ubah enter jadi <br>)
-                    let reply = data.response || "Maaf, error koneksi.";
-                    reply = reply.replace(/\n/g, '<br>');
-
-                    botDiv.innerHTML = `<p>${reply}</p>`;
-                    chatMessages.appendChild(botDiv);
-
-                } catch (error) {
-                    console.error("Error Chatbot:", error);
-                    const loader = document.getElementById(loadingId);
-                    if (loader) loader.remove();
-
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'message bot-message';
-                    errorDiv.innerHTML = '<p style="color:red">Gagal terhubung ke server.</p>';
-                    chatMessages.appendChild(errorDiv);
-                }
-
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            // Event Listener Tombol Kirim
-            if (sendButton) {
-                sendButton.addEventListener('click', sendMessage);
-            }
-
-            if (chatInput) {
-                chatInput.addEventListener('keypress', function (event) {
-                    if (event.key === 'Enter') sendMessage();
-                });
-            }
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
 
 </body>
-
 </html>

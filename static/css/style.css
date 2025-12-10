@@ -1,4 +1,16 @@
-/* Reset and Base Styles */
+/* =========================================
+   1. VARIABLES & RESET
+   ========================================= */
+:root {
+    --primary: #D4A373;       /* Emas Wayang */
+    --primary-dark: #B88656;  /* Emas Gelap */
+    --bg-dark: #121212;       /* Hitam Background */
+    --text-main: #333333;
+    --text-light: #888888;
+    --danger: #dc3545;
+    --success: #28a745;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -8,23 +20,32 @@
 body {
     font-family: 'Inter', sans-serif;
     line-height: 1.6;
-    color: #333;
     background-color: #000;
+    color: #333;
     overflow-x: hidden;
 }
 
-/* Navbar */
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+
+/* =========================================
+   2. NAVBAR
+   ========================================= */
 .navbar {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    border-bottom: 1px solid rgba(212, 163, 115, 0.2);
     z-index: 1000;
     padding: 15px 0;
     transition: all 0.3s ease;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
 .navbar-content {
@@ -100,13 +121,9 @@ body {
     box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Hero Section */
+/* =========================================
+   3. HERO SECTION
+   ========================================= */
 .hero {
     min-height: 100vh;
     display: flex;
@@ -118,10 +135,7 @@ body {
 .hero::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 70% 60%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
     pointer-events: none;
@@ -167,15 +181,9 @@ body {
 }
 
 @keyframes gradientShift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .hero-description {
@@ -242,7 +250,9 @@ body {
     filter: drop-shadow(0 10px 30px rgba(255, 215, 0, 0.2));
 }
 
-/* About Section */
+/* =========================================
+   4. ABOUT SECTION
+   ========================================= */
 .about {
     background-color: #1A140B;
     padding: 100px 0;
@@ -253,10 +263,7 @@ body {
 .about::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.03) 0%, transparent 50%);
     pointer-events: none;
@@ -343,13 +350,8 @@ body {
     animation: fadeInUp 1s ease-out 0.6s forwards;
 }
 
-.stat-card:nth-child(2) {
-    animation-delay: 0.8s;
-}
-
-.stat-card:nth-child(3) {
-    animation-delay: 1s;
-}
+.stat-card:nth-child(2) { animation-delay: 0.8s; }
+.stat-card:nth-child(3) { animation-delay: 1s; }
 
 .stat-card:hover {
     transform: translateY(-10px) scale(1.05);
@@ -374,62 +376,9 @@ body {
     letter-spacing: 1px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero-content {
-        flex-direction: column;
-        text-align: center;
-        gap: 40px;
-    }
-
-    .hero-title {
-        font-size: 2.5rem;
-    }
-
-    .hero-description {
-        font-size: 1rem;
-    }
-
-    .hero-buttons {
-        justify-content: center;
-    }
-
-    .btn {
-        min-width: 180px;
-    }
-
-    .wayang-image {
-        max-width: 80%;
-    }
-
-    .about {
-        padding: 80px 0;
-    }
-
-    .about-title {
-        font-size: 2.5rem;
-    }
-
-    .about-description {
-        font-size: 1rem;
-        margin-bottom: 50px;
-    }
-
-    .stats {
-        gap: 20px;
-    }
-
-    .stat-card {
-        min-width: 150px;
-        padding: 30px 20px;
-    }
-
-    .stat-number {
-        font-size: 2.5rem;
-    }
-}
-
-/* Features Section */
+/* =========================================
+   5. FEATURES SECTION
+   ========================================= */
 .features {
     background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
     padding: 100px 0;
@@ -440,10 +389,7 @@ body {
 .features::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 70% 60%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
     pointer-events: none;
@@ -510,17 +456,9 @@ body {
     animation: fadeInUp 1s ease-out 0.6s forwards;
 }
 
-.feature-card:nth-child(2) {
-    animation-delay: 0.8s;
-}
-
-.feature-card:nth-child(3) {
-    animation-delay: 1s;
-}
-
-.feature-card:nth-child(4) {
-    animation-delay: 1.2s;
-}
+.feature-card:nth-child(2) { animation-delay: 0.8s; }
+.feature-card:nth-child(3) { animation-delay: 1s; }
+.feature-card:nth-child(4) { animation-delay: 1.2s; }
 
 .feature-card:hover {
     transform: translateY(-10px) scale(1.03);
@@ -543,10 +481,7 @@ body {
 .feature-image::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
+    bottom: 0; left: 0; right: 0; height: 50%;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
 }
 
@@ -594,510 +529,66 @@ body {
     color: #ccc;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero-content {
-        flex-direction: column;
-        text-align: center;
-        gap: 40px;
-    }
-
-    .hero-title {
-        font-size: 2.5rem;
-    }
-
-    .hero-description {
-        font-size: 1rem;
-    }
-
-    .hero-buttons {
-        justify-content: center;
-    }
-
-    .btn {
-        min-width: 180px;
-    }
-
-    .wayang-image {
-        max-width: 80%;
-    }
-
-    .about {
-        padding: 80px 0;
-    }
-
-    .about-title {
-        font-size: 2.5rem;
-    }
-
-    .about-description {
-        font-size: 1rem;
-        margin-bottom: 50px;
-    }
-
-    .stats {
-        gap: 20px;
-    }
-
-    .stat-card {
-        min-width: 150px;
-        padding: 30px 20px;
-    }
-
-    .stat-number {
-        font-size: 2.5rem;
-    }
-
-    .features {
-        padding: 80px 0;
-    }
-
-    .features-title {
-        font-size: 2.5rem;
-    }
-
-    .features-description {
-        font-size: 1rem;
-        margin-bottom: 50px;
-    }
-
-    .features-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .feature-card {
-        max-width: 100%;
-    }
-}
-
-/* Navbar Responsive */
-@media (max-width: 768px) {
-    .navbar-content {
-        padding: 0 10px;
-    }
-
-    .navbar-menu {
-        display: none;
-    }
-
-    .logo-text {
-        font-size: 1.5rem;
-    }
-
-    .navbar-actions .btn-login {
-        padding: 8px 20px;
-        font-size: 0.8rem;
-    }
-}
-
-@media (max-width: 1024px) {
-    .navbar-menu {
-        display: none;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero-title {
-        font-size: 2rem;
-    }
-
-    .hero-tag {
-        font-size: 16px;
-    }
-
-    .hero-description {
-        font-size: 0.95rem;
-    }
-
-    .btn {
-        padding: 12px 24px;
-        font-size: 0.9rem;
-        min-width: 160px;
-    }
-
-    .wayang-image {
-        max-width: 90%;
-    }
-
-    .about-title {
-        font-size: 2rem;
-    }
-
-    .about-description {
-        font-size: 0.9rem;
-    }
-
-    .stats {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .stat-card {
-        min-width: 200px;
-    }
-
-    .features-title {
-        font-size: 2rem;
-    }
-
-    .features-description {
-        font-size: 0.9rem;
-    }
-
-    .feature-content {
-        padding: 20px;
-    }
-
-    .feature-title {
-        font-size: 1.3rem;
-    }
-
-    .logo-text {
-        font-size: 1.3rem;
-    }
-
-    .navbar-actions .btn-login {
-        padding: 6px 16px;
-        font-size: 0.75rem;
-    }
-}
-
-/* Login Page Styles */
-.login-page {
-    font-family: 'Poppins', sans-serif;
+/* =========================================
+   6. DALANG SHOWCASE SECTION
+   ========================================= */
+.dalang-showcase {
     background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    padding: 100px 0;
     position: relative;
+    overflow: hidden;
 }
 
-.login-page::before {
+.dalang-showcase::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 70% 60%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
     pointer-events: none;
 }
 
-.login-container {
-    max-width: 400px;
-    width: 100%;
-    background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    padding: 40px;
+.dalang-showcase-content {
     text-align: center;
     position: relative;
     z-index: 1;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease-out 0.3s forwards;
 }
 
-.login-header {
-    position: relative;
-    margin-bottom: 40px;
+.dalang-showcase-tag {
+    font-size: 16px;
+    color: #d4af37;
+    margin-bottom: 20px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
-.login-text {
-    position: absolute;
-    top: -20px;
-    left: 0;
-    text-align: left;
-}
-
-.login-text h2 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 18px;
+.dalang-showcase-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
     font-weight: 700;
     color: #fff;
-    margin: 0;
-}
-
-.login-logo {
-    display: flex;
-    justify-content: center;
-}
-
-.logo-capsule {
-    background: transparent;
-    border-radius: 50px;
-    padding: 15px 30px;
-    display: inline-block;
-    transition: all 0.3s ease;
-}
-
-.logo-image {
-    height: 45px;
-    width: auto;
-    filter: brightness(1.1);
-}
-
-.login-form {
     margin-bottom: 30px;
+    line-height: 1.2;
 }
 
-.form-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.form-label {
-    display: block;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
+.dalang-showcase-title .highlight {
     color: #d4af37;
-    margin-bottom: 8px;
 }
 
-.form-input {
-    width: 100%;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    color: #fff;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-}
-
-.form-input::placeholder {
-    color: #888;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: #d4af37;
-    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
-}
-
-.password-input-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.password-toggle {
-    position: absolute;
-    right: 12px;
-    background: none;
-    border: none;
-    color: #d4af37;
-    cursor: pointer;
-    padding: 4px;
-    transition: all 0.3s ease;
-}
-
-.password-toggle:hover {
-    color: #ffd700;
-    transform: scale(1.1);
-}
-
-.form-group.focused .form-label {
-    color: #ffd700;
-}
-
-.form-group.focused .form-input {
-    border-color: #ffd700;
-    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3);
-}
-
-.form-options {
-    text-align: right;
-    margin-bottom: 20px;
-}
-
-.forgot-password {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: #d4af37;
-    text-decoration: none;
-}
-
-.forgot-password:hover {
-    text-decoration: underline;
-}
-
-.btn-login {
-    width: 100%;
-    background: linear-gradient(135deg, #ffd700, #ffb347);
-    color: #000;
-    border: none;
-    border-radius: 50px;
-    padding: 15px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-}
-
-.btn-login:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-}
-
-.register-link {
-    margin-bottom: 30px;
-}
-
-.register-link p {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
+.dalang-showcase-description {
+    font-size: 1.2rem;
     color: #ccc;
-    margin: 0;
+    margin-bottom: 60px;
+    line-height: 1.7;
+    max-width: 70%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.register-text {
-    color: #d4af37;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.register-text:hover {
-    text-decoration: underline;
-}
-
-.social-login {
-    margin-top: 30px;
-}
-
-.divider {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.divider::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: rgba(212, 175, 55, 0.3);
-}
-
-.divider span {
-    background-color: #2a2a2a;
-    padding: 0 15px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: #ccc;
-    position: relative;
-    z-index: 1;
-}
-
-.social-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.social-btn {
-    width: 50px;
-    height: 50px;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-}
-
-.google-btn {
-    background-color: #DB4437;
-    color: #fff;
-}
-
-.google-btn:hover {
-    transform: scale(1.1);
-    background-color: #C23321;
-}
-
-.facebook-btn {
-    background-color: #4267B2;
-    color: #fff;
-}
-
-.facebook-btn:hover {
-    transform: scale(1.1);
-    background-color: #365899;
-}
-
-/* Responsive Design for Login */
-@media (max-width: 480px) {
-    .login-container {
-        padding: 30px 20px;
-        margin: 20px;
-    }
-
-    .login-text h2 {
-        font-size: 16px;
-    }
-
-    .logo-capsule {
-        padding: 15px 30px;
-    }
-
-    .logo-image {
-        height: 40px;
-    }
-
-    .form-input {
-        padding: 10px 14px;
-        font-size: 14px;
-    }
-
-    .btn-login {
-        padding: 12px;
-        font-size: 14px;
-    }
-
-    .social-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 18px;
-    }
-}
-
-/* Dalang List Styles */
-.dalang-list {
-    margin-top: 20px;
-}
-
-.dalang-list ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.dalang-list li {
-    background: #f8f9fa;
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-}
-
-.dalang-list li img {
-    margin-left: 10px;
-    border-radius: 4px;
-}
-
-/* Dalang Grid Styles for mencari_dalang.html and index.html */
 .dalang-list-section {
     margin-bottom: 40px;
 }
@@ -1167,68 +658,11 @@ body {
     font-weight: 500;
 }
 
-/* Dalang Showcase Section */
-.dalang-showcase {
-    background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-    padding: 100px 0;
-    position: relative;
-    overflow: hidden;
-}
+/* =========================================
+   7. CHATBOT STYLES (WEB & ARDUINO)
+   ========================================= */
 
-.dalang-showcase::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 70% 60%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
-    pointer-events: none;
-}
-
-.dalang-showcase-content {
-    text-align: center;
-    position: relative;
-    z-index: 1;
-    opacity: 0;
-    transform: translateY(30px);
-    animation: fadeInUp 1s ease-out 0.3s forwards;
-}
-
-.dalang-showcase-tag {
-    font-size: 16px;
-    color: #d4af37;
-    margin-bottom: 20px;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-
-.dalang-showcase-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 3rem;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 30px;
-    line-height: 1.2;
-}
-
-.dalang-showcase-title .highlight {
-    color: #d4af37;
-}
-
-.dalang-showcase-description {
-    font-size: 1.2rem;
-    color: #ccc;
-    margin-bottom: 60px;
-    line-height: 1.7;
-    max-width: 70%;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Chatbot Styles */
+/* Tombol Floating */
 .chatbot-button {
     position: fixed;
     bottom: 30px;
@@ -1257,12 +691,13 @@ body {
     object-fit: contain;
 }
 
+/* Popup Window */
 .chat-popup {
     position: fixed;
     bottom: 100px;
     right: 30px;
     width: 400px;
-    height: 500px;
+    height: 550px;
     background-color: #fff;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -1280,24 +715,31 @@ body {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
-    display: flex !important; /* Paksa Muncul */
+    display: flex !important;
     animation: slideUp 0.3s ease-out;
 }
 
+/* Header & Switch Mode */
 .chat-popup-header {
-    padding: 20px;
-    border-bottom: 1px solid #eee;
+    background: linear-gradient(135deg, #D4A373, #B88656);
+    color: white;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 20px 20px 0 0;
+}
+
+.chat-header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #A3683C, #8B4513);
-    color: white;
-    border-radius: 20px 20px 0 0;
+    width: 100%;
 }
 
 .chat-popup-header h3 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
 }
 
@@ -1321,6 +763,55 @@ body {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
+/* Switch Mode Buttons */
+.mode-switch-container {
+    display: flex;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px;
+    border-radius: 25px;
+    width: 100%;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.mode-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.mode-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.mode-btn.active {
+    background: white;
+    color: #B88656;
+    font-weight: 700;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Chat Panel */
+#panelChat {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    background-color: #f9f9f9;
+}
+
 .chat-messages {
     flex: 1;
     padding: 20px;
@@ -1338,10 +829,7 @@ body {
     line-height: 1.4;
 }
 
-.message p {
-    margin: 0;
-    font-size: 0.95rem;
-}
+.message p { margin: 0; font-size: 0.95rem; }
 
 .bot-message {
     background-color: #e3f2fd;
@@ -1359,25 +847,114 @@ body {
     border-bottom-right-radius: 4px;
 }
 
-.chat-input-area {
+/* Wayang Panel */
+#panelWayang {
+    flex: 1;
     padding: 20px;
+    text-align: center;
+    overflow-y: auto;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#panelWayang img {
+    border-radius: 50%;
+    margin-bottom: 15px;
+    border: 4px solid #D4A373;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+#panelWayang h4 {
+    color: #6B4226;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+#panelWayang p {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+/* Port Selector */
+.port-selector {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 15px;
+    width: 100%;
+    text-align: left;
+    border: 1px solid #eee;
+}
+
+.port-input-group { display: flex; gap: 8px; }
+
+.port-input-group select {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 0.9rem;
+    outline: none;
+    background-color: #fcfcfc;
+}
+
+.port-input-group button {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0 12px;
+    color: #666;
+    transition: all 0.2s;
+}
+
+.port-input-group button:hover { background: #e0e0e0; color: #333; }
+
+/* Status Box */
+.status-box {
+    background: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    border: 1px solid #eee;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* Input Area */
+.chat-input-area {
+    padding: 15px;
     border-top: 1px solid #eee;
     background-color: white;
     border-radius: 0 0 20px 20px;
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
 }
 
 .chat-input-area input {
     flex: 1;
-    padding: 12px 16px;
-    border: 2px solid #e0e0e0;
+    padding: 10px 15px;
+    border: 1px solid #e0e0e0;
     border-radius: 25px;
     font-family: 'Inter', sans-serif;
     font-size: 0.95rem;
     outline: none;
     transition: all 0.3s ease;
+    background-color: #f9f9f9;
 }
 
 .chat-input-area input:focus {
@@ -1386,557 +963,53 @@ body {
 }
 
 .chat-input-area button {
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #A3683C, #8B4513);
-    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     border: none;
-    border-radius: 25px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 70px;
 }
 
-.chat-input-area button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(163, 104, 60, 0.3);
+#sendButton { background: linear-gradient(135deg, #A3683C, #8B4513); color: white; }
+#sendButton:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(163, 104, 60, 0.3); }
+
+#micButton { background-color: #f0f0f0; color: #666; }
+#micButton:hover { background-color: #e0e0e0; }
+#micButton.listening {
+    background-color: #dc3545;
+    color: white;
+    animation: pulse-red 1.5s infinite;
 }
 
-/* Responsive Chatbot */
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+/* =========================================
+   8. RESPONSIVE DESIGN (GLOBAL)
+   ========================================= */
 @media (max-width: 768px) {
-    .chatbot-button {
-        bottom: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-    }
-
-    .chatbot-icon {
-        width: 26px;
-        height: 26px;
-    }
-
-    .chat-popup {
-        bottom: 80px;
-        right: 20px;
-        width: 320px;
-        height: 400px;
-    }
-
-    .chat-messages {
-        max-height: 280px;
-    }
-
-    .chat-popup-header h3 {
-        font-size: 1.1rem;
-    }
+    .hero-content { flex-direction: column; text-align: center; gap: 40px; }
+    .hero-title { font-size: 2.5rem; }
+    .btn { min-width: 180px; }
+    .wayang-image { max-width: 80%; }
+    .features-grid, .dalang-grid { grid-template-columns: 1fr; }
+    
+    /* Chatbot Mobile */
+    .chatbot-button { bottom: 20px; right: 20px; width: 50px; height: 50px; }
+    .chatbot-icon { width: 26px; height: 26px; }
+    .chat-popup { bottom: 80px; right: 20px; width: 320px; height: 400px; }
+    .navbar-menu { display: none; }
 }
 
 @media (max-width: 480px) {
-    .chatbot-button {
-        bottom: 15px;
-        right: 15px;
-        width: 45px;
-        height: 45px;
-    }
-
-    .chatbot-icon {
-        width: 22px;
-        height: 22px;
-    }
-
-    .chat-popup {
-        bottom: 70px;
-        right: 15px;
-        width: 280px;
-        height: 350px;
-    }
-
-    .chat-messages {
-        max-height: 230px;
-        padding: 15px;
-    }
-
-    .message {
-        max-width: 85%;
-        padding: 10px 14px;
-    }
-
-    .chat-input-area {
-        padding: 15px;
-    }
-
-    .chat-input-area input {
-        padding: 10px 14px;
-        font-size: 0.9rem;
-    }
-
-    .chat-input-area button {
-        padding: 10px 16px;
-        font-size: 0.85rem;
-        min-width: 60px;
-    }
-}
-
-/* --- WAYANG RECOGNITION STYLES --- */
-/* --- GLOBAL & BACKGROUND --- */
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #121212;
-}
-
-.wayang-recognition {
-    min-height: 100vh;
-    background: radial-gradient(circle at top right, #3d2b1f 0%, #1a1a1a 40%, #000000 100%);
-    padding: 40px 0;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* --- CONTAINER UTAMA --- */
-.recognition-wrapper {
-    width: 100%;
-    max-width: 900px;
-    padding: 20px;
-    position: relative;
-    z-index: 2;
-}
-
-/* --- HEADER SECTION --- */
-.recognition-header {
-    text-align: center;
-    margin-bottom: 40px;
-    position: relative;
-}
-
-.back-btn-wrapper {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.back-btn {
-    background: rgba(255, 255, 255, 0.1);
-    color: #D4A373;
-    border: 1px solid rgba(212, 163, 115, 0.3);
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-}
-
-.back-btn:hover {
-    background: #D4A373;
-    color: #fff;
-    transform: scale(1.1);
-}
-
-.recognition-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
-    background: linear-gradient(to right, #D4A373, #F3E5AB, #D4A373);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 0;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-
-/* --- MAIN CARD --- */
-.recognition-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(212, 163, 115, 0.3);
-    position: relative;
-    overflow: hidden;
-    min-height: 500px;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Hiasan Batik Halus di Header Card */
-.recognition-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: linear-gradient(90deg, #6B4226, #D4A373, #6B4226);
-}
-
-/* --- PROGRESS BAR --- */
-.progress-indicator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 40px;
-    position: relative;
-}
-
-.progress-step {
-    z-index: 2;
-}
-
-.step-circle {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: #f0f0f0;
-    color: #999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid #e0e0e0;
-}
-
-.step-circle.active {
-    background: #D4A373;
-    color: white;
-    border-color: #D4A373;
-    box-shadow: 0 0 15px rgba(212, 163, 115, 0.5);
-    transform: scale(1.1);
-}
-
-.step-circle.completed {
-    background: #6B4226;
-    color: white;
-    border-color: #6B4226;
-}
-
-.step-line {
-    width: 60px;
-    height: 3px;
-    background: #e0e0e0;
-    margin: 0 5px;
-    transition: all 0.4s ease;
-    border-radius: 2px;
-}
-
-.step-line.active,
-.step-line.completed {
-    background: linear-gradient(90deg, #6B4226, #D4A373);
-}
-
-/* --- STAGE CONTENT AREA --- */
-.stage-content {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
-/* --- STAGE 1: SELECTION CARDS --- */
-.selection-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    width: 100%;
-    max-width: 600px;
-}
-
-.selection-card {
-    background: #fff;
-    border: 2px solid #f0f0f0;
-    border-radius: 16px;
-    padding: 30px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.selection-card:hover {
-    border-color: #D4A373;
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(212, 163, 115, 0.2);
-}
-
-.selection-icon {
-    font-size: 3rem;
-    color: #6B4226;
-    margin-bottom: 15px;
-}
-
-.selection-title {
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 5px;
-    font-size: 1.1rem;
-}
-
-.selection-desc {
-    font-size: 0.85rem;
-    color: #777;
-}
-
-/* --- STAGE 2: CAMERA UI --- */
-.camera-frame {
-    width: 100%;
-    max-width: 450px;
-    height: 350px;
-    background: #000;
-    border-radius: 20px;
-    position: relative;
-    overflow: hidden;
-    border: 4px solid #333;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* Scanner Animation */
-.scanner-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: #00ff00;
-    box-shadow: 0 0 10px #00ff00;
-    animation: scan 2s linear infinite;
-    z-index: 5;
-}
-
-.camera-overlay {
-    position: absolute;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    z-index: 10;
-}
-
-.shutter-btn {
-    width: 60px;
-    height: 60px;
-    background: white;
-    border-radius: 50%;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.shutter-btn:active {
-    transform: scale(0.9);
-    background: #ddd;
-}
-
-/* --- STAGE 3: UPLOAD UI --- */
-.upload-zone {
-    width: 100%;
-    max-width: 500px;
-    height: 300px;
-    border: 3px dashed #D4A373;
-    border-radius: 20px;
-    background: #FBEDE3;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.upload-zone:hover {
-    background: #F5DEC9;
-    transform: scale(1.02);
-}
-
-/* --- PREVIEW IMAGE --- */
-.preview-container {
-    position: relative;
-    padding: 10px;
-    background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-    transform: rotate(-2deg);
-    /* Artistic tilt */
-}
-
-.image-preview {
-    max-width: 300px;
-    max-height: 300px;
-    border-radius: 10px;
-    object-fit: cover;
-    border: 1px solid #ddd;
-}
-
-/* --- STAGE 4: RESULT --- */
-.result-layout {
-    display: flex;
-    flex-direction: row;
-    gap: 30px;
-    text-align: left;
-    width: 100%;
-    align-items: flex-start;
-}
-
-.result-img-wrapper {
-    flex: 0 0 150px;
-}
-
-.result-img {
-    width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    border: 3px solid #D4A373;
-}
-
-.result-info {
-    flex: 1;
-}
-
-.confidence-badge {
-    display: inline-block;
-    background: #e6f4ea;
-    color: #1e8e3e;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-
-.wayang-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: #6B4226;
-    margin: 0 0 15px 0;
-    border-bottom: 2px solid #f0f0f0;
-    padding-bottom: 10px;
-}
-
-.wayang-desc {
-    font-size: 0.95rem;
-    line-height: 1.7;
-    color: #555;
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 10px;
-    border-left: 4px solid #D4A373;
-}
-
-/* --- BUTTONS --- */
-.action-btn {
-    padding: 12px 30px;
-    border-radius: 30px;
-    border: none;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-top: 20px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #D4A373 0%, #B88656 100%);
-    color: white;
-    box-shadow: 0 5px 15px rgba(212, 163, 115, 0.4);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(212, 163, 115, 0.6);
-}
-
-.btn-secondary {
-    background: #f0f0f0;
-    color: #666;
-}
-
-.btn-secondary:hover {
-    background: #e0e0e0;
-}
-
-/* --- ANIMATIONS --- */
-@keyframes scan {
-    0% {
-        top: 0;
-        opacity: 0;
-    }
-
-    10% {
-        opacity: 1;
-    }
-
-    90% {
-        opacity: 1;
-    }
-
-    100% {
-        top: 100%;
-        opacity: 0;
-    }
-}
-
-.fade-in-up {
-    animation: fadeInUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* --- RESPONSIVE --- */
-@media (max-width: 768px) {
-    .selection-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .result-layout {
-        flex-direction: column;
-        text-align: center;
-        align-items: center;
-    }
-
-    .result-img-wrapper {
-        width: 150px;
-        margin-bottom: 20px;
-    }
-
-    .wayang-desc {
-        text-align: left;
-    }
-
-    .step-line {
-        width: 30px;
-    }
-
-    .recognition-title {
-        font-size: 1.8rem;
-    }
-
-    .back-btn-wrapper {
-        position: static;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: center;
-        transform: none;
-    }
+    .chatbot-button { bottom: 15px; right: 15px; width: 45px; height: 45px; }
+    .chatbot-icon { width: 22px; height: 22px; }
+    .chat-popup { bottom: 70px; right: 15px; width: 280px; height: 350px; }
 }
