@@ -20,7 +20,7 @@
 
             <div class="navbar-actions">
                 {% if session.get('user_logged_in') %}
-                    <span class="user-greeting">Halo, {{ session.get('user_name', 'User') }}!</span>
+                    <span class="user-greeting">{{ session.get('user_name', 'User') }}</span>
                     <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
                 {% else %}
                     <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>

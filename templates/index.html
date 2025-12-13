@@ -21,6 +21,19 @@
 
     {% include 'layouts/navbar.html' %}
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" style="padding: 12px; margin-bottom: 10px; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; min-width: 300px;">
+                <span>{{ message }}</span>
+                <button class="close-btn" onclick="this.parentElement.style.display='none';" style="background: none; border: none; color: inherit; font-weight: bold; cursor: pointer; font-size: 1.2rem;">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <!-- ================= HERO ================= -->
     <main class="hero">
         <div class="container">

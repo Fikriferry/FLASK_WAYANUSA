@@ -92,7 +92,6 @@ class AIModel(db.Model):
     accuracy = db.Column(db.String(50))
     is_active = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    labels = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
         return f'<AIModel {self.version_name}>'
