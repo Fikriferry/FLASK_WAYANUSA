@@ -1,0 +1,45 @@
+{% extends "admin/layout_admin.html" %}
+{% block title %}Data Wayang Game{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Data Wayang Game</h3>
+        <a href="{{ url_for('web.admin_wayanggame_add') }}" class="btn btn-primary btn-sm float-right">
+            <i class="fas fa-plus"></i> Tambah Wayang
+        </a>
+    </div>
+
+    <div class="card-body table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th width="50">ID</th>
+                    <th>Nama</th>
+                    <th>Gambar</th>
+                    <th width="150">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in wayangs %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.nama }}</td>
+                    <td>
+                        <img src="{{ url_for('static', filename=item.file_path) }}" width="80">
+                    </td>
+                    <td>
+                        <a href="{{ url_for('web.admin_wayanggame_edit', id=item.id) }}"
+                            class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{{ url_for('web.admin_wayanggame_delete', id=item.id) }}"
+                            onclick="return confirm('Hapus data ini?')" class="btn btn-danger btn-sm">Hapus</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

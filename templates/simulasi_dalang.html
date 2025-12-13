@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <title>Panggung Dalang</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
-
     <style>
         body {
             margin: 0;
@@ -17,12 +15,11 @@
         .panggung {
             position: absolute;
             inset: 0;
-            background: url("static/images/panggung.jpg") center/cover no-repeat;
+            background: url("{{ url_for('static', filename='images/panggung.jpg') }}") center/cover no-repeat;
             filter: brightness(0.85);
             z-index: 1;
         }
 
-        /* === AREA STAGE === */
         .stage-area {
             position: absolute;
             top: 12vh;
@@ -35,38 +32,21 @@
             border-radius: 12px;
             overflow: hidden;
             z-index: 3;
-            box-shadow:
-                0 0 40px rgba(0, 0, 0, 0.6) inset,
-                0 0 25px rgba(255, 200, 150, 0.4);
+            box-shadow: 0 0 40px rgba(0,0,0,0.6) inset, 0 0 25px rgba(255,200,150,0.4);
         }
 
         .tirai-area {
             position: absolute;
             inset: 0;
-            background: url("static/images/tirai2.png") center/cover no-repeat;
+            background: url("{{ url_for('static', filename='images/tirai2.png') }}") center/cover no-repeat;
             z-index: 10;
             pointer-events: none;
         }
 
-        /* === AREA DALANG === */
-        .dalang-area {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 85vw;
-            height: 25vh;
-            background: rgba(0, 0, 0, 0.85);
-            border-top: 4px solid #b88a33;
-            z-index: 4;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
         .btn-add {
-            margin-left: auto;
+            position: absolute;
+            top: 10px;
+            right: 10px;
             background: #d4a23a;
             border: none;
             padding: 10px 20px;
@@ -75,30 +55,32 @@
             cursor: pointer;
             color: #000;
             font-weight: bold;
+            z-index: 20;
         }
 
         .wayang-list {
-            position: relative;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            flex-direction: row;
             gap: 10px;
             overflow-x: auto;
-
-            /* ANIMASI SLIDE */
-            transform: translateX(120%);   /* posisinya di luar kanan */
             opacity: 0;
-            transition: transform 0.5s ease, opacity 0.5s ease;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 15;
         }
 
         .wayang-list.show {
-            transform: translateX(0);     /* posisinya normal */
             opacity: 1;
+            pointer-events: auto;
         }
 
         .wayang-slot {
             width: 80px;
             height: 120px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.1);
             border: 2px solid #d4a23a;
             border-radius: 10px;
             overflow: hidden;
@@ -126,7 +108,7 @@
             left: 8px;
             width: 60px;
             height: 60px;
-            background: rgba(200, 0, 0, 0.7);
+            background: rgba(200,0,0,0.7);
             border: 3px solid #ffaaaa;
             border-radius: 12px;
             font-size: 32px;
@@ -135,163 +117,115 @@
             justify-content: center;
             z-index: 20;
             pointer-events: none;
-            /* supaya tidak mengganggu drag */
             user-select: none;
         }
     </style>
 </head>
-
 <body>
 
     {% include 'layouts/navbar.html' %}
 
     <div class="panggung"></div>
 
-    <!-- === FIXED VERSION === -->
     <div class="stage-area" id="stageArea">
         <div class="tirai-area"></div>
         <div class="trash-bin" id="trashBin">🗑️</div>
     </div>
 
-    <div class="dalang-area">
-        <div class="wayang-list" id="wayangList">
-
-            <div class="wayang-slot" draggable="true" data-src="static/wayang/arjuna.png">
-                <img src="static/wayang/arjuna.png">
-            </div>
-
-            <div class="wayang-slot" draggable="true" data-src="static/wayang/semar.png">
-                <img src="static/wayang/semar.png">
-            </div>
-
-            <div class="wayang-slot" draggable="true" data-src="static/wayang/bima.png">
-                <img src="static/wayang/bima.png">
-            </div>
-
+    <!-- Wayang list -->
+    <div class="wayang-list" id="wayangList">
+        {% for w in wayangs %}
+        <div class="wayang-slot" draggable="true" data-src="{{ url_for('static', filename=w.file_path) }}">
+            <img src="{{ url_for('static', filename=w.file_path) }}">
         </div>
-
-        <button class="btn-add" id="btnAdd">+</button>
+        {% endfor %}
     </div>
 
+    <button class="btn-add" id="btnAdd">+</button>
+
     <script>
-        /* === TOMBOL + === */
-        document.getElementById("btnAdd").addEventListener("click", () => {
-            const list = document.getElementById("wayangList");
-            list.classList.toggle("show");
-        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const btnAdd = document.getElementById("btnAdd");
+            const wayangList = document.getElementById("wayangList");
+            const stage = document.getElementById("stageArea");
+            const trash = document.getElementById("trashBin");
+            let draggedSrc = null;
 
+            // Toggle wayang list
+            btnAdd.addEventListener("click", () => wayangList.classList.toggle("show"));
 
-        /* === DRAG WAYANG DARI LIST === */
-        const stage = document.getElementById("stageArea");
-        let draggedSrc = null;
-
-        document.querySelectorAll(".wayang-slot").forEach(slot => {
-            slot.addEventListener("dragstart", () => {
-                draggedSrc = slot.getAttribute("data-src");
-            });
-        });
-
-        /* DROP KE STAGE */
-        stage.addEventListener("dragover", e => e.preventDefault());
-
-        stage.addEventListener("drop", e => {
-            const img = document.createElement("img");
-            img.src = draggedSrc;
-            img.className = "wayang";
-
-            img.style.left = e.offsetX + "px";
-            img.style.top = e.offsetY + "px";
-
-            stage.appendChild(img);
-
-            enableDrag(img);
-            fallDown(img);
-        });
-
-        /* === DRAG DI DALAM STAGE === */
-        function enableDrag(el) {
-            let offsetX, offsetY, isDown = false;
-
-            el.style.pointerEvents = "auto";
-            el.style.cursor = "grab";
-
-            el.addEventListener("mousedown", (e) => {
-                isDown = true;
-                el.style.cursor = "grabbing";
-                offsetX = e.offsetX;
-                offsetY = e.offsetY;
+            // Drag dari list
+            document.querySelectorAll(".wayang-slot").forEach(slot => {
+                slot.addEventListener("dragstart", () => {
+                    draggedSrc = slot.getAttribute("data-src");
+                });
             });
 
-            document.addEventListener("mouseup", () => {
-                if (!isDown) return;
+            // Drop ke stage
+            stage.addEventListener("dragover", e => e.preventDefault());
+            stage.addEventListener("drop", e => {
+                if (!draggedSrc) return;
+                const img = document.createElement("img");
+                img.src = draggedSrc;
+                img.className = "wayang";
+                img.style.left = e.offsetX + "px";
+                img.style.top = e.offsetY + "px";
+                stage.appendChild(img);
+                enableDrag(img);
+                fallDown(img);
+            });
 
-                // cek apakah wayang masuk kotak sampah
-                if (isOverTrash(el)) {
-                    el.remove();
-                    isDown = false;
-                    return;
-                }
-
-                // kalau tidak masuk sampah → jatuh seperti biasa
-                fallDown(el);
-                isDown = false;
+            // Drag di stage
+            function enableDrag(el) {
+                let offsetX, offsetY, isDown = false;
+                el.style.pointerEvents = "auto";
                 el.style.cursor = "grab";
-            });
 
+                el.addEventListener("mousedown", e => {
+                    isDown = true;
+                    el.style.cursor = "grabbing";
+                    offsetX = e.offsetX;
+                    offsetY = e.offsetY;
+                });
 
-            document.addEventListener("mousemove", (e) => {
-                if (!isDown) return;
+                document.addEventListener("mouseup", () => {
+                    if (!isDown) return;
+                    if (isOverTrash(el)) { el.remove(); isDown = false; return; }
+                    fallDown(el);
+                    isDown = false;
+                    el.style.cursor = "grab";
+                });
 
+                document.addEventListener("mousemove", e => {
+                    if (!isDown) return;
+                    const rect = stage.getBoundingClientRect();
+                    let x = e.clientX - rect.left - offsetX;
+                    let y = e.clientY - rect.top - offsetY;
+                    x = Math.max(0, Math.min(rect.width - el.clientWidth, x));
+                    y = Math.max(0, Math.min(rect.height - el.clientHeight, y));
+                    el.style.left = x + "px";
+                    el.style.top = y + "px";
+                });
+            }
+
+            function isOverTrash(el) {
+                const wRect = el.getBoundingClientRect();
+                const tRect = trash.getBoundingClientRect();
+                return !(wRect.right < tRect.left || wRect.left > tRect.right ||
+                         wRect.bottom < tRect.top || wRect.top > tRect.bottom);
+            }
+
+            function fallDown(el) {
                 const rect = stage.getBoundingClientRect();
-
-                let x = e.clientX - rect.left - offsetX;
-                let y = e.clientY - rect.top - offsetY;
-
-                x = Math.max(0, Math.min(rect.width - el.clientWidth, x));
-                y = Math.max(0, Math.min(rect.height - el.clientHeight, y));
-
-                el.style.left = x + "px";
-                el.style.top = y + "px";
-            });
-
-
-        }
-
-        /* === DETEKSI JIKA DIJATUHKAN KE TEMPAT SAMPAH === */
-        const trash = document.getElementById("trashBin");
-
-        function isOverTrash(el) {
-            const wRect = el.getBoundingClientRect();
-            const tRect = trash.getBoundingClientRect();
-
-            return !(
-                wRect.right < tRect.left ||
-                wRect.left > tRect.right ||
-                wRect.bottom < tRect.top ||
-                wRect.top > tRect.bottom
-            );
-        }
-
-
-        /* === GRAVITY: WAYANG JATUH === */
-        function fallDown(el) {
-            const rect = stage.getBoundingClientRect();
-            const bottom = rect.height - el.clientHeight;
-            let current = parseInt(el.style.top);
-
-            let fall = setInterval(() => {
-                current += 3;
-
-                if (current >= bottom) {
-                    current = bottom;
-                    clearInterval(fall);
-                }
-
-                el.style.top = current + "px";
-            }, 10);
-        }
+                const bottom = rect.height - el.clientHeight;
+                let current = parseInt(el.style.top) || 0;
+                const fall = setInterval(() => {
+                    current += 3;
+                    if (current >= bottom) { current = bottom; clearInterval(fall); }
+                    el.style.top = current + "px";
+                }, 10);
+            }
+        });
     </script>
-
 </body>
-
 </html>

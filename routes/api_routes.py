@@ -115,6 +115,22 @@ def get_dalang():
         return jsonify({"dalangs": data}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@api.route("/api/wayang")
+def api_wayang():
+    wayangs = Wayang.query.all()
+    return {
+        "data": [
+            {
+                "id": w.id,
+                "nama": w.nama,
+                "file": w.file_path
+            }
+            for w in wayangs
+        ]
+    }
+
 
 # ================================
 # 3. AI VISION API (PREDIKSI WAYANG)

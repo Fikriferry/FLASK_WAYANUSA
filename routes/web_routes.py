@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 from functools import wraps
 import os
-from models import Video, db, AIModel, Dalang, User, Admin, QuizLevel, QuizQuestion, Article, QuizResult, Wayang
+from models import Video, db, AIModel, Dalang, User, Admin, QuizLevel, QuizQuestion, Article, QuizResult, Wayang, WayangGame
 from ai_manager import reload_model
 
 web_routes = Blueprint("web", __name__)
@@ -158,9 +158,11 @@ def artikel_detail(id):
     artikel = Article.query.get_or_404(id)
     return render_template('artikel_detail.html', artikel=artikel)
 
-@web_routes.route('/v-dalang')
-def v_dalang():
-    return render_template('simulasi_dalang.html')
+@web_routes.route('/s-dalang')
+def simulasi_dalang():
+    wayangs = WayangGame.query.order_by(WayangGame.id.asc()).all()
+    print("Jumlah wayang:", len(wayangs))  # Debug: cek di console server
+    return render_template("simulasi_dalang.html", wayangs=wayangs)
 
 # -------------------------
 # ADMIN ROUTES
@@ -666,3 +668,107 @@ def admin_wayang_delete(id):
     db.session.commit()
     flash('Data wayang berhasil dihapus.', 'success')
     return redirect(url_for('web.admin_wayang_list'))
+
+# Folder upload
+UPLOAD_FOLDER_WAYANGGAME = os.path.join("static", "uploads", "wayanggame")
+os.makedirs(UPLOAD_FOLDER_WAYANGGAME, exist_ok=True)
+
+def save_wayang_file(file):
+    try:
+        filename = secure_filename(file.filename)
+        save_path = os.path.join(UPLOAD_FOLDER_WAYANGGAME, filename)
+        file.save(save_path)
+        return filename, None
+    except Exception as e:
+        return None, str(e)
+
+# =========================
+# LIST WAYANG GAME
+# =========================
+@web_routes.route('/admin/wayanggame')
+@admin_login_required
+def admin_wayanggame_list():
+    wayangs = WayangGame.query.order_by(WayangGame.id.asc()).all()
+    return render_template("admin/wayanggame_list.html", wayangs=wayangs)
+
+# =========================
+# ADD WAYANG GAME
+# =========================
+@web_routes.route('/admin/wayanggame/add', methods=['GET', 'POST'])
+@admin_login_required
+def admin_wayanggame_add():
+    if request.method == "POST":
+        nama = request.form.get("nama")
+        file = request.files.get("file")
+
+        if not nama or not file or not file.filename:
+            flash("Nama dan file gambar wajib diisi!", "error")
+            return redirect(url_for("web.admin_wayanggame_add"))
+
+        filename, error = save_wayang_file(file)
+        if error:
+            flash(f"Error upload file: {error}", "error")
+            return redirect(url_for("web.admin_wayanggame_add"))
+
+        new_wayang = WayangGame(
+            nama=nama,
+            file_path=f"uploads/wayanggame/{filename}"
+        )
+        db.session.add(new_wayang)
+        db.session.commit()
+        flash("Wayang berhasil ditambahkan!", "success")
+        return redirect(url_for("web.admin_wayanggame_list"))
+
+    return render_template("admin/wayanggame_add.html", wayang=None)
+
+# =========================
+# EDIT WAYANG GAME
+# =========================
+@web_routes.route('/admin/wayanggame/edit/<int:id>', methods=['GET', 'POST'])
+@admin_login_required
+def admin_wayanggame_edit(id):
+    item = WayangGame.query.get_or_404(id)
+
+    if request.method == "POST":
+        nama = request.form.get("nama")
+        if not nama:
+            flash("Nama wayang wajib diisi!", "error")
+            return redirect(url_for("web.admin_wayanggame_edit", id=id))
+        item.nama = nama
+
+        file = request.files.get("file")
+        if file and file.filename:
+            # Hapus file lama jika ada
+            old_path = os.path.join("static", item.file_path)
+            if os.path.exists(old_path):
+                os.remove(old_path)
+
+            filename, error = save_wayang_file(file)
+            if error:
+                flash(f"Error upload file: {error}", "error")
+                return redirect(url_for("web.admin_wayanggame_edit", id=id))
+            item.file_path = f"uploads/wayanggame/{filename}"
+
+        db.session.commit()
+        flash("Wayang berhasil diperbarui!", "success")
+        return redirect(url_for("web.admin_wayanggame_list"))
+
+    return render_template("admin/wayanggame_edit.html", wayang=item)
+
+# =========================
+# DELETE WAYANG GAME
+# =========================
+@web_routes.route('/admin/wayanggame/delete/<int:id>')
+@admin_login_required
+def admin_wayanggame_delete(id):
+    item = WayangGame.query.get_or_404(id)
+
+    # Hapus file fisik jika ada
+    file_path = os.path.join("static", item.file_path)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    db.session.delete(item)
+    db.session.commit()
+    flash("Wayang berhasil dihapus!", "success")
+    return redirect(url_for("web.admin_wayanggame_list"))
