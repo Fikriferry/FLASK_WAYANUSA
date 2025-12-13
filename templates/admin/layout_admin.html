@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}WAYANUSA Admin{% endblock %}</title>
@@ -19,122 +20,133 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.css">
 
     <style>
-        #map { border-radius: 8px; }
+        #map {
+            border-radius: 8px;
+        }
     </style>
 
     {% block head %}{% endblock %}
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
+    <div class="wrapper">
 
-    <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#">
-                    <i class="fas fa-bars"></i>
-                </a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="{{ url_for('web.admin_dashboard') }}" class="nav-link">Home</a>
-            </li>
-        </ul>
-    </nav>
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#">
+                        <i class="fas fa-bars"></i>
+                    </a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="{{ url_for('web.admin_dashboard') }}" class="nav-link">Home</a>
+                </li>
+            </ul>
+        </nav>
 
-    <!-- Sidebar -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
-        <a href="{{ url_for('web.admin_dashboard') }}" class="brand-link">
-            <span class="brand-text font-weight-light">WAYANUSA Admin</span>
-        </a>
+        <!-- Sidebar -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <a href="{{ url_for('web.admin_dashboard') }}" class="brand-link">
+                <span class="brand-text font-weight-light">WAYANUSA Admin</span>
+            </a>
 
-        <div class="sidebar">
-            <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column">
+            <div class="sidebar">
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column">
 
-                    <li class="nav-item">
-                        <a href="{{ url_for('web.admin_dashboard') }}" class="nav-link">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>Dashboard</p>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('web.admin_dashboard') }}" class="nav-link">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="{{ url_for('web.dalang_list') }}" class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Data Dalang</p>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('web.dalang_list') }}" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Data Dalang</p>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="{{ url_for('web.video_list') }}" class="nav-link">
-                            <i class="nav-icon fab fa-youtube"></i>
-                            <p>Data YouTube</p>
-                        </a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a href="{{ url_for('web.admin_models') }}" class="nav-link">
-                            <i class="nav-icon fas fa-robot"></i>
-                            <p>Data AI Models</p>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('web.video_list') }}" class="nav-link">
+                                <i class="nav-icon fab fa-youtube"></i>
+                                <p>Data YouTube</p>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="{{ url_for('web.admin_wayang_list') }}" class="nav-link">
-                            <i class="nav-icon fas fa-robot"></i>
-                            <p>Data Info Wayang</p>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('web.admin_models') }}" class="nav-link">
+                                <i class="nav-icon fas fa-robot"></i>
+                                <p>Data AI Models</p>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="{{ url_for('web.artikel_list') }}" class="nav-link">
-                            <i class="nav-icon fas fa-newspaper"></i>
-                            <p>Artikel</p>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('web.admin_wayang_list') }}" class="nav-link">
+                                <i class="nav-icon fas fa-robot"></i>
+                                <p>Data Info Wayang</p>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="{{ url_for('web.logout_admin') }}" class="nav-link text-danger">
-                            <i class="nav-icon fas fa-sign-out-alt"></i>
-                            <p>Logout</p>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('web.artikel_list') }}" class="nav-link">
+                                <i class="nav-icon fas fa-newspaper"></i>
+                                <p>Artikel</p>
+                            </a>
+                        </li>
 
-                </ul>
-            </nav>
-        </div>
-    </aside>
+                        <li class="nav-item">
+                            <a href="{{ url_for('web.admin_wayanggame_list') }}" class="nav-link">
+                                <i class="nav-icon fas fa-dragon"></i>
+                                <p>Data Wayang Game</p>
+                            </a>
+                        </li>
 
-    <!-- Main content -->
-    <div class="content-wrapper">
-        <section class="content pt-3">
-            <div class="container-fluid">
-                {% block content %}{% endblock %}
+
+                        <li class="nav-item">
+                            <a href="{{ url_for('web.logout_admin') }}" class="nav-link text-danger">
+                                <i class="nav-icon fas fa-sign-out-alt"></i>
+                                <p>Logout</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
             </div>
-        </section>
+        </aside>
+
+        <!-- Main content -->
+        <div class="content-wrapper">
+            <section class="content pt-3">
+                <div class="container-fluid">
+                    {% block content %}{% endblock %}
+                </div>
+            </section>
+        </div>
+
+        <footer class="main-footer text-sm">
+            <strong>WAYANUSA Admin Panel</strong>
+            <div class="float-right d-none d-sm-inline-block">Version 1.0</div>
+        </footer>
+
     </div>
 
-    <footer class="main-footer text-sm">
-        <strong>WAYANUSA Admin Panel</strong>
-        <div class="float-right d-none d-sm-inline-block">Version 1.0</div>
-    </footer>
+    <!-- AdminLTE JS -->
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
-</div>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- AdminLTE JS -->
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Summernote JS -->
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 
-<!-- Bootstrap Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Summernote JS -->
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-
-{% block scripts %}{% endblock %}
+    {% block scripts %}{% endblock %}
 
 </body>
+
 </html>

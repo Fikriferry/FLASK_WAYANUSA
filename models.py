@@ -173,3 +173,8 @@ class Wayang(db.Model):
     
     def __repr__(self):
         return f'<Wayang {self.nama}>'
+    
+class WayangGame(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nama = db.Column(db.String(100), nullable=False)
+    file_path = db.Column(db.String(200), nullable=False)
