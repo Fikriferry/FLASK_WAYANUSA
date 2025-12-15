@@ -8,7 +8,9 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -22,16 +24,18 @@
     {% include 'layouts/navbar.html' %}
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-messages" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
-          {% for category, message in messages %}
-            <div class="alert alert-{{ category }}" style="padding: 12px; margin-bottom: 10px; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; min-width: 300px;">
-                <span>{{ message }}</span>
-                <button class="close-btn" onclick="this.parentElement.style.display='none';" style="background: none; border: none; color: inherit; font-weight: bold; cursor: pointer; font-size: 1.2rem;">&times;</button>
-            </div>
-          {% endfor %}
+    {% if messages %}
+    <div class="flash-messages" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}"
+            style="padding: 12px; margin-bottom: 10px; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; min-width: 300px;">
+            <span>{{ message }}</span>
+            <button class="close-btn" onclick="this.parentElement.style.display='none';"
+                style="background: none; border: none; color: inherit; font-weight: bold; cursor: pointer; font-size: 1.2rem;">&times;</button>
         </div>
-      {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
     <!-- ================= HERO ================= -->
@@ -47,7 +51,8 @@
                     </h1>
 
                     <p class="hero-description">
-                        Belajar, bermain, dan melestarikan budaya Indonesia melalui pengalaman digital interaktif yang menawan dan penuh makna.
+                        Belajar, bermain, dan melestarikan budaya Indonesia melalui pengalaman digital interaktif yang
+                        menawan dan penuh makna.
                     </p>
 
                     <div class="hero-buttons">
@@ -71,7 +76,8 @@
                 <p class="about-tag">TENTANG WAYANUSA</p>
                 <h2 class="about-title">Cara Baru Mengenal <span class="highlight">Budaya Wayang</span></h2>
                 <p class="about-description">
-                    WAYANUSA adalah aplikasi edukatif berbasis mobile yang menghadirkan cara baru untuk mengenal budaya wayang kulit.
+                    WAYANUSA adalah aplikasi edukatif berbasis mobile yang menghadirkan cara baru untuk mengenal budaya
+                    wayang kulit.
                 </p>
                 <div class="stats">
                     <div class="stat-card">
@@ -172,6 +178,22 @@
                             </p>
                         </div>
                     </div>
+
+                    <div class="feature-card">
+                        <div class="feature-image">
+                            <img src="{{ url_for('static', filename='images/feature_ai.jpg') }}"
+                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Simulasi+Dalang'"
+                                alt="Simulasi Dalang">
+                        </div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Simulasi Dalang</h3>
+                            <div class="feature-badge">🎙️ Interaktif & Games</div>
+                            <p class="feature-description">
+                                Rasakan pengalaman menjadi dalang dengan simulasi interaktif,
+                                mengatur dialog, karakter, dan alur cerita wayang secara digital.
+                            </p>
+                        </div>
+                    </div>  
                 </div>
             </div>
         </div>
@@ -184,24 +206,23 @@
                 <h2 class="dalang-showcase-title">Dalang <span class="highlight">Terdaftar</span></h2>
                 <div class="dalang-list-section">
                     {% if dalangs %}
-                        <div class="dalang-grid">
-                            {% for dalang in dalangs %}
-                            <div class="dalang-card">
-                                <img src="{{ dalang.foto and url_for('static', filename='uploads/' + dalang.foto) or 'https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo' }}" 
-                                     alt="Foto {{ dalang.nama }}" 
-                                     class="dalang-photo">
-                                <div class="dalang-info">
-                                    <h4>{{ dalang.nama }}</h4>
-                                    <p>{{ dalang.alamat }}</p>
-                                </div>
+                    <div class="dalang-grid">
+                        {% for dalang in dalangs %}
+                        <div class="dalang-card">
+                            <img src="{{ dalang.foto and url_for('static', filename='uploads/' + dalang.foto) or 'https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo' }}"
+                                alt="Foto {{ dalang.nama }}" class="dalang-photo">
+                            <div class="dalang-info">
+                                <h4>{{ dalang.nama }}</h4>
+                                <p>{{ dalang.alamat }}</p>
                             </div>
-                            {% endfor %}
                         </div>
-                        <div style="text-align: center; margin-top: 30px;">
-                            <a href="{{ url_for('web.mencari_dalang') }}" class="btn btn-secondary">Lihat Semua Dalang</a>
-                        </div>
+                        {% endfor %}
+                    </div>
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="{{ url_for('web.mencari_dalang') }}" class="btn btn-secondary">Lihat Semua Dalang</a>
+                    </div>
                     {% else %}
-                        <p style="color:#888;">Belum ada data dalang yang ditampilkan.</p>
+                    <p style="color:#888;">Belum ada data dalang yang ditampilkan.</p>
                     {% endif %}
                 </div>
             </div>
@@ -219,4 +240,5 @@
     <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
 
 </body>
+
 </html>

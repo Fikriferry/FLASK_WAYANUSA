@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Panggung Dalang</title>
@@ -32,7 +33,7 @@
             border-radius: 12px;
             overflow: hidden;
             z-index: 3;
-            box-shadow: 0 0 40px rgba(0,0,0,0.6) inset, 0 0 25px rgba(255,200,150,0.4);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6) inset, 0 0 25px rgba(255, 200, 150, 0.4);
         }
 
         .tirai-area {
@@ -55,12 +56,14 @@
             cursor: pointer;
             color: #000;
             font-weight: bold;
-            z-index: 20;
+            z-index: 60;
         }
 
         .wayang-list {
-            position: absolute;
-            bottom: 10px;
+            position: fixed;
+            /* ⬅️ ganti dari absolute */
+            bottom: 80px;
+            /* ⬅️ naikkan dari bawah */
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -69,8 +72,10 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.5s ease;
-            z-index: 15;
+            z-index: 50;
+            /* ⬅️ lebih tinggi dari stage */
         }
+
 
         .wayang-list.show {
             opacity: 1;
@@ -80,13 +85,16 @@
         .wayang-slot {
             width: 80px;
             height: 120px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border: 2px solid #d4a23a;
             border-radius: 10px;
             overflow: hidden;
             flex-shrink: 0;
             cursor: grab;
         }
+
+
+
 
         .wayang-slot img {
             width: 100%;
@@ -99,7 +107,12 @@
             position: absolute;
             width: 90px;
             height: 140px;
-            pointer-events: none;
+            pointer-events: auto;
+            cursor: grab;
+        }
+
+        .wayang:active {
+            cursor: grabbing;
         }
 
         .trash-bin {
@@ -108,7 +121,7 @@
             left: 8px;
             width: 60px;
             height: 60px;
-            background: rgba(200,0,0,0.7);
+            background: rgba(200, 0, 0, 0.7);
             border: 3px solid #ffaaaa;
             border-radius: 12px;
             font-size: 32px;
@@ -116,11 +129,18 @@
             align-items: center;
             justify-content: center;
             z-index: 20;
-            pointer-events: none;
+            pointer-events: auto;
+            transition: background 0.3s, transform 0.2s;
             user-select: none;
+        }
+
+        .trash-bin.active {
+            background: rgba(255, 0, 0, 0.9);
+            transform: scale(1.1);
         }
     </style>
 </head>
+
 <body>
 
     {% include 'layouts/navbar.html' %}
@@ -144,88 +164,129 @@
     <button class="btn-add" id="btnAdd">+</button>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const btnAdd = document.getElementById("btnAdd");
-            const wayangList = document.getElementById("wayangList");
+        document.addEventListener("DOMContentLoaded", () => {
             const stage = document.getElementById("stageArea");
             const trash = document.getElementById("trashBin");
+            const btnAdd = document.getElementById("btnAdd");
+            const wayangList = document.getElementById("wayangList");
+
             let draggedSrc = null;
+            let isFromList = false;
 
-            // Toggle wayang list
-            btnAdd.addEventListener("click", () => wayangList.classList.toggle("show"));
+            // =====================
+            // TOMBOL +
+            // =====================
+            btnAdd.onclick = () => {
+                wayangList.classList.toggle("show");
+            };
 
-            // Drag dari list
+
+            // =====================
+            // DRAG DARI LIST
+            // =====================
             document.querySelectorAll(".wayang-slot").forEach(slot => {
                 slot.addEventListener("dragstart", () => {
-                    draggedSrc = slot.getAttribute("data-src");
+                    draggedSrc = slot.dataset.src;
+                    isFromList = true;
                 });
             });
 
-            // Drop ke stage
             stage.addEventListener("dragover", e => e.preventDefault());
+
             stage.addEventListener("drop", e => {
-                if (!draggedSrc) return;
+                e.preventDefault();
+                if (!isFromList || !draggedSrc) return;
+
+                const rect = stage.getBoundingClientRect();
                 const img = document.createElement("img");
+
                 img.src = draggedSrc;
                 img.className = "wayang";
-                img.style.left = e.offsetX + "px";
-                img.style.top = e.offsetY + "px";
+                img.draggable = false;
+
+                img.style.left = (e.clientX - rect.left - 45) + "px";
+                img.style.top = (e.clientY - rect.top - 70) + "px";
+
                 stage.appendChild(img);
-                enableDrag(img);
+                enableStageDrag(img);
                 fallDown(img);
+
+                draggedSrc = null;
+                isFromList = false;
             });
 
-            // Drag di stage
-            function enableDrag(el) {
-                let offsetX, offsetY, isDown = false;
-                el.style.pointerEvents = "auto";
-                el.style.cursor = "grab";
+            // =====================
+            // DRAG DI STAGE
+            // =====================
+            function enableStageDrag(el) {
+                let isDrag = false, offsetX = 0, offsetY = 0;
 
                 el.addEventListener("mousedown", e => {
-                    isDown = true;
-                    el.style.cursor = "grabbing";
+                    isDrag = true;
                     offsetX = e.offsetX;
                     offsetY = e.offsetY;
+                    el.falling = false;
+
+                    document.addEventListener("mousemove", move);
+                    document.addEventListener("mouseup", up);
                 });
 
-                document.addEventListener("mouseup", () => {
-                    if (!isDown) return;
-                    if (isOverTrash(el)) { el.remove(); isDown = false; return; }
-                    fallDown(el);
-                    isDown = false;
-                    el.style.cursor = "grab";
-                });
+                function move(e) {
+                    if (!isDrag) return;
+                    const r = stage.getBoundingClientRect();
 
-                document.addEventListener("mousemove", e => {
-                    if (!isDown) return;
-                    const rect = stage.getBoundingClientRect();
-                    let x = e.clientX - rect.left - offsetX;
-                    let y = e.clientY - rect.top - offsetY;
-                    x = Math.max(0, Math.min(rect.width - el.clientWidth, x));
-                    y = Math.max(0, Math.min(rect.height - el.clientHeight, y));
+                    let x = e.clientX - r.left - offsetX;
+                    let y = e.clientY - r.top - offsetY;
+
+                    x = Math.max(0, Math.min(r.width - el.clientWidth, x));
+                    y = Math.max(0, Math.min(r.height - el.clientHeight, y));
+
                     el.style.left = x + "px";
                     el.style.top = y + "px";
-                });
+
+                    trash.classList.toggle("active", isOverTrash(el));
+                }
+
+                function up() {
+                    isDrag = false;
+                    if (isOverTrash(el)) el.remove();
+                    else fallDown(el);
+
+                    trash.classList.remove("active");
+                    document.removeEventListener("mousemove", move);
+                    document.removeEventListener("mouseup", up);
+                }
             }
 
             function isOverTrash(el) {
-                const wRect = el.getBoundingClientRect();
-                const tRect = trash.getBoundingClientRect();
-                return !(wRect.right < tRect.left || wRect.left > tRect.right ||
-                         wRect.bottom < tRect.top || wRect.top > tRect.bottom);
+                const w = el.getBoundingClientRect();
+                const t = trash.getBoundingClientRect();
+                return !(w.right < t.left || w.left > t.right ||
+                    w.bottom < t.top || w.top > t.bottom);
             }
 
             function fallDown(el) {
+                if (el.falling) return;
+                el.falling = true;
+
                 const rect = stage.getBoundingClientRect();
                 const bottom = rect.height - el.clientHeight;
-                let current = parseInt(el.style.top) || 0;
+                let y = parseInt(el.style.top) || 0;
+
                 const fall = setInterval(() => {
-                    current += 3;
-                    if (current >= bottom) { current = bottom; clearInterval(fall); }
-                    el.style.top = current + "px";
+                    y += 4;
+                    if (y >= bottom) {
+                        y = bottom;
+                        clearInterval(fall);
+                        el.falling = false;
+                    }
+                    el.style.top = y + "px";
                 }, 10);
             }
         });
     </script>
+
+
 </body>
+
 </html>
