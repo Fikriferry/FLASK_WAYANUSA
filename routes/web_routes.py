@@ -621,18 +621,31 @@ def admin_wayang_list():
 @admin_login_required
 def admin_wayang_edit(id):
     wayang = Wayang.query.get_or_404(id)
-    
+
     if request.method == 'POST':
         # Admin mengedit deskripsi
         wayang.deskripsi = request.form['deskripsi']
-        
-        # Admin juga bisa upload foto referensi baru jika mau (opsional)
-        # ... kode upload foto ...
-        
+
+        # Handle file upload
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename:
+                # Hapus file lama jika ada
+                if wayang.file_path:
+                    old_path = os.path.join("static", wayang.file_path)
+                    if os.path.exists(old_path):
+                        os.remove(old_path)
+
+                filename, error = save_wayang_file(file)
+                if error:
+                    flash(f'Error upload file: {error}', 'error')
+                    return redirect(url_for('web.admin_wayang_edit', id=id))
+                wayang.file_path = f"uploads/wayanggame/{filename}"
+
         db.session.commit()
         flash(f'Deskripsi {wayang.nama} berhasil diperbarui!', 'success')
         return redirect(url_for('web.admin_wayang_list'))
-        
+
     return render_template('admin/wayang_form.html', wayang=wayang)
 
 # --- ROUTE TAMBAH WAYANG ---
@@ -642,20 +655,31 @@ def admin_wayang_add():
     if request.method == 'POST':
         nama = request.form['nama']
         deskripsi = request.form['deskripsi']
-        
+
         # Cek apakah nama sudah ada (Mencegah duplikat)
         existing = Wayang.query.filter_by(nama=nama).first()
         if existing:
             flash('Gagal! Nama wayang tersebut sudah ada.', 'danger')
             return redirect(url_for('web.admin_wayang_add'))
-            
-        new_wayang = Wayang(nama=nama, deskripsi=deskripsi)
+
+        # Handle file upload
+        file_path = None
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename:
+                filename, error = save_wayang_file(file)
+                if error:
+                    flash(f'Error upload file: {error}', 'error')
+                    return redirect(url_for('web.admin_wayang_add'))
+                file_path = f"uploads/wayanggame/{filename}"
+
+        new_wayang = Wayang(nama=nama, deskripsi=deskripsi, file_path=file_path)
         db.session.add(new_wayang)
         db.session.commit()
-        
+
         flash('Data wayang berhasil ditambahkan!', 'success')
         return redirect(url_for('web.admin_wayang_list'))
-        
+
     # Render form kosong (pass wayang=None untuk menandakan mode tambah)
     return render_template('admin/wayang_form.html', wayang=None)
 

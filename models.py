@@ -169,7 +169,8 @@ class Wayang(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(100), unique=True, nullable=False) # Kunci utama (misal: "Arjuna")
     deskripsi = db.Column(db.Text, nullable=False) # Deskripsi panjang
-    
+    file_path = db.Column(db.String(200), nullable=True) # Path gambar wayang
+
     def __repr__(self):
         return f'<Wayang {self.nama}>'
     
