@@ -164,6 +164,14 @@ def simulasi_dalang():
     print("Jumlah wayang:", len(wayangs))  # Debug: cek di console server
     return render_template("simulasi_dalang.html", wayangs=wayangs)
 
+@web_routes.route('/smart-wayang')
+def smart_wayang():
+    # Pastikan user login jika fitur ini butuh akses khusus (opsional)
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
+        
+    return render_template('smart_wayang.html')
+
 # -------------------------
 # ADMIN ROUTES
 # -------------------------
@@ -796,3 +804,6 @@ def admin_wayanggame_delete(id):
     db.session.commit()
     flash("Wayang berhasil dihapus!", "success")
     return redirect(url_for("web.admin_wayanggame_list"))
+
+# ================================
+

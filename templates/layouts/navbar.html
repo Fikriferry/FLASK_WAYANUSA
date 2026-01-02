@@ -1,31 +1,84 @@
 <nav class="navbar">
     <div class="container">
         <div class="navbar-content">
+            
             <div class="navbar-logo">
                 <a href="{{ url_for('web.home') }}" class="logo-link">
                     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
                 </a>
             </div>
 
-            <div class="navbar-menu">
+            <div class="navbar-menu" id="navbarMenu">
                 <ul class="nav-links">
-                    <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan Wayang</a></li>
+                    <li><a href="{{ url_for('web.smart_wayang') }}">Smart Wayang</a></li>
+                    <li><a href="{{ url_for('web.pengenalan_wayang') }}">Pengenalan</a></li>
                     <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
-                    <li><a href="{{ url_for('web.mencari_dalang') }}">Mencari Dalang</a></li>
-                    <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan Wayang</a></li>
-                    <li><a href="{{ url_for('web.artikel') }}" class="active">Artikel</a></li>
-                    <li><a href="{{ url_for('web.simulasi_dalang') }}" class="active">Simulasi Dalang</a></li>
+                    <li><a href="{{ url_for('web.mencari_dalang') }}">Cari Dalang</a></li>
+                    <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan</a></li>
+                    <li><a href="{{ url_for('web.artikel') }}">Artikel</a></li>
+                    <li><a href="{{ url_for('web.simulasi_dalang') }}">Simulasi</a></li>
+                    
+                    <li class="mobile-only-action">
+                        {% if session.get('user_logged_in') %}
+                            <a href="{{ url_for('web.logout_user') }}" class="btn-mobile-auth">Logout</a>
+                        {% else %}
+                            <a href="{{ url_for('web.login_user') }}" class="btn-mobile-auth">Login</a>
+                        {% endif %}
+                    </li>
                 </ul>
             </div>
 
-            <div class="navbar-actions">
-                {% if session.get('user_logged_in') %}
-                    <span class="user-greeting">{{ session.get('user_name', 'User') }}</span>
-                    <a href="{{ url_for('web.logout_user') }}" class="btn-login">Logout</a>
-                {% else %}
-                    <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
-                {% endif %}
+            <div class="navbar-right-side">
+                <div class="navbar-actions desktop-only-action">
+                    {% if session.get('user_logged_in') %}
+                        <span class="user-greeting">Hi, {{ session.get('user_name', 'User') }}</span>
+                        <a href="{{ url_for('web.logout_user') }}" class="btn-logout" title="Logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('web.login_user') }}" class="btn-login">Login</a>
+                    {% endif %}
+                </div>
+
+                <button class="burger-menu" id="burgerMenu" type="button" aria-label="Menu">
+                    <span class="burger-line"></span>
+                    <span class="burger-line"></span>
+                    <span class="burger-line"></span>
+                </button>
             </div>
+
         </div>
     </div>
 </nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const burger = document.getElementById('burgerMenu');
+        const menu = document.getElementById('navbarMenu');
+
+        // Reset state saat halaman dimuat (Penting untuk Firefox/Safari cache)
+        if(burger && menu) {
+            burger.classList.remove('active');
+            menu.classList.remove('active');
+
+            // Hapus event listener lama (clone node trick)
+            const newBurger = burger.cloneNode(true);
+            burger.parentNode.replaceChild(newBurger, burger);
+
+            newBurger.addEventListener('click', function(e) {
+                e.stopPropagation(); // Mencegah klik tembus
+                console.log("🍔 Burger Clicked - Toggling Menu");
+                this.classList.toggle('active');
+                menu.classList.toggle('active');
+            });
+
+            // Tutup menu jika klik di luar area menu
+            document.addEventListener('click', function(e) {
+                if (menu.classList.contains('active') && !menu.contains(e.target) && !newBurger.contains(e.target)) {
+                    menu.classList.remove('active');
+                    newBurger.classList.remove('active');
+                }
+            });
+        }
+    });
+</script>

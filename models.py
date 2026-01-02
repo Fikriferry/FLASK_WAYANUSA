@@ -91,7 +91,9 @@ class AIModel(db.Model):
     file_path = db.Column(db.String(255), nullable=False)
     accuracy = db.Column(db.String(50))
     is_active = db.Column(db.Boolean, default=False)
+    labels = db.Column(db.Text, nullable=False)  # Comma-separated labels
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return f'<AIModel {self.version_name}>'

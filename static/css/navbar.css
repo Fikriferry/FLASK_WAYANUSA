@@ -1,171 +1,266 @@
 /* =========================
-   NAVBAR CONTAINER
+   1. NAVBAR CONTAINER & CORE
 ========================= */
 .navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.95); /* Sedikit lebih pekat agar menu jelas */
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(212, 163, 115, 0.2);
     z-index: 1000;
-    padding: 15px 0;
+    padding: 10px 0; /* Padding sedikit dikecilkan agar compact */
     transition: all 0.3s ease;
+    height: 80px;
+    display: flex;
+    align-items: center;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    width: 100%;
 }
 
 .navbar-content {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     width: 100%;
-    flex-wrap: nowrap;
 }
 
 /* =========================
-   POSISI
+   2. LOGO (KIRI)
 ========================= */
-
-/* Logo kiri */
 .navbar-logo {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
+    z-index: 1002; /* Agar logo tetap bisa diklik saat menu terbuka */
 }
 
-/* Menu tengah */
-.navbar-menu {
-    flex: 1 1 auto;
-    display: flex;
-    justify-content: center;
-}
-
-/* Login kanan */
-.navbar-actions {
-    flex: 0 0 auto;
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-}
-
-/* =========================
-   MENU LINKS
-========================= */
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 20px;
-    margin: 0;
-    padding: 0;
-    flex-wrap: nowrap;
-}
-
-.nav-links li a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    padding: 5px 10px;
-    border-radius: 4px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-    .nav-links {
-        gap: 15px;
-    }
-    .nav-links li a {
-        font-size: 0.8rem;
-        padding: 5px 8px;
-    }
-    .user-greeting {
-        font-size: 0.8rem;
-        padding: 8px 12px;
-    }
-    .btn-login {
-        font-size: 0.8rem;
-        padding: 8px 20px;
-    }
-}
-
-@media (max-width: 768px) {
-    .nav-links {
-        gap: 10px;
-    }
-    .nav-links li a {
-        font-size: 0.7rem;
-        padding: 5px 6px;
-    }
-    .user-greeting {
-        font-size: 0.7rem;
-        padding: 6px 10px;
-    }
-    .btn-login {
-        font-size: 0.7rem;
-        padding: 6px 15px;
-    }
-}
-
-.nav-links li a:hover {
-    color: #d4af37;
-    background: rgba(212, 175, 55, 0.1);
-}
-
-/* =========================
-   LOGO IMAGE
-========================= */
 .logo-image {
-    height: 40px;
+    height: 45px;
     width: auto;
     max-width: 150px;
     object-fit: contain;
 }
 
 /* =========================
-   LOGIN BUTTON
+   3. MENU LINKS (TENGAH - DESKTOP)
 ========================= */
-.btn-login {
-    background: linear-gradient(135deg, #ffd700, #ffb347);
-    color: #000;
-    padding: 10px 25px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+.navbar-menu {
+    flex: 1;
+    display: flex;
+    justify-content: center;
 }
 
-.btn-login:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+}
+
+/* Hover Effect Emas */
+.nav-links li a:hover, 
+.nav-links li a.active {
+    color: #d4af37;
+    background: rgba(212, 175, 55, 0.1);
 }
 
 /* =========================
-   USER GREETING
+   4. ACTIONS (KANAN)
 ========================= */
+.navbar-right-side {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* User Greeting Style */
 .user-greeting {
     background: rgba(255, 215, 0, 0.1);
     color: #ffd700;
-    font-weight: 500;
-    font-size: 0.9rem;
-    padding: 10px 15px;
-    border-radius: 25px;
-    margin-right: 10px;
-    white-space: nowrap;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 8px 15px;
+    border-radius: 20px;
     border: 1px solid rgba(255, 215, 0, 0.2);
+    white-space: nowrap;
+}
+
+/* Login Button Style (Gradient Emas) */
+.btn-login, .btn-mobile-auth {
+    background: linear-gradient(135deg, #ffd700, #ffb347);
+    color: #000;
+    padding: 8px 25px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    border: none;
+    display: inline-block;
+}
+
+.btn-login:hover, .btn-mobile-auth:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+    background: #fff;
+}
+
+.btn-logout {
+    color: #ccc;
+    font-size: 1.2rem;
+    transition: 0.3s;
+}
+.btn-logout:hover { color: #dc3545; }
+
+
+/* =========================
+   5. BURGER MENU (HIDDEN ON DESKTOP)
+========================= */
+.burger-menu {
+    display: none; /* Default hidden */
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1002;
+    padding: 0;
+}
+
+.burger-line {
+    width: 100%;
+    height: 3px;
+    background-color: #d4af37; /* Warna Emas */
+    border-radius: 10px;
     transition: all 0.3s ease;
 }
 
-.user-greeting:hover {
-    background: rgba(255, 215, 0, 0.2);
-    color: #fff;
+/* Helper Classes */
+.mobile-only-action { display: none; } /* Login di menu mobile hidden di desktop */
+.desktop-only-action { display: flex; } /* Login di header visible di desktop */
+
+/* ================= RESPONSIVE (MOBILE) ================= */
+@media (max-width: 992px) {
+    
+    /* 1. Tampilkan Burger, Sembunyikan Auth Desktop */
+    .burger-menu { 
+        display: flex; 
+        z-index: 10002; /* Burger harus paling atas */
+    }
+    .desktop-only-action { display: none; }
+
+    /* 2. MENU DROPDOWN MOBILE (PERBAIKAN UTAMA) */
+    .navbar-menu {
+        position: fixed;        /* Pakai fixed agar tidak terpengaruh scroll parent */
+        top: 0;                 /* Mulai dari paling atas layar */
+        left: 0;
+        width: 100%;
+        height: 100vh;          /* Full layar */
+        background: rgba(0, 0, 0, 0.95); /* Hitam Pekat Transparan */
+        backdrop-filter: blur(15px);
+        
+        /* Flex untuk menengahkan isi menu */
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-top: 60px;      /* Jarak biar gak nabrak tombol close */
+        
+        /* Animasi Sembunyi */
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-20px);
+        transition: all 0.4s ease;
+        
+        display: flex !important; /* Paksa display flex */
+        z-index: 10001; /* Pastikan DI ATAS Hero Section (Hero biasanya z-index 1-10) */
+    }
+
+    /* 3. SAAT MENU AKTIF (DIBUKA) */
+    .navbar-menu.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    /* 4. Style Link di Mobile */
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+        gap: 25px; /* Jarak antar menu lebih lega */
+        text-align: center;
+    }
+
+    .nav-links li {
+        width: 100%;
+        border: none; /* Hapus garis pemisah biar bersih */
+    }
+
+    .nav-links li a {
+        display: inline-block;
+        font-size: 1.5rem; /* Font lebih besar di HP */
+        font-weight: 700;
+        color: #fff;
+        font-family: 'Playfair Display', serif; /* Font judul biar elegan */
+    }
+    
+    .nav-links li a:hover {
+        color: #d4af37;
+        background: none;
+        transform: scale(1.1); /* Efek zoom dikit */
+    }
+
+    /* 5. Tombol Login di Mobile */
+    .mobile-only-action {
+        display: block;
+        margin-top: 30px;
+    }
+    
+    .btn-mobile-auth {
+        background: #d4af37;
+        color: #000;
+        padding: 12px 50px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+    }
+
+    /* 6. Animasi Burger jadi X */
+    .burger-menu.active .burger-line:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 6px);
+        background-color: #dc3545; /* Warna merah saat close */
+    }
+    .burger-menu.active .burger-line:nth-child(2) {
+        opacity: 0;
+    }
+    .burger-menu.active .burger-line:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+        background-color: #dc3545;
+    }
 }

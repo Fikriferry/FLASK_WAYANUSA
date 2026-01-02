@@ -1,26 +1,21 @@
-<!DOCTYPE html>
-<html lang="id">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengenalan Wayang - WAYANUSA</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% block title %}Pengenalan Wayang - WAYANUSA{% endblock %}
+
+{% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/wayang.css') }}">
-</head>
+    
+    <style>
+        /* Agar background section menyatu dengan navbar jika transparan */
+        .wayang-recognition {
+            padding-top: 100px;
+        }
+    </style>
+{% endblock %}
 
-<body>
-    {% include 'layouts/navbar.html' %}
-
-    <section class="wayang-recognition" style="padding-top: 100px;">
+{% block content %}
+    <section class="wayang-recognition">
         <div class="recognition-wrapper">
 
             <div class="recognition-header">
@@ -34,6 +29,7 @@
             </div>
 
             <div class="recognition-card" id="recognitionCard">
+                
                 <div class="progress-indicator">
                     <div class="progress-step"><div class="step-circle" id="step1">1</div></div>
                     <div class="step-line" id="line1"></div>
@@ -67,241 +63,238 @@
             </div>
         </div>
     </section>
+{% endblock %}
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- 1. SETUP VARIABEL GLOBAL ---
-            let currentStage = 1;
-            let selectedMethod = null;
-            let selectedFile = null;
-            let previewUrl = null;
+{% block scripts_extra %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- 1. SETUP VARIABEL GLOBAL ---
+        let currentStage = 1;
+        let selectedMethod = null;
+        let selectedFile = null;
+        let previewUrl = null;
 
-            // --- 2. FUNGSI NAVIGASI ---
-            window.goBack = function() {
-                window.history.back();
-            };
+        // --- 2. FUNGSI NAVIGASI ---
+        window.goBack = function() {
+            window.history.back();
+        };
 
-            // --- 3. PILIH METODE ---
-            window.selectMethod = function(method) {
-                // Cek Login Session dari Flask
-                const isLoggedIn = {{ session.get('user_logged_in', False)|tojson }};
-                if (!isLoggedIn) {
-                    alert('Silakan login terlebih dahulu untuk menggunakan fitur ini.');
-                    window.location.href = "{{ url_for('web.login_user') }}";
+        // --- 3. PILIH METODE ---
+        window.selectMethod = function(method) {
+            // Cek Login Session dari Flask (Jinja Render)
+            const isLoggedIn = {{ session.get('user_logged_in', False)|tojson }};
+            
+            if (!isLoggedIn) {
+                alert('Silakan login terlebih dahulu untuk menggunakan fitur ini.');
+                window.location.href = "{{ url_for('web.login_user') }}";
+                return;
+            }
+
+            selectedMethod = method;
+            selectedFile = null;
+
+            if (selectedMethod === 'camera') {
+                showStage2();
+            } else if (selectedMethod === 'upload') {
+                showStage3();
+            }
+        };
+
+        // --- 4. UPDATE PROGRESS BAR ---
+        window.updateProgress = function(stage) {
+            currentStage = stage;
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                const line = document.getElementById(`line${i}`);
+
+                if(step) {
+                    step.className = 'step-circle';
+                    if (i < currentStage) step.classList.add('completed');
+                    else if (i === currentStage) step.classList.add('active');
+                }
+                
+                if(line) {
+                    line.className = 'step-line';
+                    if (i < currentStage) line.classList.add('completed');
+                    else if (i === currentStage) line.classList.add('active');
+                }
+            }
+        };
+
+        // --- 5. STAGE 2: KAMERA (SIMULASI) ---
+        window.showStage2 = function() {
+            updateProgress(2);
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = `
+                <div class="fade-in-up" style="display:flex; flex-direction:column; align-items:center;">
+                    <div class="camera-frame">
+                        <div class="scanner-line"></div>
+                        <div style="width:100%; height:100%; background: #222; display:flex; align-items:center; justify-content:center;">
+                            <i class="fas fa-video" style="color:#444; font-size:3rem;"></i>
+                        </div>
+                        <div class="camera-overlay">
+                            <button class="shutter-btn" onclick="capturePhoto()" title="Ambil Foto"></button>
+                        </div>
+                    </div>
+                    <p style="margin-top:15px; color:#666; font-size:0.9rem;">Posisikan wayang di dalam bingkai</p>
+                    <button onclick="resetToStage1()" class="action-btn btn-secondary" style="margin-top:10px;">Kembali</button>
+                </div>
+            `;
+        };
+
+        window.capturePhoto = function() {
+            // Simulasi Fetch Gambar (Placeholder)
+            fetch("https://via.placeholder.com/300x400/D4A373/FFFFFF?text=Wayang+Capture")
+                .then(res => res.blob())
+                .then(blob => {
+                    selectedFile = new File([blob], "capture.jpg", { type: "image/jpeg" });
+                    previewUrl = URL.createObjectURL(blob);
+                    showPreviewStage();
+                });
+        };
+
+        // --- 6. STAGE 3: UPLOAD ---
+        window.showStage3 = function() {
+            updateProgress(3);
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = `
+                <div class="fade-in-up" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                    <label class="upload-zone" for="fileInput">
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div class="upload-text">Klik untuk Upload Foto</div>
+                        <div class="upload-subtext">JPG, PNG (Max 5MB)</div>
+                        <input type="file" id="fileInput" class="file-input" accept="image/*" 
+                               onclick="this.value=null" 
+                               onchange="handleFileUpload(event)">
+                    </label>
+                    <button onclick="resetToStage1()" class="action-btn btn-secondary" style="margin-top:20px;">Kembali</button>
+                </div>
+            `;
+        };
+
+        window.handleFileUpload = function(event) {
+            if (event.target.files && event.target.files.length > 0) {
+                const file = event.target.files[0];
+                if (!file.type.startsWith('image/')) {
+                    alert('Mohon upload file gambar (JPG/PNG).');
                     return;
                 }
+                selectedFile = file;
+                previewUrl = URL.createObjectURL(file);
+                showPreviewStage();
+            }
+        };
 
-                selectedMethod = method;
-                selectedFile = null;
-
-                if (selectedMethod === 'camera') {
-                    showStage2();
-                } else if (selectedMethod === 'upload') {
-                    showStage3();
-                }
-            };
-
-            // --- 4. UPDATE PROGRESS BAR ---
-            window.updateProgress = function(stage) {
-                currentStage = stage;
-                for (let i = 1; i <= 4; i++) {
-                    const step = document.getElementById(`step${i}`);
-                    const line = document.getElementById(`line${i}`);
-
-                    if(step) {
-                        step.className = 'step-circle';
-                        if (i < currentStage) step.classList.add('completed');
-                        else if (i === currentStage) step.classList.add('active');
-                    }
-                    
-                    if(line) {
-                        line.className = 'step-line';
-                        if (i < currentStage) line.classList.add('completed');
-                        else if (i === currentStage) line.classList.add('active');
-                    }
-                }
-            };
-
-            // --- 5. STAGE 2: KAMERA (SIMULASI) ---
-            window.showStage2 = function() {
-                updateProgress(2);
-                const stageContent = document.getElementById('stageContent');
-                stageContent.innerHTML = `
-                    <div class="fade-in-up" style="display:flex; flex-direction:column; align-items:center;">
-                        <div class="camera-frame">
-                            <div class="scanner-line"></div>
-                            <div style="width:100%; height:100%; background: #222; display:flex; align-items:center; justify-content:center;">
-                                <i class="fas fa-video" style="color:#444; font-size:3rem;"></i>
-                            </div>
-                            <div class="camera-overlay">
-                                <button class="shutter-btn" onclick="capturePhoto()" title="Ambil Foto"></button>
-                            </div>
-                        </div>
-                        <p style="margin-top:15px; color:#666; font-size:0.9rem;">Posisikan wayang di dalam bingkai</p>
-                        <button onclick="resetToStage1()" class="action-btn btn-secondary" style="margin-top:10px;">Kembali</button>
+        // --- 7. PREVIEW & KONFIRMASI ---
+        window.showPreviewStage = function() {
+            updateProgress(3);
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = `
+                <div class="fade-in-up" style="display:flex; flex-direction:column; align-items:center;">
+                    <div class="preview-container">
+                        <img src="${previewUrl}" class="image-preview" alt="Preview">
                     </div>
-                `;
-            };
-
-            window.capturePhoto = function() {
-                // Simulasi Fetch Gambar (Placeholder)
-                fetch("https://via.placeholder.com/300x400/D4A373/FFFFFF?text=Wayang+Capture")
-                    .then(res => res.blob())
-                    .then(blob => {
-                        selectedFile = new File([blob], "capture.jpg", { type: "image/jpeg" });
-                        previewUrl = URL.createObjectURL(blob);
-                        showPreviewStage();
-                    });
-            };
-
-            // --- 6. STAGE 3: UPLOAD ---
-            window.showStage3 = function() {
-                updateProgress(3);
-                const stageContent = document.getElementById('stageContent');
-                stageContent.innerHTML = `
-                    <div class="fade-in-up" style="width:100%; display:flex; flex-direction:column; align-items:center;">
-                        <label class="upload-zone" for="fileInput">
-                            <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                            <div class="upload-text">Klik untuk Upload Foto</div>
-                            <div class="upload-subtext">JPG, PNG (Max 5MB)</div>
-                            <input type="file" id="fileInput" class="file-input" accept="image/*" 
-                                   onclick="this.value=null" 
-                                   onchange="handleFileUpload(event)">
-                        </label>
-                        <button onclick="resetToStage1()" class="action-btn btn-secondary" style="margin-top:20px;">Kembali</button>
+                    <h4 style="margin-top:20px; color:#444;">Apakah foto sudah jelas?</h4>
+                    <div style="display:flex; gap:15px;">
+                        <button class="action-btn btn-secondary" onclick="resetToStage1()">Ulangi</button>
+                        <button class="action-btn btn-primary" onclick="processImage()">
+                            <i class="fas fa-search"></i> Analisis Sekarang
+                        </button>
                     </div>
-                `;
-            };
+                </div>
+            `;
+        };
 
-            window.handleFileUpload = function(event) {
-                if (event.target.files && event.target.files.length > 0) {
-                    const file = event.target.files[0];
-                    if (!file.type.startsWith('image/')) {
-                        alert('Mohon upload file gambar (JPG/PNG).');
-                        return;
-                    }
-                    selectedFile = file;
-                    previewUrl = URL.createObjectURL(file);
-                    showPreviewStage();
-                }
-            };
-
-            // --- 7. PREVIEW & KONFIRMASI ---
-            window.showPreviewStage = function() {
-                updateProgress(3);
-                const stageContent = document.getElementById('stageContent');
-                stageContent.innerHTML = `
-                    <div class="fade-in-up" style="display:flex; flex-direction:column; align-items:center;">
-                        <div class="preview-container">
-                            <img src="${previewUrl}" class="image-preview" alt="Preview">
+        window.resetToStage1 = function() {
+            updateProgress(1);
+            document.getElementById('stageContent').innerHTML = `
+                <div id="stage1" class="fade-in-up" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                    <h3 style="margin-bottom: 30px; color: #6B4226;">Pilih Metode Pengambilan Gambar</h3>
+                    <div class="selection-grid">
+                        <div class="selection-card" onclick="selectMethod('camera')">
+                            <div class="selection-icon"><i class="fas fa-camera"></i></div>
+                            <div class="selection-title">Gunakan Kamera</div>
+                            <div class="selection-desc">Ambil foto langsung dari kamera perangkatmu</div>
                         </div>
-                        <h4 style="margin-top:20px; color:#444;">Apakah foto sudah jelas?</h4>
-                        <div style="display:flex; gap:15px;">
-                            <button class="action-btn btn-secondary" onclick="resetToStage1()">Ulangi</button>
-                            <button class="action-btn btn-primary" onclick="processImage()">
-                                <i class="fas fa-search"></i> Analisis Sekarang
-                            </button>
+                        <div class="selection-card" onclick="selectMethod('upload')">
+                            <div class="selection-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div class="selection-title">Upload File</div>
+                            <div class="selection-desc">Pilih foto dari galeri (JPG/PNG)</div>
                         </div>
                     </div>
-                `;
-            };
+                </div>
+            `;
+        };
 
-            window.resetToStage1 = function() {
-                updateProgress(1);
-                document.getElementById('stageContent').innerHTML = `
-                    <div id="stage1" class="fade-in-up" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-                        <h3 style="margin-bottom: 30px; color: #6B4226;">Pilih Metode Pengambilan Gambar</h3>
-                        <div class="selection-grid">
-                            <div class="selection-card" onclick="selectMethod('camera')">
-                                <div class="selection-icon"><i class="fas fa-camera"></i></div>
-                                <div class="selection-title">Gunakan Kamera</div>
-                                <div class="selection-desc">Ambil foto langsung dari kamera perangkatmu</div>
-                            </div>
-                            <div class="selection-card" onclick="selectMethod('upload')">
-                                <div class="selection-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                                <div class="selection-title">Upload File</div>
-                                <div class="selection-desc">Pilih foto dari galeri (JPG/PNG)</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            };
+        // --- 8. PROSES API KE BACKEND ---
+        window.processImage = async function() {
+            if (!selectedFile) return;
 
-            // --- 8. PROSES API KE BACKEND ---
-            window.processImage = async function() {
-                if (!selectedFile) return;
+            // Tampilkan Loading
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = `
+                <div class="fade-in-up" style="text-align: center; padding:40px;">
+                    <div style="width: 60px; height: 60px; border: 5px solid #f3f3f3; border-top: 5px solid #D4A373; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                    <h3 style="color: #6B4226; margin-top: 20px;">AI Sedang Berpikir...</h3>
+                    <p style="color: #888;">Menganalisis pola wayang di server</p>
+                </div>
+            `;
 
-                // Tampilkan Loading
-                const stageContent = document.getElementById('stageContent');
-                stageContent.innerHTML = `
-                    <div class="fade-in-up" style="text-align: center; padding:40px;">
-                        <div style="width: 60px; height: 60px; border: 5px solid #f3f3f3; border-top: 5px solid #D4A373; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-                        <h3 style="color: #6B4226; margin-top: 20px;">AI Sedang Berpikir...</h3>
-                        <p style="color: #888;">Menganalisis pola wayang di server</p>
-                    </div>
-                `;
+            const formData = new FormData();
+            formData.append('image', selectedFile);
 
-                const formData = new FormData();
-                formData.append('image', selectedFile);
+            try {
+                // Panggil API Python
+                const response = await fetch('/api/predict-wayang', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
 
-                try {
-                    // Panggil API Python
-                    const response = await fetch('/api/predict-wayang', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        // SUKSES: Kirim data JSON ke fungsi showResult
-                        showResult(data);
-                    } else {
-                        // ERROR dari Server
-                        alert("Gagal: " + (data.error || "Terjadi kesalahan di server."));
-                        resetToStage1();
-                    }
-                } catch (error) {
-                    console.error("API Error", error);
-                    alert("Koneksi Error: Pastikan server Flask berjalan.");
+                if (response.ok) {
+                    showResult(data);
+                } else {
+                    alert("Gagal: " + (data.error || "Terjadi kesalahan di server."));
                     resetToStage1();
                 }
-            };
+            } catch (error) {
+                console.error("API Error", error);
+                alert("Koneksi Error: Pastikan server Flask berjalan.");
+                resetToStage1();
+            }
+        };
 
-            // --- 9. TAMPILKAN HASIL DARI DB ---
-            window.showResult = function(data) {
-                updateProgress(4);
-                
-                // Ambil data langsung dari JSON API
-                // Backend sudah mengirim: { 'prediksi': '...', 'confidence': '...', 'deskripsi': '...' }
-                const namaWayang = data.prediksi;
-                const confidence = data.confidence;
-                const deskripsi = data.deskripsi; // <--- INI DIAMBIL DARI DB MYSQL
+        // --- 9. TAMPILKAN HASIL ---
+        window.showResult = function(data) {
+            updateProgress(4);
+            const namaWayang = data.prediksi;
+            const confidence = data.confidence;
+            const deskripsi = data.deskripsi;
 
-                const stageContent = document.getElementById('stageContent');
-                stageContent.innerHTML = `
-                    <div class="result-layout fade-in-up">
-                        <div class="result-img-wrapper">
-                            <img src="${previewUrl}" class="result-img" alt="${namaWayang}">
-                        </div>
-                        <div class="result-info">
-                            <span class="confidence-badge"><i class="fas fa-check-circle"></i> Akurasi: ${confidence}</span>
-                            <h2 class="wayang-name">${namaWayang}</h2>
-                            <div class="wayang-desc">
-                                <p>${deskripsi}</p>
-                            </div>
-                            <button class="action-btn btn-primary" onclick="resetToStage1()">
-                                <i class="fas fa-redo"></i> Coba Lagi
-                            </button>
-                        </div>
+            const stageContent = document.getElementById('stageContent');
+            stageContent.innerHTML = `
+                <div class="result-layout fade-in-up">
+                    <div class="result-img-wrapper">
+                        <img src="${previewUrl}" class="result-img" alt="${namaWayang}">
                     </div>
-                `;
-            };
+                    <div class="result-info">
+                        <span class="confidence-badge"><i class="fas fa-check-circle"></i> Akurasi: ${confidence}</span>
+                        <h2 class="wayang-name">${namaWayang}</h2>
+                        <div class="wayang-desc">
+                            <p>${deskripsi}</p>
+                        </div>
+                        <button class="action-btn btn-primary" onclick="resetToStage1()">
+                            <i class="fas fa-redo"></i> Coba Lagi
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
 
-            // CSS Animasi Loading
-            const style = document.createElement('style');
-            style.textContent = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
-            document.head.appendChild(style);
-        });
-    </script>
-</body>
-</html>
+        // CSS Animasi Loading (Inject Script)
+        const style = document.createElement('style');
+        style.textContent = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+        document.head.appendChild(style);
+    });
+</script>
+{% endblock %}

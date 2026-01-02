@@ -1,44 +1,31 @@
-<!DOCTYPE html>
-<html lang="id">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beranda - WAYANUSA</title>
+{% block title %}Beranda - WAYANUSA{% endblock %}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
-        rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/wayang.css') }}">
-    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
-</head>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
 
-<body>
-
-    {% include 'layouts/navbar.html' %}
-
+{% block content %}
+    
     {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="flash-messages" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}"
-            style="padding: 12px; margin-bottom: 10px; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; min-width: 300px;">
-            <span>{{ message }}</span>
-            <button class="close-btn" onclick="this.parentElement.style.display='none';"
-                style="background: none; border: none; color: inherit; font-weight: bold; cursor: pointer; font-size: 1.2rem;">&times;</button>
+        {% if messages %}
+        <div class="flash-messages" style="position: fixed; top: 100px; right: 20px; z-index: 9999;">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" 
+                 style="background: #fff; color: #333; padding: 15px 20px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #D4A373; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: space-between; min-width: 300px;">
+                <span style="font-weight: 500;">{{ message }}</span>
+                <button onclick="this.parentElement.style.display='none';" 
+                        style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #999;">&times;</button>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
+        {% endif %}
     {% endwith %}
 
-    <!-- ================= HERO ================= -->
     <main class="hero">
         <div class="container">
             <div class="hero-content">
@@ -62,8 +49,9 @@
                 </div>
 
                 <div class="hero-image">
-                    <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Siluet Wayang Kulit"
-                        class="wayang-image">
+                    <img src="{{ url_for('static', filename='images/banner.jpg') }}" 
+                         onerror="this.src='https://via.placeholder.com/500x600/1a1a1a/D4A373?text=Wayang+Banner'"
+                         alt="Siluet Wayang Kulit" class="wayang-image">
                 </div>
 
             </div>
@@ -106,9 +94,7 @@
                 <div class="features-grid">
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_ai.jpg') }}"
-                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Pengenalan+Wayang'"
-                                alt="Pengenalan Wayang">
+                            <img src="{{ url_for('static', filename='images/feature_ai.jpg') }}" onerror="this.src='https://via.placeholder.com/400x250/222/D4A373?text=AI+Camera'" alt="Pengenalan Wayang">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Pengenalan Wayang</h3>
@@ -121,13 +107,11 @@
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_quiz.jpg') }}"
-                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Kuis+Edukatif'"
-                                alt="Kuis Edukatif">
+                            <img src="{{ url_for('static', filename='images/feature_quiz.jpg') }}" onerror="this.src='https://via.placeholder.com/400x250/222/D4A373?text=Quiz'" alt="Kuis Edukatif">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Kuis Edukatif</h3>
-                            <div class="feature-badge">🎮 Gamifikasi Pembelajaran</div>
+                            <div class="feature-badge">🎮 Gamifikasi</div>
                             <p class="feature-description">
                                 Uji pengetahuan budaya wayangmu melalui kuis interaktif yang seru.
                             </p>
@@ -136,9 +120,7 @@
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_dalang.jpg') }}"
-                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Mencari+Dalang'"
-                                alt="Mencari Dalang">
+                            <img src="{{ url_for('static', filename='images/feature_dalang.jpg') }}" onerror="this.src='https://via.placeholder.com/400x250/222/D4A373?text=Dalang'" alt="Mencari Dalang">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Mencari Dalang</h3>
@@ -151,49 +133,42 @@
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/PertunukanWayang.jpeg') }}"
-                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Pertunjukan+Wayang'"
-                                alt="Pertunjukan Wayang">
+                            <img src="{{ url_for('static', filename='images/PertunukanWayang.jpeg') }}" onerror="this.src='https://via.placeholder.com/400x250/222/D4A373?text=Pertunjukan'" alt="Pertunjukan Wayang">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Pertunjukan Wayang</h3>
                             <div class="feature-badge">🎭 Acara & Jadwal</div>
                             <p class="feature-description">
-                                Temukan vidio pertunjukan wayang kulit yang spektakuler.
+                                Temukan video pertunjukan wayang kulit yang spektakuler.
                             </p>
                         </div>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/Artikel.jpeg') }}"
-                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Artikel'"
-                                alt="Artikel">
+                            <img src="{{ url_for('static', filename='images/Artikel.jpeg') }}" onerror="this.src='https://via.placeholder.com/400x250/222/D4A373?text=Artikel'" alt="Artikel">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Artikel</h3>
-                            <div class="feature-badge">📖 Edukasi & Informasi</div>
+                            <div class="feature-badge">📖 Edukasi</div>
                             <p class="feature-description">
-                                Baca artikel menarik tentang budaya wayang kulit.
+                                Baca artikel menarik tentang sejarah dan filosofi budaya wayang kulit.
                             </p>
                         </div>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="{{ url_for('static', filename='images/feature_ai.jpg') }}"
-                                onerror="this.src='https://via.placeholder.com/400x250/2a2a2a/ffd700?text=Simulasi+Dalang'"
-                                alt="Simulasi Dalang">
+                            <img src="{{ url_for('static', filename='images/simulasi_dalang.jpg') }}" onerror="this.src='https://via.placeholder.com/400x250/222/D4A373?text=Simulasi'" alt="Simulasi Dalang">
                         </div>
                         <div class="feature-content">
                             <h3 class="feature-title">Simulasi Dalang</h3>
-                            <div class="feature-badge">🎙️ Interaktif & Games</div>
+                            <div class="feature-badge">🎙️ Interaktif</div>
                             <p class="feature-description">
-                                Rasakan pengalaman menjadi dalang dengan simulasi interaktif,
-                                mengatur dialog, karakter, dan alur cerita wayang secara digital.
+                                Rasakan pengalaman menjadi dalang dengan simulasi interaktif digital.
                             </p>
                         </div>
-                    </div>  
+                    </div>
                 </div>
             </div>
         </div>
@@ -204,13 +179,14 @@
             <div class="dalang-showcase-content">
                 <p class="dalang-showcase-tag">MITRA SENIMAN</p>
                 <h2 class="dalang-showcase-title">Dalang <span class="highlight">Terdaftar</span></h2>
+                
                 <div class="dalang-list-section">
                     {% if dalangs %}
                     <div class="dalang-grid">
                         {% for dalang in dalangs %}
                         <div class="dalang-card">
-                            <img src="{{ dalang.foto and url_for('static', filename='uploads/' + dalang.foto) or 'https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo' }}"
-                                alt="Foto {{ dalang.nama }}" class="dalang-photo">
+                            <img src="{{ dalang.foto and url_for('static', filename='uploads/' + dalang.foto) or 'https://via.placeholder.com/150x150/2a2a2a/ffd700?text=Dalang' }}"
+                                 alt="Foto {{ dalang.nama }}" class="dalang-photo">
                             <div class="dalang-info">
                                 <h4>{{ dalang.nama }}</h4>
                                 <p>{{ dalang.alamat }}</p>
@@ -218,7 +194,7 @@
                         </div>
                         {% endfor %}
                     </div>
-                    <div style="text-align: center; margin-top: 30px;">
+                    <div style="text-align: center; margin-top: 40px;">
                         <a href="{{ url_for('web.mencari_dalang') }}" class="btn btn-secondary">Lihat Semua Dalang</a>
                     </div>
                     {% else %}
@@ -229,16 +205,21 @@
         </div>
     </section>
 
-    <footer style="background: #000; color: #888; padding: 40px 0; text-align: center; border-top: 1px solid #333;">
-        <div class="container">
-            <p>&copy; 2024 WAYANUSA. Melestarikan Budaya dengan Teknologi.</p>
-        </div>
-    </footer>
-
     {% include 'components/chatbot.html' %}
 
-    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+{% endblock %}
 
-</body>
-
-</html>
+{% block scripts_extra %}
+    <!-- <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script> -->
+    
+    <script>
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.flash-messages .alert');
+            alerts.forEach(alert => {
+                alert.style.transition = "opacity 0.5s ease";
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 4000); // Hilang setelah 4 detik
+    </script>
+{% endblock %}
