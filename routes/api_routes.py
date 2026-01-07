@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, Flask
 from models import db, User, Dalang, Wayang, AIModel
 from flask_jwt_extended import (
     create_access_token,
@@ -14,6 +14,8 @@ import google.generativeai as genai
 from cepot_controller import cepot_system
 from dotenv import load_dotenv
 from functools import wraps
+from sqlalchemy import func
+from rag_service import rag_service
 
 # ================================
 # KONFIGURASI BLUEPRINT
@@ -130,6 +132,7 @@ def get_wayang():
 # ================================
 @api.route("/predict-wayang", methods=["POST"])
 def predict_wayang():
+    print("PREDICT CALLED")
     active_model = AIModel.query.filter_by(is_active=True).first()
     if not active_model:
         return jsonify({"error": "Model AI belum diaktifkan"}), 503
@@ -150,14 +153,26 @@ def predict_wayang():
     confidence = float(np.max(prediction))
 
     labels = [l.strip() for l in active_model.labels.split(",")]
-    label = labels[idx] if idx < len(labels) else "Unknown"
+    
+    # === SOLUSI: LOGIC THRESHOLD ===
+    # Jika confidence di bawah 70%, anggap bukan wayang
+    THRESHOLD = 0.75
+    
+    if confidence < THRESHOLD:
+        return jsonify({
+            "prediksi": "Objek Tidak Dikenali",
+            "confidence": f"{confidence*100:.2f}% (Terlalu Rendah)",
+            "deskripsi": "Maaf, sistem tidak yakin ini gambar wayang. Pastikan foto wayang terlihat jelas, pencahayaan cukup, dan background tidak terlalu ramai."
+        })
 
-    wayang = Wayang.query.filter_by(nama=label).first()
+    # Jika lolos threshold, baru ambil data dari DB
+    label = labels[idx] if idx < len(labels) else "Unknown"
+    wayang = Wayang.query.filter(func.lower(Wayang.nama) == func.lower(label)).first()
 
     return jsonify({
         "prediksi": label,
         "confidence": f"{confidence*100:.2f}%",
-        "deskripsi": wayang.deskripsi if wayang else "-"
+        "deskripsi": wayang.deskripsi if wayang else "Deskripsi belum tersedia."
     })
 
 
@@ -181,6 +196,33 @@ def chat_api():
     reply = response.text.replace("*", "")
 
     return jsonify({"response": reply})
+
+# --- API 1: Build Database (Jalankan ini dulu via Postman/Browser) ---
+@api.route("/rag/build", methods=["GET"])
+def build_rag():
+    try:
+        rag_service.build_index()
+        return jsonify({"message": "Database Wayang berhasil dibangun!"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# --- API 2: Chatbot Versi 2 (RAG) ---
+@api.route("/chat-rag", methods=["POST"])
+# @jwt_required(optional=True) # Aktifkan jwt jika perlu
+def chat_rag_api():
+    data = request.get_json()
+    message = data.get("message")
+
+    if not message:
+        return jsonify({"response": "Waduh, kok meneng bae?"}), 400
+
+    try:
+        # Panggil fungsi RAG
+        reply = rag_service.get_answer(message)
+        return jsonify({"response": reply})
+    except Exception as e:
+        print(e)
+        return jsonify({"response": "Maaf, Ki Sabda sedang pusing (Error Server)."}), 500
 
 
 # ================================
