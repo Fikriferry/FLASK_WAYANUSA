@@ -123,7 +123,8 @@ def quiz_play():
 
 @web_routes.route('/mencari-dalang')
 def mencari_dalang():
-    return render_template('mencari_dalang.html')
+    dalangs = Dalang.query.all()   # 🔥 INI KUNCI UTAMA
+    return render_template('mencari_dalang.html', dalangs=dalangs)
 
 @web_routes.route("/pertunjukan_wayang/video/<int:id>")
 def video_detail(id):
@@ -302,6 +303,28 @@ def video_add():
         return redirect(url_for('web.video_list'))
 
     return render_template('admin/video_add.html')
+
+@web_routes.route('/admin/video/edit/<int:id>', methods=['GET', 'POST'])
+@admin_login_required
+def video_edit(id):
+    item = Video.query.get_or_404(id)
+
+    if request.method == 'POST':
+        judul = request.form.get('judul')
+        youtube_link = request.form.get('youtube_link')
+
+        if not judul or not youtube_link:
+            flash("Judul dan YouTube Link wajib diisi!", "error")
+            return redirect(url_for('web.video_edit', id=id))
+
+        item.judul = judul
+        item.youtube_link = youtube_link
+
+        db.session.commit()
+        flash("Video berhasil diperbarui!", "success")
+        return redirect(url_for('web.video_list'))
+
+    return render_template('admin/video_edit.html', item=item)
 
 @web_routes.route('/admin/video/delete/<int:id>')
 @admin_login_required
@@ -785,7 +808,7 @@ def admin_wayanggame_edit(id):
         flash("Wayang berhasil diperbarui!", "success")
         return redirect(url_for("web.admin_wayanggame_list"))
 
-    return render_template("admin/wayanggame_edit.html", wayang=item)
+    return render_template("admin/wayanggame_edit.html", item=item)
 
 # =========================
 # DELETE WAYANG GAME

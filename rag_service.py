@@ -10,7 +10,7 @@ import os
 
 # Load API Key
 load_dotenv()
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY")
 
 class RagService:
     def __init__(self):
@@ -18,7 +18,7 @@ class RagService:
         self.qa_chain = None
         # Inisialisasi Model Gemini khusus RAG
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash", 
+            model="gemini-2.5-flash", 
             temperature=0.3, # Rendah biar faktual, tidak halusinasi
             google_api_key=GOOGLE_API_KEY
         )

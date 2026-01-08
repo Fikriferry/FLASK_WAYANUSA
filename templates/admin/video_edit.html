@@ -1,0 +1,38 @@
+{% extends "admin/layout_admin.html" %}
+{% block title %}Edit Video{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Edit Video</h3>
+    </div>
+
+    <div class="card-body">
+        <form method="POST">
+
+            <div class="form-group">
+                <label>Judul Video</label>
+                <input type="text"
+                       name="judul"
+                       value="{{ item.judul }}"
+                       class="form-control"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>YouTube Link</label>
+                <input type="url"
+                       name="youtube_link"
+                       value="{{ item.youtube_link }}"
+                       class="form-control"
+                       required>
+            </div>
+
+            <button class="btn btn-warning">Update</button>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

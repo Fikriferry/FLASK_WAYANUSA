@@ -4,52 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mencari Dalang - WAYANUSA</title>
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 </head>
 <body>
-    
+
     {% include 'layouts/navbar.html' %}
 
     <section class="features">
         <div class="container">
             <div class="features-content">
+
                 <p class="features-tag">DALANG TERSEDIA</p>
-                <h2 class="features-title">Temukan <span class="highlight">Dalang</span> Terdekat</h2>
+                <h2 class="features-title">
+                    Temukan <span class="highlight">Dalang</span> Terdekat
+                </h2>
+
                 <p class="features-description">
-                    Jelajahi daftar lengkap dalang yang telah terdaftar di platform WAYANUSA. Temukan nama dalang, alamat lokasi, dan koordinat untuk pengalaman budaya yang autentik.
+                    Jelajahi daftar lengkap dalang yang telah terdaftar di platform WAYANUSA.
+                    Temukan nama, alamat lokasi, dan koordinat untuk pengalaman budaya yang autentik.
                 </p>
+
+                <!-- LIST DALANG -->
                 <div class="dalang-list-section">
                     <h3>Daftar Dalang Tersedia</h3>
+
                     {% if dalangs %}
-                        <div class="dalang-grid">
-                            {% for dalang in dalangs %}
-                            <div class="dalang-card">
-                                {% if dalang.foto %}
-                                    <img src="{{ url_for('static', filename='uploads/' + dalang.foto) }}" alt="Foto {{ dalang.nama }}" class="dalang-photo">
+                    <div class="dalang-grid">
+
+                        {% for dalang in dalangs %}
+                        <div class="dalang-card">
+
+                            <!-- FOTO -->
+                            {% if dalang.foto %}
+                                <img 
+                                    src="{{ url_for('web.uploaded_file', filename=dalang.foto) }}"
+                                    alt="Foto {{ dalang.nama }}"
+                                    class="dalang-photo">
+                            {% else %}
+                                <img 
+                                    src="{{ url_for('static', filename='img/no-photo.png') }}"
+                                    alt="No Photo"
+                                    class="dalang-photo">
+                            {% endif %}
+
+                            <!-- INFO -->
+                            <div class="dalang-info">
+                                <h4>{{ dalang.nama }}</h4>
+
+                                <p>
+                                    <strong>Alamat:</strong><br>
+                                    {{ dalang.alamat }}
+                                </p>
+
+                                {% if dalang.latitude and dalang.longitude %}
+                                <p>
+                                    <strong>Koordinat:</strong><br>
+                                    {{ "%.4f"|format(dalang.latitude) }},
+                                    {{ "%.4f"|format(dalang.longitude) }}
+                                </p>
                                 {% else %}
-                                    <img src="https://via.placeholder.com/150x150/2a2a2a/ffd700?text=No+Photo" alt="No Photo" class="dalang-photo">
+                                <p class="text-muted">
+                                    <em>Koordinat belum tersedia</em>
+                                </p>
                                 {% endif %}
-                                <div class="dalang-info">
-                                    <h4>{{ dalang.nama }}</h4>
-                                    <p><strong>Alamat:</strong> {{ dalang.alamat }}</p>
-                                    {% if dalang.latitude and dalang.longitude %}
-                                        <p><strong>Koordinat:</strong> {{ dalang.latitude }}, {{ dalang.longitude }}</p>
-                                    {% endif %}
-                                </div>
                             </div>
-                            {% endfor %}
+
                         </div>
+                        {% endfor %}
+
+                    </div>
                     {% else %}
-                        <p>Belum ada dalang yang terdaftar.</p>
+                        <p class="text-muted">Belum ada dalang yang terdaftar.</p>
                     {% endif %}
                 </div>
 
             </div>
         </div>
     </section>
+
 </body>
 </html>
