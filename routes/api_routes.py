@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, jsonify, request, Flask
-from models import db, User, Dalang, Wayang, AIModel
+from models import db, User, Dalang, Wayang, AIModel, Video
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
@@ -15,7 +15,8 @@ from cepot_controller import cepot_system
 from dotenv import load_dotenv
 from functools import wraps
 from sqlalchemy import func
-from rag_service import rag_service
+from services.rag_service import rag_service
+import re # Import Regex untuk parsing link Youtube
 
 # ================================
 # KONFIGURASI BLUEPRINT
@@ -253,3 +254,51 @@ def cepot_talk():
 
     reply = cepot_system.process_physical_interaction(msg)
     return jsonify({"response": reply})
+
+# ================================
+# VIDEO WAYANG
+# ================================
+
+# --- HELPER: Fungsi Ekstrak ID Youtube ---
+def extract_youtube_id(url):
+    """
+    Mengambil ID unik (misal: J_t9G2bWqYA) dari link Youtube panjang/pendek.
+    """
+    if not url: return None
+    # Regex untuk menangani berbagai format link youtube
+    regex = r'(?:v=|\/)([0-9A-Za-z_-]{11}).*'
+    match = re.search(regex, url)
+    if match:
+        return match.group(1)
+    return None
+
+# 1. GET ALL VIDEOS (Untuk ditampilkan di Flutter)
+@api.route('/videos', methods=['GET'])
+def get_videos():
+    try:
+        videos = db.session.query(Video).order_by(Video.id.desc()).all()
+        output = []
+        
+        for vid in videos:
+            video_id = extract_youtube_id(vid.youtube_link)
+            
+            # Kita format datanya biar Flutter tinggal pakai
+            video_data = {
+                'id': vid.id,
+                'title': vid.judul,
+                'youtube_link': vid.youtube_link,
+                'youtube_id': video_id, # ID ini penting buat player Flutter
+                'thumbnail': f"https://img.youtube.com/vi/{video_id}/0.jpg" if video_id else None,
+                'channel': "Wayanusa Official" # Default channel name (karena di DB ga ada kolom channel)
+            }
+            output.append(video_data)
+
+        return jsonify({
+            'status': 'success', 
+            'total': len(output),
+            'data': output
+        }), 200
+
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)}), 500
