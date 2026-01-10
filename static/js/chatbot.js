@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     
-    // 1. ELEMEN SELEKTOR
+    // ============================================================
+    // 1. ELEMEN SELEKTOR (Sesuaikan dengan ID di HTML)
+    // ============================================================
     const chatbotButton = document.getElementById('chatbotButton');
     const chatPopup = document.getElementById('chatPopup');
     const chatClose = document.getElementById('chatClose');
@@ -9,19 +11,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatMessages = document.getElementById('chatMessages');
     const typingIndicator = document.getElementById('typingIndicator');
     const chatbotWrapper = document.getElementById('chatbot-wrapper');
+    
+    // ELEMENT BARU: SWITCH MODE
+    const modeToggle = document.getElementById('aiModeToggle');
+    const statusText = document.getElementById('chatStatusText');
 
-    // Cek Login
+    // Cek Login (Dari atribut data HTML)
     const isLoggedIn = chatbotWrapper ? JSON.parse(chatbotWrapper.getAttribute('data-user-logged-in')) : false;
-    const loginUrl = chatbotWrapper ? chatbotWrapper.getAttribute('data-login-url') : '/login';
+    const loginUrl = chatbotWrapper ? chatbotWrapper.getAttribute('data-login-url') : '/auth/login';
 
-    // 2. TOGGLE CHATBOT
+    // ============================================================
+    // 2. TOGGLE BUKA/TUTUP CHAT
+    // ============================================================
     if (chatbotButton) {
         chatbotButton.addEventListener('click', () => {
             if (!isLoggedIn) {
+                // Arahkan ke login jika belum login
                 window.location.href = loginUrl;
                 return;
             }
             chatPopup.classList.add('active');
+            // Fokus ke input otomatis saat dibuka
             setTimeout(() => chatInput.focus(), 300);
         });
     }
@@ -32,7 +42,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 3. FUNGSI RENDER PESAN
+    // ============================================================
+    // 3. LOGIKA SWITCH MODE (GEMINI VS RAG)
+    // ============================================================
+    if (modeToggle) {
+        modeToggle.addEventListener('change', function() {
+            if(this.checked) {
+                // Mode ON (Kanan/Hijau) -> Gemini
+                if(statusText) statusText.innerText = "Mode: Gemini (Umum)";
+                addSystemMessage("🔄 Mode beralih ke <b>Gemini</b> (Pengetahuan Umum).");
+            } else {
+                // Mode OFF (Kiri/Coklat) -> RAG Wayanusa
+                if(statusText) statusText.innerText = "Mode: Wayanusa (RAG)";
+                addSystemMessage("🔄 Mode beralih ke <b>Wayanusa</b> (Data Spesifik Wayang).");
+            }
+        });
+    }
+
+    // Helper: Menambahkan pesan sistem kecil di tengah (abu-abu)
+    function addSystemMessage(htmlMsg) {
+        const div = document.createElement('div');
+        div.style.textAlign = 'center';
+        div.style.fontSize = '0.75rem';
+        div.style.color = '#888';
+        div.style.margin = '10px 0';
+        div.style.fontStyle = 'italic';
+        div.innerHTML = htmlMsg;
+        
+        chatMessages.appendChild(div);
+        scrollToBottom();
+    }
+
+    // ============================================================
+    // 4. FUNGSI RENDER PESAN (UI)
+    // ============================================================
     function appendUserMessage(text) {
         const div = document.createElement('div');
         div.className = 'message-row user-row';
@@ -42,13 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span class="message-time">Kamu</span>
             </div>
         `;
-        // Insert SEBELUM typing indicator
-        if(typingIndicator && typingIndicator.parentNode === chatMessages) {
-            chatMessages.insertBefore(div, typingIndicator);
-        } else {
-            chatMessages.appendChild(div);
-        }
-        scrollToBottom();
+        insertMessage(div);
     }
 
     function appendBotMessage(text) {
@@ -63,23 +100,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span class="message-time">Cepot AI</span>
             </div>
         `;
-        
-        if(typingIndicator && typingIndicator.parentNode === chatMessages) {
-            chatMessages.insertBefore(div, typingIndicator);
-        } else {
-            chatMessages.appendChild(div);
-        }
-        scrollToBottom();
+        insertMessage(div);
         playNotification();
     }
 
-    function showTyping() {
-        typingIndicator.style.display = 'block';
+    function insertMessage(divElement) {
+        // Insert sebelum typing indicator agar indikator selalu di bawah
+        if(typingIndicator && typingIndicator.parentNode === chatMessages) {
+            chatMessages.insertBefore(divElement, typingIndicator);
+        } else {
+            chatMessages.appendChild(divElement);
+        }
         scrollToBottom();
     }
 
+    function showTyping() {
+        if(typingIndicator) {
+            typingIndicator.style.display = 'flex'; // Pakai flex biar titiknya rapi
+            scrollToBottom();
+        }
+    }
+
     function hideTyping() {
-        typingIndicator.style.display = 'none';
+        if(typingIndicator) typingIndicator.style.display = 'none';
     }
 
     function scrollToBottom() {
@@ -101,38 +144,60 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch(e) {}
     }
 
-    // 4. LOGIKA PENGIRIMAN
+    // ============================================================
+    // 5. LOGIKA PENGIRIMAN PESAN (API)
+    // ============================================================
     async function handleSendMessage(textOverride) {
         const text = textOverride || chatInput.value.trim();
         if (!text) return;
 
-        chatInput.value = '';
+        // Reset input & Tampilkan pesan user
+        if(chatInput) chatInput.value = '';
         appendUserMessage(text);
         showTyping();
 
+        // Tentukan Mode: Jika checked = 'gemini', jika tidak = 'rag'
+        // Default ke 'rag' jika tombol toggle belum ada
+        const currentMode = (modeToggle && modeToggle.checked) ? 'gemini' : 'rag';
+
         try {
-            const response = await fetch('/api/chat', {
+            // KIRIM KE ENDPOINT BARU: /api/chat-smart
+            const response = await fetch('/api/chat-smart', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
+                body: JSON.stringify({ 
+                    message: text,
+                    mode: currentMode // Kirim mode yang dipilih user
+                })
             });
 
             const data = await response.json();
 
+            // Sembunyikan typing & tampilkan balasan
             setTimeout(() => {
                 hideTyping();
-                const formatted = data.response.replace(/\n/g, '<br>');
+                
+                // Format baris baru jadi <br> agar rapi
+                let formatted = "Maaf, tidak ada respon.";
+                if (data.response) {
+                    formatted = data.response.replace(/\n/g, '<br>');
+                    // Opsional: Parse Markdown bold (**) jadi <b>
+                    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                }
+                
                 appendBotMessage(formatted);
-            }, 800); // Delay buatan biar lebih natural
+            }, 500); 
 
         } catch (error) {
-            console.error(error);
+            console.error("Chat Error:", error);
             hideTyping();
-            appendBotMessage("Maaf Jang, koneksi error. Coba lagi nanti ya.");
+            appendBotMessage("Maaf Jang, koneksi lagi error euy. Coba lagi nanti ya.");
         }
     }
 
-    // 5. EVENT LISTENERS
+    // ============================================================
+    // 6. EVENT LISTENERS INPUT
+    // ============================================================
     if (sendButton) {
         sendButton.addEventListener('click', () => handleSendMessage());
     }
@@ -143,71 +208,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Handle Quick Replies (Pake Event Delegation)
+    // Handle Quick Replies (Tombol Cepat)
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('quick-btn')) {
             const text = e.target.getAttribute('data-text');
             handleSendMessage(text);
         }
     });
-
-    document.addEventListener('DOMContentLoaded', function() {
-    const chatbotToggle = document.getElementById('chatbot-toggle');
-    const chatWindow = document.getElementById('chat-window');
-    const chatClose = document.getElementById('chat-close');
-    const chatInput = document.getElementById('chat-input');
-    const chatSend = document.getElementById('chat-send');
-    const chatBody = document.getElementById('chat-body');
-    const chatbotBadge = document.getElementById('chatbot-badge');
-
-    // Buka/Tutup Jendela Chat
-    chatbotToggle.addEventListener('click', function() {
-        chatWindow.classList.toggle('active');
-        // Sembunyikan badge saat chat dibuka
-        if (chatWindow.classList.contains('active')) {
-            chatbotBadge.style.display = 'none';
-        }
-    });
-
-    chatClose.addEventListener('click', function() {
-        chatWindow.classList.remove('active');
-    });
-
-    // Fungsi Kirim Pesan
-    function sendMessage() {
-        const message = chatInput.value.trim();
-        if (message === '') return;
-
-        // Tambahkan pesan pengguna
-        appendMessage(message, 'user-message');
-        chatInput.value = '';
-
-        // Simulasi respons bot (Ganti dengan logika backend Anda nanti)
-        setTimeout(() => {
-            const botResponse = "Maaf, saat ini saya masih dalam pengembangan. Silakan coba lagi nanti!";
-            appendMessage(botResponse, 'bot-message');
-        }, 1000);
-    }
-
-    // Tambahkan Pesan ke Chat Body
-    function appendMessage(message, type) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', type);
-        const messageText = document.createElement('p');
-        messageText.textContent = message;
-        messageDiv.appendChild(messageText);
-        chatBody.appendChild(messageDiv);
-        // Scroll ke bawah otomatis
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    // Event Listener untuk Tombol Kirim dan Enter
-    chatSend.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-});
 
 });

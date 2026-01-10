@@ -453,24 +453,33 @@ def delete_model(id):
     flash('Model berhasil dihapus.', 'success')
     return redirect(url_for('web.admin_models'))
 
-# -------------------------
-# QUIZ CRUD
-# -------------------------
+# =========================================================
+# QUIZ CRUD (FIXED)
+# =========================================================
+
 @web_routes.route('/admin/quiz/list')
 @admin_login_required
 def quiz_list():
+    # PERBAIKAN: Tambahkan option_a, b, c, d ke dalam query
     questions = QuizQuestion.query.join(QuizLevel).add_columns(
         QuizQuestion.id,
         QuizQuestion.question,
+        QuizQuestion.option_a, # <--- WAJIB ADA
+        QuizQuestion.option_b, # <--- WAJIB ADA
+        QuizQuestion.option_c, # <--- WAJIB ADA
+        QuizQuestion.option_d, # <--- WAJIB ADA
         QuizQuestion.correct_answer,
         QuizLevel.name.label('level_name')
     ).all()
+    
     return render_template('admin/quiz_list.html', questions=questions)
+
 
 @web_routes.route('/admin/quiz/add', methods=['GET', 'POST'])
 @admin_login_required
 def quiz_add():
     levels = QuizLevel.query.all()
+    
     if request.method == 'POST':
         level_id = request.form.get('level_id')
         question = request.form.get('question')
@@ -478,14 +487,18 @@ def quiz_add():
         option_b = request.form.get('option_b')
         option_c = request.form.get('option_c')
         option_d = request.form.get('option_d')
-        correct_answer = request.form.get('correct_answer')
+        
+        # Ambil jawaban dan paksa jadi lowercase ('a', 'b'...) agar sesuai DB
+        correct_answer = request.form.get('correct_answer', '').lower()
 
+        # Validasi Input Kosong
         if not all([level_id, question, option_a, option_b, option_c, option_d, correct_answer]):
-            flash('Semua field harus diisi!', 'error')
+            flash('Semua field wajib diisi!', 'error')
             return redirect(url_for('web.quiz_add'))
 
-        if correct_answer not in ['A', 'B', 'C', 'D']:
-            flash('Jawaban benar harus A, B, C, atau D!', 'error')
+        # Validasi Jawaban (a, b, c, d)
+        if correct_answer not in ['a', 'b', 'c', 'd']:
+            flash('Pilihan jawaban benar tidak valid (harus A, B, C, atau D)!', 'error')
             return redirect(url_for('web.quiz_add'))
 
         new_question = QuizQuestion(
@@ -495,14 +508,20 @@ def quiz_add():
             option_b=option_b,
             option_c=option_c,
             option_d=option_d,
-            correct_answer=correct_answer
+            correct_answer=correct_answer # Disimpan sebagai 'a', 'b', dst
         )
-        db.session.add(new_question)
-        db.session.commit()
-        flash('Soal berhasil ditambahkan!', 'success')
-        return redirect(url_for('web.quiz_list'))
+        
+        try:
+            db.session.add(new_question)
+            db.session.commit()
+            flash('Soal berhasil ditambahkan!', 'success')
+            return redirect(url_for('web.quiz_list'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error database: {e}', 'error')
 
     return render_template('admin/quiz_form.html', question=None, levels=levels)
+
 
 @web_routes.route('/admin/quiz/edit/<int:id>', methods=['GET', 'POST'])
 @admin_login_required
@@ -517,29 +536,41 @@ def quiz_edit(id):
         question.option_b = request.form.get('option_b')
         question.option_c = request.form.get('option_c')
         question.option_d = request.form.get('option_d')
-        question.correct_answer = request.form.get('correct_answer')
+        
+        # Konsistensi lowercase
+        question.correct_answer = request.form.get('correct_answer', '').lower()
 
         if not all([question.level_id, question.question, question.option_a, question.option_b, question.option_c, question.option_d, question.correct_answer]):
             flash('Semua field harus diisi!', 'error')
             return redirect(url_for('web.quiz_edit', id=id))
 
-        if question.correct_answer not in ['A', 'B', 'C', 'D']:
+        if question.correct_answer not in ['a', 'b', 'c', 'd']:
             flash('Jawaban benar harus A, B, C, atau D!', 'error')
             return redirect(url_for('web.quiz_edit', id=id))
 
-        db.session.commit()
-        flash('Soal berhasil diperbarui!', 'success')
-        return redirect(url_for('web.quiz_list'))
+        try:
+            db.session.commit()
+            flash('Soal berhasil diperbarui!', 'success')
+            return redirect(url_for('web.quiz_list'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Gagal update: {e}', 'error')
 
     return render_template('admin/quiz_form.html', question=question, levels=levels)
+
 
 @web_routes.route('/admin/quiz/delete/<int:id>')
 @admin_login_required
 def quiz_delete(id):
     question = QuizQuestion.query.get_or_404(id)
-    db.session.delete(question)
-    db.session.commit()
-    flash('Soal berhasil dihapus!', 'success')
+    try:
+        db.session.delete(question)
+        db.session.commit()
+        flash('Soal berhasil dihapus!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Gagal menghapus: {e}', 'error')
+        
     return redirect(url_for('web.quiz_list'))
 
 # -------------------------

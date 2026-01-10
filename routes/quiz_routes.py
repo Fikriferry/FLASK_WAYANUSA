@@ -128,16 +128,20 @@ def get_history(user_id):
 # ============================================================
 @quiz_routes.route("/result_detail/<int:result_id>", methods=["GET"])
 def result_detail(result_id):
-    answers = UserAnswer.query.filter_by(quiz_result_id=result_id).all()
+    # Lakukan JOIN antara tabel UserAnswer dan QuizQuestion
+    results = db.session.query(UserAnswer, QuizQuestion)\
+        .join(QuizQuestion, UserAnswer.question_id == QuizQuestion.id)\
+        .filter(UserAnswer.quiz_result_id == result_id).all()
 
-    if not answers:
+    if not results:
         return jsonify({"error": "Result not found"}), 404
 
     data = []
-    for a in answers:
-        question = QuizQuestion.query.get(a.question_id)
+    for answer, question in results:
+        # Logika dinamis tetap dipakai
         correct_answer_key = question.correct_answer.lower()
-        correct_answer_text = getattr(question, f"option_{correct_answer_key}")
+        # Ambil teks jawaban benar secara dinamis (option_a, option_b, dst)
+        correct_answer_text = getattr(question, f"option_{correct_answer_key}", "-")
 
         data.append({
             "question": question.question,
@@ -148,8 +152,8 @@ def result_detail(result_id):
                 "d": question.option_d
             },
             "correct_answer": correct_answer_text,
-            "user_answer": a.user_answer,
-            "is_correct": a.is_correct
+            "user_answer": answer.user_answer,
+            "is_correct": answer.is_correct
         })
 
     return jsonify({"detail": data}), 200
