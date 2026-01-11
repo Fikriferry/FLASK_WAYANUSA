@@ -179,4 +179,9 @@ class Wayang(db.Model):
 class WayangGame(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(100), nullable=False)
-    file_path = db.Column(db.String(200), nullable=False)
+    thumbnail = db.Column(db.String(200), nullable=True)
+    badan = db.Column(db.String(200), nullable=True)
+    tangan_kanan_atas = db.Column(db.String(200), nullable=True)
+    tangan_kanan_bawah = db.Column(db.String(200), nullable=True)
+    tangan_kiri_atas = db.Column(db.String(200), nullable=True)
+    tangan_kiri_bawah = db.Column(db.String(200), nullable=True)
