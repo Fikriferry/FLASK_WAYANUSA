@@ -2,53 +2,57 @@
     data-login-url="{{ url_for('web.login_user') }}">
 
     <div class="chatbot-button" id="chatbotButton">
-        
+
         <div class="chatbot-icon-wrapper">
-            <img src="https://cdn-icons-png.flaticon.com/512/8943/8943377.png" 
-                 alt="Chatbot" 
-                 class="chatbot-img">
+            <img src="https://cdn-icons-png.flaticon.com/512/8943/8943377.png" alt="Chatbot" class="chatbot-img">
         </div>
-        
+
         <div class="chatbot-tooltip">
             <span>Butuh Bantuan?</span>
         </div>
-        
+
         <div class="chatbot-badge">1</div>
     </div>
 
     <div class="chat-popup" id="chatPopup">
-        
+
         <div class="chat-header">
             <div class="chat-header-info">
                 <div class="chat-avatar">
-                    <img src="{{ url_for('static', filename='images/cepot_avatar.png') }}" 
-                         onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" 
-                         alt="Cepot Bot">
+                    <img src="{{ url_for('static', filename='images/cepot_avatar.png') }}"
+                        onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" alt="Cepot Bot">
                     <div class="status-dot"></div>
                 </div>
                 <div>
                     <h3 class="chat-title">Cepot AI</h3>
-                    <span class="chat-status">Online • Asisten Wayang</span>
+                    <span class="chat-status" id="chatStatusText">Mode: Wayanusa (RAG)</span>
                 </div>
             </div>
-            <button class="chat-close" id="chatClose">
-                <i class="fas fa-times"></i>
-            </button>
+
+            <div class="chat-controls">
+                <label class="switch" title="Ganti Mode AI">
+                    <input type="checkbox" id="aiModeToggle">
+                    <span class="slider round"></span>
+                </label>
+                <button class="chat-close" id="chatClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
 
         <div class="chat-body" id="panelChat">
             <div class="chat-messages" id="chatMessages">
                 <div class="message-row bot-row">
                     <div class="message-avatar">
-                        <img src="{{ url_for('static', filename='images/cepot_avatar.png') }}" 
-                             onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
+                        <img src="{{ url_for('static', filename='images/cepot_avatar.png') }}"
+                            onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
                     </div>
                     <div class="message-bubble bot-bubble">
                         <p>Sampurasun! 👋<br>Kenalin inyong Cepot. Ana sing bisa dibantu?</p>
                         <span class="message-time">Baru saja</span>
                     </div>
                 </div>
-                
+
                 <div class="quick-replies">
                     <button class="quick-btn" data-text="Apa itu Wayang?">Apa itu Wayang?</button>
                     <button class="quick-btn" data-text="Siapa tokoh Pandawa?">Tokoh Pandawa</button>
@@ -87,7 +91,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 70px;  /* Ukuran Area Klik */
+        width: 70px;
+        /* Ukuran Area Klik */
         height: 70px;
         background-color: #33333300;
     }
@@ -96,26 +101,38 @@
     .chatbot-icon-wrapper {
         width: 65px;
         height: 65px;
-        background-color: #ffffff; /* HARUS PUTIH agar robot terlihat */
+        background-color: #ffffff;
+        /* HARUS PUTIH agar robot terlihat */
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.3); /* Bayangan kuat biar ngambang */
-        border: 3px solid #D4A373; /* Border Emas */
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        /* Bayangan kuat biar ngambang */
+        border: 3px solid #D4A373;
+        /* Border Emas */
         position: relative;
         transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        animation: floatBot 3s ease-in-out infinite; /* Animasi Melayang */
+        animation: floatBot 3s ease-in-out infinite;
+        /* Animasi Melayang */
     }
 
     @keyframes floatBot {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-8px); }
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-8px);
+        }
     }
 
     /* Gambar Robot */
     .chatbot-img {
-        width: 75%; /* Ukuran gambar 75% dari lingkaran */
+        width: 75%;
+        /* Ukuran gambar 75% dari lingkaran */
         height: 75%;
         object-fit: contain;
         transition: transform 0.3s;
@@ -123,12 +140,16 @@
 
     /* Efek Hover */
     .chatbot-button:hover .chatbot-icon-wrapper {
-        transform: scale(1.1); /* Membesar saat dihover */
-        box-shadow: 0 10px 30px rgba(212, 163, 115, 0.5); /* Bayangan Emas */
-        border-color: #fff; /* Border jadi putih saat hover */
-        background-color: #D4A373; /* Background jadi emas */
+        transform: scale(1.1);
+        /* Membesar saat dihover */
+        box-shadow: 0 10px 30px rgba(212, 163, 115, 0.5);
+        /* Bayangan Emas */
+        border-color: #fff;
+        /* Border jadi putih saat hover */
+        background-color: #D4A373;
+        /* Background jadi emas */
     }
-    
+
     .chatbot-button:hover .chatbot-img {
         transform: scale(1.1) rotate(10deg);
     }
@@ -136,14 +157,15 @@
     /* Tooltip Teks "Butuh Bantuan?" */
     .chatbot-tooltip {
         position: absolute;
-        right: 80px; /* Di sebelah kiri tombol */
+        right: 80px;
+        /* Di sebelah kiri tombol */
         background: #fff;
         color: #333;
         padding: 8px 15px;
         border-radius: 8px;
         font-size: 0.9rem;
         font-weight: 600;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         opacity: 0;
         visibility: hidden;
         transform: translateX(10px);
@@ -151,7 +173,7 @@
         white-space: nowrap;
         pointer-events: none;
     }
-    
+
     /* Panah kecil pada tooltip */
     .chatbot-tooltip::after {
         content: '';
@@ -191,8 +213,15 @@
     }
 
     @keyframes bounceBadge {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.15); }
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.15);
+        }
     }
 
     /* --- CHAT POPUP (Sama seperti sebelumnya) --- */
@@ -204,7 +233,7 @@
         height: 550px;
         background: #fff;
         border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
         z-index: 9999;
         display: flex;
         flex-direction: column;
@@ -217,49 +246,356 @@
         font-family: 'Inter', sans-serif;
     }
 
-    .chat-popup.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
-    
+    .chat-popup.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
+
     /* STYLE LAINNYA (Header, Body, Footer) SAMA */
-    .chat-header { background: linear-gradient(135deg, #D4A373, #B88656); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
-    .chat-header-info { display: flex; align-items: center; gap: 12px; }
-    .chat-avatar { position: relative; width: 45px; height: 45px; }
-    .chat-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.8); }
-    .status-dot { position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px; background: #2ecc71; border-radius: 50%; border: 2px solid #fff; }
-    .chat-title { margin: 0; font-size: 1.1rem; font-weight: 700; }
-    .chat-status { font-size: 0.75rem; opacity: 0.9; }
-    .chat-close { background: none; border: none; color: white; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
-    .chat-close:hover { opacity: 0.8; }
-    .chat-body { flex: 1; background: #f4f4f4; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-    .chat-body::-webkit-scrollbar { width: 5px; }
-    .chat-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-    .message-row { display: flex; gap: 10px; align-items: flex-end; opacity: 0; animation: slideIn 0.3s forwards; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .bot-row { flex-direction: row; }
-    .user-row { flex-direction: row-reverse; }
-    .message-avatar img { width: 32px; height: 32px; border-radius: 50%; }
-    .message-bubble { max-width: 75%; padding: 10px 14px; border-radius: 18px; font-size: 0.9rem; line-height: 1.4; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-    .bot-bubble { background: white; color: #333; border-bottom-left-radius: 2px; }
-    .user-bubble { background: #D4A373; color: white; border-bottom-right-radius: 2px; }
-    .message-time { display: block; font-size: 0.65rem; opacity: 0.6; margin-top: 4px; text-align: right; }
-    .quick-replies { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-top: 5px; }
-    .quick-replies::-webkit-scrollbar { display: none; }
-    .quick-btn { background: white; border: 1px solid #D4A373; color: #D4A373; padding: 6px 12px; border-radius: 15px; font-size: 0.75rem; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-    .quick-btn:hover { background: #D4A373; color: white; }
-    .typing-indicator { padding: 8px 12px; background: white; border-radius: 15px; width: fit-content; margin-left: 42px; display: flex; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-    .typing-indicator span { width: 6px; height: 6px; background: #bbb; border-radius: 50%; animation: blink 1.4s infinite both; }
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
-    .chat-footer { padding: 12px; background: white; border-top: 1px solid #eee; }
-    .input-wrapper { display: flex; align-items: center; background: #f0f2f5; border-radius: 25px; padding: 8px 15px; }
-    .input-wrapper:focus-within { background: #fff; box-shadow: 0 0 0 2px #D4A373; }
-    #chatInput { flex: 1; border: none; background: transparent; outline: none; font-size: 0.9rem; }
-    #sendButton { background: none; border: none; color: #D4A373; font-size: 1.2rem; cursor: pointer; padding: 0 0 0 10px; transition: 0.2s; }
-    #sendButton:hover { color: #B88656; transform: scale(1.1); }
-    .chat-branding { text-align: center; font-size: 0.7rem; color: #aaa; margin-top: 5px; }
+    .chat-header {
+        background: linear-gradient(135deg, #D4A373, #B88656);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+    }
+
+    .chat-header-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .chat-avatar {
+        position: relative;
+        width: 45px;
+        height: 45px;
+    }
+
+    .chat-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .status-dot {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 10px;
+        height: 10px;
+        background: #2ecc71;
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+
+    .chat-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .chat-status {
+        font-size: 0.75rem;
+        opacity: 0.9;
+    }
+
+    .chat-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .chat-close:hover {
+        opacity: 0.8;
+    }
+
+    .chat-body {
+        flex: 1;
+        background: #f4f4f4;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .chat-body::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .chat-body::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 3px;
+    }
+
+    .message-row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+        opacity: 0;
+        animation: slideIn 0.3s forwards;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .bot-row {
+        flex-direction: row;
+    }
+
+    .user-row {
+        flex-direction: row-reverse;
+    }
+
+    .message-avatar img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+    }
+
+    .message-bubble {
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 18px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        position: relative;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .bot-bubble {
+        background: white;
+        color: #333;
+        border-bottom-left-radius: 2px;
+    }
+
+    .user-bubble {
+        background: #D4A373;
+        color: white;
+        border-bottom-right-radius: 2px;
+    }
+
+    .message-time {
+        display: block;
+        font-size: 0.65rem;
+        opacity: 0.6;
+        margin-top: 4px;
+        text-align: right;
+    }
+
+    .quick-replies {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        margin-top: 5px;
+    }
+
+    .quick-replies::-webkit-scrollbar {
+        display: none;
+    }
+
+    .quick-btn {
+        background: white;
+        border: 1px solid #D4A373;
+        color: #D4A373;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: 0.2s;
+    }
+
+    .quick-btn:hover {
+        background: #D4A373;
+        color: white;
+    }
+
+    .typing-indicator {
+        padding: 8px 12px;
+        background: white;
+        border-radius: 15px;
+        width: fit-content;
+        margin-left: 42px;
+        display: flex;
+        gap: 4px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .typing-indicator span {
+        width: 6px;
+        height: 6px;
+        background: #bbb;
+        border-radius: 50%;
+        animation: blink 1.4s infinite both;
+    }
+
+    .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes blink {
+
+        0%,
+        100% {
+            opacity: 0.2;
+        }
+
+        50% {
+            opacity: 1;
+        }
+    }
+
+    .chat-footer {
+        padding: 12px;
+        background: white;
+        border-top: 1px solid #eee;
+    }
+
+    .input-wrapper {
+        display: flex;
+        align-items: center;
+        background: #f0f2f5;
+        border-radius: 25px;
+        padding: 8px 15px;
+    }
+
+    .input-wrapper:focus-within {
+        background: #fff;
+        box-shadow: 0 0 0 2px #D4A373;
+    }
+
+    #chatInput {
+        flex: 1;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 0.9rem;
+    }
+
+    #sendButton {
+        background: none;
+        border: none;
+        color: #D4A373;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0 0 0 10px;
+        transition: 0.2s;
+    }
+
+    #sendButton:hover {
+        color: #B88656;
+        transform: scale(1.1);
+    }
+
+    .chat-branding {
+        text-align: center;
+        font-size: 0.7rem;
+        color: #aaa;
+        margin-top: 5px;
+    }
 
     @media (max-width: 480px) {
-        .chat-popup { width: 100%; height: 100%; bottom: 0; right: 0; border-radius: 0; }
-        .chatbot-button { bottom: 20px; right: 20px; }
+        .chat-popup {
+            width: 100%;
+            height: 100%;
+            bottom: 0;
+            right: 0;
+            border-radius: 0;
+        }
+
+        .chatbot-button {
+            bottom: 20px;
+            right: 20px;
+        }
     }
+
+    /* Container Controls di kanan atas */
+    .chat-controls {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    /* --- TOGGLE SWITCH STYLE --- */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #A06838;
+        /* Warna saat Mode Wayang (Off) */
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    /* Warna saat Mode Gemini (On) */
+    input:checked+.slider {
+        background-color: #2ecc71;
+    }
+
+    input:checked+.slider:before {
+        -webkit-transform: translateX(20px);
+        -ms-transform: translateX(20px);
+        transform: translateX(20px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+    
 </style>
