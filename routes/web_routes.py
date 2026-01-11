@@ -124,8 +124,13 @@ def quiz_play():
 
 @web_routes.route('/mencari-dalang')
 def mencari_dalang():
-    dalangs = Dalang.query.all()   # 🔥 INI KUNCI UTAMA
+    dalangs = Dalang.query.all()   
     return render_template('mencari_dalang.html', dalangs=dalangs)
+
+@web_routes.route('/dalang/<int:dalang_id>')
+def dalang_detail(dalang_id):
+    dalang = Dalang.query.get_or_404(dalang_id)
+    return render_template('dalang_detail.html', dalang=dalang)
 
 @web_routes.route("/pertunjukan_wayang/video/<int:id>")
 def video_detail(id):

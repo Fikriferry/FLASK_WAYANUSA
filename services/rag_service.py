@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 
 # --- PERBAIKAN IMPORT ---
 # Gunakan import standar ini (setelah update library, ini yang paling stabil)
-from langchain.chains import RetrievalQA 
+import langchain_classic
+from langchain_classic.chains import RetrievalQA 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Import untuk Model Lokal & Google
@@ -11,7 +12,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFDirectoryLoader, DirectoryLoader, TextLoader
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 # ------------------------
 
 load_dotenv()
