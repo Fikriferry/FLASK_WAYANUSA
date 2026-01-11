@@ -1,3 +1,4 @@
+from fileinput import filename
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, send_from_directory, current_app
 from werkzeug.utils import secure_filename
 from functools import wraps
@@ -126,7 +127,98 @@ def logout_user():
     flash('Logout berhasil!', 'success')
     return redirect(url_for('web.home'))
 
+<<<<<<< HEAD
 # =========================
+=======
+@web_routes.route('/pengenalan-wayang')
+def pengenalan_wayang():
+    return render_template('pengenalan_wayang.html')
+
+@web_routes.route('/pertunjukan-wayang')
+def pertunjukan_wayang():
+    videos = Video.query.filter_by(tampil=True).all()
+    return render_template('pertunjukan_wayang.html', videos=videos)
+
+@web_routes.route('/quiz')
+@user_login_required
+def quiz():
+    levels = QuizLevel.query.all()
+    return render_template('quiz.html', levels=levels)
+
+@web_routes.route('/quiz/play')
+@user_login_required
+def quiz_play():
+    level_id = request.args.get('level', type=int)
+    if not level_id:
+        flash('Level quiz tidak valid!', 'error')
+        return redirect(url_for('web.quiz'))
+
+    level = QuizLevel.query.get(level_id)
+    if not level:
+        flash('Level quiz tidak ditemukan!', 'error')
+        return redirect(url_for('web.quiz'))
+
+    return render_template('quiz_play.html', level=level)
+
+@web_routes.route('/mencari-dalang')
+def mencari_dalang():
+    dalangs = Dalang.query.all()   
+    return render_template('mencari_dalang.html', dalangs=dalangs)
+
+@web_routes.route('/dalang/<int:dalang_id>')
+def dalang_detail(dalang_id):
+    dalang = Dalang.query.get_or_404(dalang_id)
+    return render_template('dalang_detail.html', dalang=dalang)
+
+@web_routes.route("/pertunjukan_wayang/video/<int:id>")
+def video_detail(id):
+    if not session.get("user_logged_in"):
+        return redirect(url_for("web.login_user"))
+
+    video = Video.query.get_or_404(id)
+    related_videos = Video.query.filter(Video.id != id).all()
+    return render_template("video_detail.html", video=video, related_videos=related_videos)
+
+@web_routes.route('/search')
+def search_video():
+    q = request.args.get("q", "")
+
+    # HINDARI: q kosong tapi masih tampil ""
+    q = q.strip()
+
+    if q:
+        videos = Video.query.filter(Video.judul.like(f"%{q}%")).all()
+    else:
+        videos = []
+
+    return render_template("search_video.html", q=q, videos=videos)
+
+@web_routes.route('/artikel')
+def artikel():
+    artikels = Article.query.order_by(Article.created_at.desc()).all()
+    return render_template('artikel.html', artikels=artikels)
+
+@web_routes.route('/artikel/<int:id>')
+def artikel_detail(id):
+    artikel = Article.query.get_or_404(id)
+    return render_template('artikel_detail.html', artikel=artikel)
+
+@web_routes.route('/s-dalang')
+def simulasi_dalang():
+    wayangs = WayangGame.query.order_by(WayangGame.id.asc()).all()
+    print("Jumlah wayang:", len(wayangs))  # Debug: cek di console server
+    return render_template("simulasi_dalang.html", wayangs=wayangs)
+
+@web_routes.route('/smart-wayang')
+def smart_wayang():
+    # Pastikan user login jika fitur ini butuh akses khusus (opsional)
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
+        
+    return render_template('smart_wayang.html')
+
+# -------------------------
+>>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
 # ADMIN ROUTES
 # =========================
 @web_routes.route('/admin/login', methods=['GET','POST'])
@@ -162,7 +254,13 @@ def admin_dashboard():
 
 # =========================
 # DALANG CRUD
+<<<<<<< HEAD
 # =========================
+=======
+# -------------------------
+
+
+>>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
 @web_routes.route('/admin/dalang/list')
 @admin_login_required
 def dalang_list():
@@ -181,10 +279,18 @@ def dalang_add():
         if 'foto' in request.files:
             file=request.files['foto']
             if file.filename:
+<<<<<<< HEAD
                 filename=secure_filename(file.filename)
                 file.save(os.path.join('static/uploads', filename))
                 foto=filename
         new_dalang=Dalang(nama=nama,alamat=alamat,latitude=latitude,longitude=longitude,foto=foto)
+=======
+                filename = secure_filename(file.filename)
+                file.save(os.path.join('static/uploads/', filename))
+                foto = filename
+
+        new_dalang = Dalang(nama=nama, alamat=alamat, latitude=latitude, longitude=longitude, foto=foto)
+>>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
         db.session.add(new_dalang)
         db.session.commit()
         flash('Dalang berhasil ditambahkan!', 'success')
@@ -246,6 +352,28 @@ def video_add():
         return redirect(url_for('web.video_list'))
 
     return render_template('admin/video_add.html')
+
+@web_routes.route('/admin/video/edit/<int:id>', methods=['GET', 'POST'])
+@admin_login_required
+def video_edit(id):
+    item = Video.query.get_or_404(id)
+
+    if request.method == 'POST':
+        judul = request.form.get('judul')
+        youtube_link = request.form.get('youtube_link')
+
+        if not judul or not youtube_link:
+            flash("Judul dan YouTube Link wajib diisi!", "error")
+            return redirect(url_for('web.video_edit', id=id))
+
+        item.judul = judul
+        item.youtube_link = youtube_link
+
+        db.session.commit()
+        flash("Video berhasil diperbarui!", "success")
+        return redirect(url_for('web.video_list'))
+
+    return render_template('admin/video_edit.html', item=item)
 
 @web_routes.route('/admin/video/delete/<int:id>')
 @admin_login_required
@@ -375,24 +503,39 @@ def delete_model(id):
     flash('Model berhasil dihapus.', 'success')
     return redirect(url_for('web.admin_models'))
 
+<<<<<<< HEAD
 # =========================
 # QUIZ CRUD
 # =========================
+=======
+# =========================================================
+# QUIZ CRUD (FIXED)
+# =========================================================
+
+>>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
 @web_routes.route('/admin/quiz/list')
 @admin_login_required
 def quiz_list():
+    # PERBAIKAN: Tambahkan option_a, b, c, d ke dalam query
     questions = QuizQuestion.query.join(QuizLevel).add_columns(
         QuizQuestion.id,
         QuizQuestion.question,
+        QuizQuestion.option_a, # <--- WAJIB ADA
+        QuizQuestion.option_b, # <--- WAJIB ADA
+        QuizQuestion.option_c, # <--- WAJIB ADA
+        QuizQuestion.option_d, # <--- WAJIB ADA
         QuizQuestion.correct_answer,
         QuizLevel.name.label('level_name')
     ).all()
+    
     return render_template('admin/quiz_list.html', questions=questions)
+
 
 @web_routes.route('/admin/quiz/add', methods=['GET', 'POST'])
 @admin_login_required
 def quiz_add():
     levels = QuizLevel.query.all()
+    
     if request.method == 'POST':
         level_id = request.form.get('level_id')
         question = request.form.get('question')
@@ -400,14 +543,18 @@ def quiz_add():
         option_b = request.form.get('option_b')
         option_c = request.form.get('option_c')
         option_d = request.form.get('option_d')
-        correct_answer = request.form.get('correct_answer')
+        
+        # Ambil jawaban dan paksa jadi lowercase ('a', 'b'...) agar sesuai DB
+        correct_answer = request.form.get('correct_answer', '').lower()
 
+        # Validasi Input Kosong
         if not all([level_id, question, option_a, option_b, option_c, option_d, correct_answer]):
-            flash('Semua field harus diisi!', 'error')
+            flash('Semua field wajib diisi!', 'error')
             return redirect(url_for('web.quiz_add'))
 
-        if correct_answer not in ['A', 'B', 'C', 'D']:
-            flash('Jawaban benar harus A, B, C, atau D!', 'error')
+        # Validasi Jawaban (a, b, c, d)
+        if correct_answer not in ['a', 'b', 'c', 'd']:
+            flash('Pilihan jawaban benar tidak valid (harus A, B, C, atau D)!', 'error')
             return redirect(url_for('web.quiz_add'))
 
         new_question = QuizQuestion(
@@ -417,14 +564,20 @@ def quiz_add():
             option_b=option_b,
             option_c=option_c,
             option_d=option_d,
-            correct_answer=correct_answer
+            correct_answer=correct_answer # Disimpan sebagai 'a', 'b', dst
         )
-        db.session.add(new_question)
-        db.session.commit()
-        flash('Soal berhasil ditambahkan!', 'success')
-        return redirect(url_for('web.quiz_list'))
+        
+        try:
+            db.session.add(new_question)
+            db.session.commit()
+            flash('Soal berhasil ditambahkan!', 'success')
+            return redirect(url_for('web.quiz_list'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error database: {e}', 'error')
 
     return render_template('admin/quiz_form.html', question=None, levels=levels)
+
 
 @web_routes.route('/admin/quiz/edit/<int:id>', methods=['GET', 'POST'])
 @admin_login_required
@@ -439,34 +592,64 @@ def quiz_edit(id):
         question.option_b = request.form.get('option_b')
         question.option_c = request.form.get('option_c')
         question.option_d = request.form.get('option_d')
-        question.correct_answer = request.form.get('correct_answer')
+        
+        # Konsistensi lowercase
+        question.correct_answer = request.form.get('correct_answer', '').lower()
 
         if not all([question.level_id, question.question, question.option_a, question.option_b, question.option_c, question.option_d, question.correct_answer]):
             flash('Semua field harus diisi!', 'error')
             return redirect(url_for('web.quiz_edit', id=id))
 
-        if question.correct_answer not in ['A', 'B', 'C', 'D']:
+        if question.correct_answer not in ['a', 'b', 'c', 'd']:
             flash('Jawaban benar harus A, B, C, atau D!', 'error')
             return redirect(url_for('web.quiz_edit', id=id))
 
-        db.session.commit()
-        flash('Soal berhasil diperbarui!', 'success')
-        return redirect(url_for('web.quiz_list'))
+        try:
+            db.session.commit()
+            flash('Soal berhasil diperbarui!', 'success')
+            return redirect(url_for('web.quiz_list'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Gagal update: {e}', 'error')
 
     return render_template('admin/quiz_form.html', question=question, levels=levels)
+
 
 @web_routes.route('/admin/quiz/delete/<int:id>')
 @admin_login_required
 def quiz_delete(id):
     question = QuizQuestion.query.get_or_404(id)
-    db.session.delete(question)
-    db.session.commit()
-    flash('Soal berhasil dihapus!', 'success')
+    try:
+        db.session.delete(question)
+        db.session.commit()
+        flash('Soal berhasil dihapus!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Gagal menghapus: {e}', 'error')
+        
     return redirect(url_for('web.quiz_list'))
 
+<<<<<<< HEAD
 # =========================
 # ARTIKEL CRUD
 # =========================
+=======
+# -------------------------
+# UPLOADS
+# -------------------------
+@web_routes.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory("static/uploads", filename)
+
+@web_routes.route('/uploads/dalang/<filename>')
+def uploaded_dalang_file(filenamed):
+    return send_from_directory('static/uploads/dalang', filenamed)
+
+# ----------------------------------------
+# ARTIKEL MANAGEMENT
+# ----------------------------------------
+
+>>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
 @web_routes.route('/admin/artikel')
 @admin_login_required
 def artikel_list():
@@ -791,9 +974,13 @@ def admin_wayanggame_edit(id):
         flash('WayangGame berhasil diperbarui!', 'success')
         return redirect(url_for('web.admin_wayanggame_list'))
 
+<<<<<<< HEAD
     # Buat dictionary files agar bisa diakses di template tanpa getattr
     parts = ['thumbnail','badan','tangan_kanan_atas','tangan_kanan_bawah','tangan_kiri_atas','tangan_kiri_bawah']
     files = {part: getattr(game, part) for part in parts}
+=======
+    return render_template("admin/wayanggame_edit.html", item=item)
+>>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
 
     return render_template('admin/wayanggame_form.html', game=game, files=files)
 
