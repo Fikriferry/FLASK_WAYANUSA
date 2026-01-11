@@ -1,3 +1,4 @@
+from fileinput import filename
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, send_from_directory, current_app
 from werkzeug.utils import secure_filename
 from functools import wraps
@@ -213,6 +214,8 @@ def logout_admin():
 # -------------------------
 # DALANG CRUD
 # -------------------------
+
+
 @web_routes.route('/admin/dalang/list')
 @admin_login_required
 def dalang_list():
@@ -233,7 +236,7 @@ def dalang_add():
             file = request.files['foto']
             if file.filename:
                 filename = secure_filename(file.filename)
-                file.save(os.path.join('static/uploads', filename))
+                file.save(os.path.join('static/uploads/', filename))
                 foto = filename
 
         new_dalang = Dalang(nama=nama, alamat=alamat, latitude=latitude, longitude=longitude, foto=foto)
@@ -548,6 +551,10 @@ def quiz_delete(id):
 @web_routes.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory("static/uploads", filename)
+
+@web_routes.route('/uploads/dalang/<filename>')
+def uploaded_dalang_file(filenamed):
+    return send_from_directory('static/uploads/dalang', filenamed)
 
 # ----------------------------------------
 # ARTIKEL MANAGEMENT
