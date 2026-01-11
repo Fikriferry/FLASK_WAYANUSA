@@ -127,9 +127,6 @@ def logout_user():
     flash('Logout berhasil!', 'success')
     return redirect(url_for('web.home'))
 
-<<<<<<< HEAD
-# =========================
-=======
 @web_routes.route('/pengenalan-wayang')
 def pengenalan_wayang():
     return render_template('pengenalan_wayang.html')
@@ -218,7 +215,6 @@ def smart_wayang():
     return render_template('smart_wayang.html')
 
 # -------------------------
->>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
 # ADMIN ROUTES
 # =========================
 @web_routes.route('/admin/login', methods=['GET','POST'])
@@ -254,13 +250,9 @@ def admin_dashboard():
 
 # =========================
 # DALANG CRUD
-<<<<<<< HEAD
-# =========================
-=======
 # -------------------------
 
 
->>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
 @web_routes.route('/admin/dalang/list')
 @admin_login_required
 def dalang_list():
@@ -279,18 +271,11 @@ def dalang_add():
         if 'foto' in request.files:
             file=request.files['foto']
             if file.filename:
-<<<<<<< HEAD
-                filename=secure_filename(file.filename)
-                file.save(os.path.join('static/uploads', filename))
-                foto=filename
-        new_dalang=Dalang(nama=nama,alamat=alamat,latitude=latitude,longitude=longitude,foto=foto)
-=======
                 filename = secure_filename(file.filename)
                 file.save(os.path.join('static/uploads/', filename))
                 foto = filename
 
         new_dalang = Dalang(nama=nama, alamat=alamat, latitude=latitude, longitude=longitude, foto=foto)
->>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
         db.session.add(new_dalang)
         db.session.commit()
         flash('Dalang berhasil ditambahkan!', 'success')
@@ -503,16 +488,10 @@ def delete_model(id):
     flash('Model berhasil dihapus.', 'success')
     return redirect(url_for('web.admin_models'))
 
-<<<<<<< HEAD
-# =========================
-# QUIZ CRUD
-# =========================
-=======
 # =========================================================
 # QUIZ CRUD (FIXED)
 # =========================================================
 
->>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
 @web_routes.route('/admin/quiz/list')
 @admin_login_required
 def quiz_list():
@@ -629,11 +608,6 @@ def quiz_delete(id):
         
     return redirect(url_for('web.quiz_list'))
 
-<<<<<<< HEAD
-# =========================
-# ARTIKEL CRUD
-# =========================
-=======
 # -------------------------
 # UPLOADS
 # -------------------------
@@ -649,7 +623,6 @@ def uploaded_dalang_file(filenamed):
 # ARTIKEL MANAGEMENT
 # ----------------------------------------
 
->>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
 @web_routes.route('/admin/artikel')
 @admin_login_required
 def artikel_list():
@@ -974,13 +947,7 @@ def admin_wayanggame_edit(id):
         flash('WayangGame berhasil diperbarui!', 'success')
         return redirect(url_for('web.admin_wayanggame_list'))
 
-<<<<<<< HEAD
-    # Buat dictionary files agar bisa diakses di template tanpa getattr
-    parts = ['thumbnail','badan','tangan_kanan_atas','tangan_kanan_bawah','tangan_kiri_atas','tangan_kiri_bawah']
-    files = {part: getattr(game, part) for part in parts}
-=======
     return render_template("admin/wayanggame_edit.html", item=item)
->>>>>>> 34c81ce68e96c4b3657f500f7b648e7930f828ae
 
     return render_template('admin/wayanggame_form.html', game=game, files=files)
 
@@ -1007,65 +974,65 @@ def admin_wayanggame_delete(id):
 # FRONTEND USER ROUTES (MISSING)
 # =========================
 
-@web_routes.route('/smart_wayang')
-def smart_wayang():
-    return render_template('smart_wayang.html')
+# @web_routes.route('/smart_wayang')
+# def smart_wayang():
+#     return render_template('smart_wayang.html')
 
-@web_routes.route('/pengenalan_wayang')
-def pengenalan_wayang():
-    return render_template('pengenalan_wayang.html')
+# @web_routes.route('/pengenalan_wayang')
+# def pengenalan_wayang():
+#     return render_template('pengenalan_wayang.html')
 
-@web_routes.route('/quiz')
-def quiz():
-    return render_template('quiz.html')
+# @web_routes.route('/quiz')
+# def quiz():
+#     return render_template('quiz.html')
 
-@web_routes.route('/mencari_dalang')
-def mencari_dalang():
-    return render_template('mencari_dalang.html')
+# @web_routes.route('/mencari_dalang')
+# def mencari_dalang():
+#     return render_template('mencari_dalang.html')
 
-@web_routes.route('/quiz_play')
-def quiz_play():
-    return render_template('quiz_play.html')
+# @web_routes.route('/quiz_play')
+# def quiz_play():
+#     return render_template('quiz_play.html')
 
-@web_routes.route('/artikel')
-def artikel():
-    artikels = Article.query.order_by(Article.created_at.desc()).all()
-    return render_template('artikel.html', artikels=artikels)
+# @web_routes.route('/artikel')
+# def artikel():
+#     artikels = Article.query.order_by(Article.created_at.desc()).all()
+#     return render_template('artikel.html', artikels=artikels)
 
-@web_routes.route('/pertunjukan_wayang')
-def pertunjukan_wayang():
-    videos = Video.query.all()
-    return render_template('pertunjukan_wayang.html', videos=videos)
+# @web_routes.route('/pertunjukan_wayang')
+# def pertunjukan_wayang():
+#     videos = Video.query.all()
+#     return render_template('pertunjukan_wayang.html', videos=videos)
 
-@web_routes.route('/leaderboard_wayang')
-def leaderboard_wayang():
-    return render_template('leaderboard_wayang.html')
+# @web_routes.route('/leaderboard_wayang')
+# def leaderboard_wayang():
+#     return render_template('leaderboard_wayang.html')
 
-@web_routes.route('/simulasi_dalang')
-def simulasi_dalang():
-    wayangs = WayangGame.query.all()
-    return render_template('simulasi_dalang.html', wayangs=wayangs)
+# @web_routes.route('/simulasi_dalang')
+# def simulasi_dalang():
+#     wayangs = WayangGame.query.all()
+#     return render_template('simulasi_dalang.html', wayangs=wayangs)
 
-@web_routes.route('/uploaded_file/<path:filename>')
-def uploaded_file(filename):
-    return send_from_directory('static/uploads', filename)
+# @web_routes.route('/uploaded_file/<path:filename>')
+# def uploaded_file(filename):
+#     return send_from_directory('static/uploads', filename)
 
-@web_routes.route('/search_video', methods=['GET'])
-def search_video():
-    query = request.args.get('q', '')
-    if query:
-        videos = Video.query.filter(Video.judul.contains(query)).all()
-    else:
-        videos = Video.query.all()
-    return render_template('search_video.html', videos=videos, query=query)
+# @web_routes.route('/search_video', methods=['GET'])
+# def search_video():
+#     query = request.args.get('q', '')
+#     if query:
+#         videos = Video.query.filter(Video.judul.contains(query)).all()
+#     else:
+#         videos = Video.query.all()
+#     return render_template('search_video.html', videos=videos, query=query)
 
-@web_routes.route('/video_detail/<int:id>')
-def video_detail(id):
-    video = Video.query.get_or_404(id)
-    related_videos = Video.query.filter(Video.id != id).limit(5).all()
-    return render_template('video_detail.html', video=video, related_videos=related_videos)
+# @web_routes.route('/video_detail/<int:id>')
+# def video_detail(id):
+#     video = Video.query.get_or_404(id)
+#     related_videos = Video.query.filter(Video.id != id).limit(5).all()
+#     return render_template('video_detail.html', video=video, related_videos=related_videos)
 
-@web_routes.route('/artikel_detail/<int:id>')
-def artikel_detail(id):
-    artikel = Article.query.get_or_404(id)
-    return render_template('artikel_detail.html', artikel=artikel)
+# @web_routes.route('/artikel_detail/<int:id>')
+# def artikel_detail(id):
+#     artikel = Article.query.get_or_404(id)
+#     return render_template('artikel_detail.html', artikel=artikel)
