@@ -1,3 +1,4 @@
+from fileinput import filename
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, send_from_directory, current_app
 from werkzeug.utils import secure_filename
 from functools import wraps
@@ -124,8 +125,13 @@ def quiz_play():
 
 @web_routes.route('/mencari-dalang')
 def mencari_dalang():
-    dalangs = Dalang.query.all()   # 🔥 INI KUNCI UTAMA
+    dalangs = Dalang.query.all()   
     return render_template('mencari_dalang.html', dalangs=dalangs)
+
+@web_routes.route('/dalang/<int:dalang_id>')
+def dalang_detail(dalang_id):
+    dalang = Dalang.query.get_or_404(dalang_id)
+    return render_template('dalang_detail.html', dalang=dalang)
 
 @web_routes.route("/pertunjukan_wayang/video/<int:id>")
 def video_detail(id):
@@ -215,6 +221,8 @@ def logout_admin():
 # -------------------------
 # DALANG CRUD
 # -------------------------
+
+
 @web_routes.route('/admin/dalang/list')
 @admin_login_required
 def dalang_list():
@@ -235,7 +243,7 @@ def dalang_add():
             file = request.files['foto']
             if file.filename:
                 filename = secure_filename(file.filename)
-                file.save(os.path.join('static/uploads', filename))
+                file.save(os.path.join('static/uploads/', filename))
                 foto = filename
 
         new_dalang = Dalang(nama=nama, alamat=alamat, latitude=latitude, longitude=longitude, foto=foto)
@@ -581,6 +589,10 @@ def quiz_delete(id):
 @web_routes.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory("static/uploads", filename)
+
+@web_routes.route('/uploads/dalang/<filename>')
+def uploaded_dalang_file(filenamed):
+    return send_from_directory('static/uploads/dalang', filenamed)
 
 # ----------------------------------------
 # ARTIKEL MANAGEMENT

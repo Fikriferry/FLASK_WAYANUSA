@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ dalang.nama }} - WAYANUSA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dalang.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+</head>
+
+<body>
+
+    {% include 'layouts/navbar.html' %}
+
+    <section class="container detail" style="padding-top: 100px;">
+
+        <div class="profile-card">
+
+            <!-- Foto Dalang -->
+            {% if dalang.foto %}
+            <div class="profile-image">
+                <img src="{{ url_for('web.uploaded_file', filename=dalang.foto) }}" alt="{{ dalang.nama }}">
+            </div>
+            {% endif %}
+
+            <!-- Konten Profil -->
+            <div class="profile-content">
+                <span class="profile-label">Profil Dalang</span>
+
+                <h2 class="profile-name">{{ dalang.nama }}</h2>
+                <p class="profile-role">Dalang Wayang Nusantara</p>
+
+                <p class="profile-desc">
+                    {{ dalang.alamat }}
+                </p>
+
+                {% if dalang.latitude and dalang.longitude %}
+                <div class="profile-location">
+                    <strong>Koordinat Lokasi</strong>
+                    <p>{{ dalang.latitude }}, {{ dalang.longitude }}</p>
+
+                    <a href="https://www.google.com/maps?q={{ dalang.latitude }},{{ dalang.longitude }}" target="_blank"
+                        class="btn-primary">
+                        📍 Buka di Google Maps
+                    </a>
+                </div>
+                {% else %}
+                <p class="profile-desc"><em>Lokasi belum tersedia</em></p>
+                {% endif %}
+
+                <div class="profile-cta">
+                    <a href="{{ url_for('web.mencari_dalang') }}" class="btn-secondary">
+                        ← Kembali ke Daftar Dalang
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+</body>
+
+</html>

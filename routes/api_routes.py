@@ -15,12 +15,7 @@ from cepot_controller import cepot_system
 from dotenv import load_dotenv
 from functools import wraps
 from sqlalchemy import func
-# from services.rag_service import rag_service
-try:
-    from services.rag_service import rag_service
-except Exception as e:
-    rag_service = None
-    print("⚠️ RAG Service dimatikan sementara:", e)
+from services.rag_service import rag_service
 import re # Import Regex untuk parsing link Youtube
 from werkzeug.utils import secure_filename
 import uuid

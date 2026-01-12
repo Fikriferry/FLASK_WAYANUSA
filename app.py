@@ -75,6 +75,5 @@ if __name__ == "__main__":
     # Inisialisasi AI
     init_ai_model(app) 
     
-    # TAMBAHKAN use_reloader=False
-    print("🚀 Menjalankan Server (Reloader Dimatikan)...")
-    app.run(debug=True, use_reloader=False, host='0.0.0.0', port=8000)
+    print("🚀 Menjalankan Server...")
+    app.run(debug=True, host='0.0.0.0', port=8000)
