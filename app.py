@@ -54,7 +54,7 @@ with app.app_context():
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Init AI Model
-init_ai_model(app)
+# init_ai_model(app)
 
 # ================================ #
 #       REGISTER BLUEPRINTS        #
@@ -76,4 +76,4 @@ if __name__ == "__main__":
     init_ai_model(app) 
     
     print("🚀 Menjalankan Server...")
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    app.run(debug=True, use_reloader=False, host='0.0.0.0', port=8000)
