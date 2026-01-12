@@ -3,15 +3,16 @@ from dotenv import load_dotenv
 
 # --- PERBAIKAN IMPORT ---
 # Gunakan import standar ini (setelah update library, ini yang paling stabil)
-# from langchain_classic.chains import RetrievalQA 
-try:
-    from services.rag_service import rag_service
-except Exception as e:
-    rag_service = None
-    print("⚠️ RAG Service dimatikan sementara:", e)
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_classic.chains import RetrievalQA 
+# try:
+#     from services.rag_service import rag_service
+# except Exception as e:
+#     rag_service = None
+#     print("⚠️ RAG Service dimatikan sementara:", e)
+# from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Import untuk Model Lokal & Google
+# from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.vectorstores import FAISS

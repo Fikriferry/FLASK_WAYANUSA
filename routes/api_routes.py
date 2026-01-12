@@ -7,6 +7,7 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 from ai_manager import get_model
+from langchain_classic.chains import RetrievalQA 
 import numpy as np
 import io
 from PIL import Image
