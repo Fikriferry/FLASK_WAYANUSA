@@ -1,0 +1,40 @@
+{% extends "admin/layout_admin.html" %}
+{% block title %}
+{% if game %}Edit Wayang Game{% else %}Tambah Wayang Game{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">{% if game %}Edit{% else %}Tambah{% endif %} Wayang Game</h3>
+        <a href="{{ url_for('web.admin_wayanggame_list') }}" class="btn btn-secondary float-right">Kembali ke List</a>
+    </div>
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label>Nama Wayang</label>
+                <input type="text" name="nama" class="form-control" 
+                       value="{{ game.nama if game else '' }}" required>
+            </div>
+
+            {% set parts = ['thumbnail','badan','tangan_kanan_atas','tangan_kanan_bawah','tangan_kiri_atas','tangan_kiri_bawah'] %}
+            {% for part in parts %}
+            <div class="form-group">
+                <label>{{ part.replace('_',' ').title() }}</label><br>
+
+                {% if game and files[part] %}
+                    <img src="{{ url_for('static', filename=files[part]) }}" width="120" class="mb-2"><br>
+                {% endif %}
+
+                <input type="file" name="{{ part }}" class="form-control" {% if not game %}required{% endif %}>
+            </div>
+            {% endfor %}
+
+            <button class="btn {% if game %}btn-warning{% else %}btn-primary{% endif %}">
+                {% if game %}Update{% else %}Simpan{% endif %}
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

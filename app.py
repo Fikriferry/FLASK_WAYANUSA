@@ -14,8 +14,8 @@ from routes.quiz_routes import quiz_routes  # <<--- Tambahkan ini
 from routes.leaderboard_wayang_routes import leaderboard_wayang_bp  # <<--- Tambahkan ini
 
 
-os.environ["TF_USE_LEGACY_KERAS"] = "1"
-os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+# os.environ["TF_USE_LEGACY_KERAS"] = "1"
+# os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 # ================================ #
 #          LOAD ENV FILE           #
 # ================================ #
@@ -54,7 +54,7 @@ with app.app_context():
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Init AI Model
-init_ai_model(app)
+# init_ai_model(app)
 
 # ================================ #
 #       REGISTER BLUEPRINTS        #
@@ -75,6 +75,5 @@ if __name__ == "__main__":
     # Inisialisasi AI
     init_ai_model(app) 
     
-    # TAMBAHKAN use_reloader=False
-    print("🚀 Menjalankan Server (Reloader Dimatikan)...")
+    print("🚀 Menjalankan Server...")
     app.run(debug=True, use_reloader=False, host='0.0.0.0', port=8000)

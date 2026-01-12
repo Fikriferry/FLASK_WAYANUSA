@@ -1,3 +1,4 @@
+from fileinput import filename
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, send_from_directory, current_app
 from werkzeug.utils import secure_filename
 from functools import wraps
@@ -23,6 +24,7 @@ def admin_login_required(f):
         return f(*args, **kwargs)
     return wrapper
 
+
 def user_login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -32,22 +34,62 @@ def user_login_required(f):
         return f(*args, **kwargs)
     return wrapper
 
-# -------------------------
+# =========================
+# HELPER FUNCTIONS
+# =========================
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def allowed_thumbnail(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'jpeg', 'png'}
+
+
+def save_thumbnail(file):
+    if file and allowed_thumbnail(file.filename):
+        from datetime import datetime
+        ext = file.filename.rsplit('.', 1)[1].lower()
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"artikel_{timestamp}.{ext}"
+        filepath = os.path.join('static/uploads/thumbnails', filename)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        file.seek(0, os.SEEK_END)
+        size = file.tell()
+        file.seek(0)
+        if size > 2 * 1024 * 1024:
+            return None, "Ukuran file maksimal 2MB!"
+        file.save(filepath)
+        return filename, None
+    return None, "Format file tidak didukung! Hanya JPG, JPEG, PNG."
+
+UPLOAD_FOLDER_WAYANGGAME = os.path.join("static", "uploads", "wayanggame")
+os.makedirs(UPLOAD_FOLDER_WAYANGGAME, exist_ok=True)
+
+
+def save_wayang_file(file):
+    try:
+        filename = secure_filename(file.filename)
+        save_path = os.path.join(UPLOAD_FOLDER_WAYANGGAME, filename)
+        file.save(save_path)
+        return filename, None
+    except Exception as e:
+        return None, str(e)
+
+# =========================
 # FRONTEND USER ROUTES
-# -------------------------
+# =========================
 @web_routes.route('/')
 def home():
     return render_template('index.html')
 
-@web_routes.route('/login', methods=['GET', 'POST'])
+# User login/register/logout
+@web_routes.route('/login', methods=['GET','POST'])
 def login_user():
     if 'user_logged_in' in session:
         return redirect(url_for('web.home'))
-
-    if request.method == 'POST':
+    if request.method=='POST':
         email = request.form.get('email')
         password = request.form.get('password')
-
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
             session['user_logged_in'] = True
@@ -57,33 +99,27 @@ def login_user():
             return redirect(url_for('web.home'))
         flash('Email atau password salah!', 'error')
         return redirect(url_for('web.login_user'))
-
     return render_template('login.html')
 
-@web_routes.route('/register', methods=['GET', 'POST'])
+@web_routes.route('/register', methods=['GET','POST'])
 def register_user():
-    if request.method == 'POST':
+    if request.method=='POST':
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
         confirm = request.form.get('confirm-password')
-
-        if password != confirm:
+        if password!=confirm:
             flash('Password dan konfirmasi tidak cocok!', 'error')
             return redirect(url_for('web.register_user'))
-
         if User.query.filter_by(email=email).first():
             flash('Email sudah terdaftar!', 'error')
             return redirect(url_for('web.register_user'))
-
-        user = User(name=name, email=email)
+        user = User(name=name,email=email)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
-
         flash('Registrasi berhasil!', 'success')
         return redirect(url_for('web.login_user'))
-
     return render_template('register_user.html')
 
 @web_routes.route('/logout')
@@ -124,8 +160,13 @@ def quiz_play():
 
 @web_routes.route('/mencari-dalang')
 def mencari_dalang():
-    dalangs = Dalang.query.all()   # 🔥 INI KUNCI UTAMA
+    dalangs = Dalang.query.all()   
     return render_template('mencari_dalang.html', dalangs=dalangs)
+
+@web_routes.route('/dalang/<int:dalang_id>')
+def dalang_detail(dalang_id):
+    dalang = Dalang.query.get_or_404(dalang_id)
+    return render_template('dalang_detail.html', dalang=dalang)
 
 @web_routes.route("/pertunjukan_wayang/video/<int:id>")
 def video_detail(id):
@@ -176,25 +217,29 @@ def smart_wayang():
 
 # -------------------------
 # ADMIN ROUTES
-# -------------------------
-@web_routes.route('/admin/login', methods=['GET', 'POST'])
+# =========================
+@web_routes.route('/admin/login', methods=['GET','POST'])
 def login_admin():
-    if request.method == 'POST':
+    if request.method=='POST':
         username = request.form.get('username')
         password = request.form.get('password')
-
         admin = Admin.query.filter_by(username=username).first()
         if not admin or not admin.check_password(password):
             flash('Username atau password salah!', 'error')
             return redirect(url_for('web.login_admin'))
-
-        session['admin_logged_in'] = True
-        session['admin_id'] = admin.id
-        session['admin_username'] = admin.username
+        session['admin_logged_in']=True
+        session['admin_id']=admin.id
+        session['admin_username']=admin.username
         flash('Login admin berhasil!', 'success')
         return redirect(url_for('web.admin_dashboard'))
-
     return render_template('admin/login.html')
+
+@web_routes.route('/admin/logout')
+@admin_login_required
+def logout_admin():
+    session.clear()
+    flash('Logout berhasil!', 'success')
+    return redirect(url_for('web.login_admin'))
 
 @web_routes.route('/admin/dashboard')
 @admin_login_required
@@ -205,37 +250,31 @@ def admin_dashboard():
     dalangs = Dalang.query.all()
     return render_template('admin/index.html', dalang_count=dalang_count, artikel_count=artikel_count, ulasan_count=ulasan_count, dalangs=dalangs)
 
-@web_routes.route('/admin/logout')
-@admin_login_required
-def logout_admin():
-    session.clear()
-    flash('Logout berhasil!', 'success')
-    return redirect(url_for('web.login_admin'))
-
-# -------------------------
+# =========================
 # DALANG CRUD
 # -------------------------
+
+
 @web_routes.route('/admin/dalang/list')
 @admin_login_required
 def dalang_list():
     dalangs = Dalang.query.all()
     return render_template('admin/dalang_list.html', dalangs=dalangs)
 
-@web_routes.route('/admin/dalang/add', methods=['GET', 'POST'])
+@web_routes.route('/admin/dalang/add', methods=['GET','POST'])
 @admin_login_required
 def dalang_add():
-    if request.method == 'POST':
-        nama = request.form.get('nama')
-        alamat = request.form.get('alamat')
-        latitude = request.form.get('latitude')
-        longitude = request.form.get('longitude')
-
-        foto = None
+    if request.method=='POST':
+        nama=request.form.get('nama')
+        alamat=request.form.get('alamat')
+        latitude=request.form.get('latitude')
+        longitude=request.form.get('longitude')
+        foto=None
         if 'foto' in request.files:
-            file = request.files['foto']
+            file=request.files['foto']
             if file.filename:
                 filename = secure_filename(file.filename)
-                file.save(os.path.join('static/uploads', filename))
+                file.save(os.path.join('static/uploads/', filename))
                 foto = filename
 
         new_dalang = Dalang(nama=nama, alamat=alamat, latitude=latitude, longitude=longitude, foto=foto)
@@ -243,44 +282,39 @@ def dalang_add():
         db.session.commit()
         flash('Dalang berhasil ditambahkan!', 'success')
         return redirect(url_for('web.dalang_list'))
-
     return render_template('admin/dalang_form.html', dalang=None)
 
-@web_routes.route('/admin/dalang/edit/<int:id>', methods=['GET', 'POST'])
+@web_routes.route('/admin/dalang/edit/<int:id>', methods=['GET','POST'])
 @admin_login_required
 def dalang_edit(id):
-    dalang = Dalang.query.get_or_404(id)
-    if request.method == 'POST':
-        dalang.nama = request.form.get('nama')
-        dalang.alamat = request.form.get('alamat')
-        dalang.latitude = request.form.get('latitude')
-        dalang.longitude = request.form.get('longitude')
-
+    dalang=Dalang.query.get_or_404(id)
+    if request.method=='POST':
+        dalang.nama=request.form.get('nama')
+        dalang.alamat=request.form.get('alamat')
+        dalang.latitude=request.form.get('latitude')
+        dalang.longitude=request.form.get('longitude')
         if 'foto' in request.files:
-            file = request.files['foto']
+            file=request.files['foto']
             if file.filename:
-                filename = secure_filename(file.filename)
+                filename=secure_filename(file.filename)
                 file.save(os.path.join('static/uploads', filename))
-                dalang.foto = filename
-
+                dalang.foto=filename
         db.session.commit()
         flash('Dalang berhasil diperbarui!', 'success')
         return redirect(url_for('web.dalang_list'))
-
     return render_template('admin/dalang_form.html', dalang=dalang)
 
 @web_routes.route('/admin/dalang/delete/<int:id>')
 @admin_login_required
 def dalang_delete(id):
-    dalang = Dalang.query.get_or_404(id)
+    dalang=Dalang.query.get_or_404(id)
     db.session.delete(dalang)
     db.session.commit()
     flash('Dalang berhasil dihapus!', 'success')
     return redirect(url_for('web.dalang_list'))
 
-# -------------------------
+# =========================
 # VIDEO CRUD
-# -------------------------
 @web_routes.route('/admin/video')
 @admin_login_required
 def video_list():
@@ -337,9 +371,10 @@ def video_delete(id):
     flash("Video berhasil dihapus!", "success")
     return redirect(url_for('web.video_list'))
 
-# -------------------------
-# MODEL MANAGEMENT
-# -------------------------
+
+# =========================
+# AI MODEL MANAGEMENT
+# =========================
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -582,6 +617,10 @@ def quiz_delete(id):
 def uploaded_file(filename):
     return send_from_directory("static/uploads", filename)
 
+@web_routes.route('/uploads/dalang/<filename>')
+def uploaded_dalang_file(filenamed):
+    return send_from_directory('static/uploads/dalang', filenamed)
+
 # ----------------------------------------
 # ARTIKEL MANAGEMENT
 # ----------------------------------------
@@ -771,95 +810,167 @@ def save_wayang_file(file):
         return None, str(e)
 
 # =========================
-# LIST WAYANG GAME
+# WAYANG & WAYANG GAME CRUD
+## =========================
+
+# Folder upload WayangGame (sudah ada tapi kita pastikan)
+UPLOAD_FOLDER_WAYANGGAME = os.path.join("static", "uploads", "wayanggame")
+os.makedirs(UPLOAD_FOLDER_WAYANGGAME, exist_ok=True)
+
 # =========================
+# HELPER WAYANGGAME FILE
+# =========================
+WAYANGGAME_ALLOWED = {
+    "thumbnail": {"jpg", "jpeg", "png"},
+    "badan": {"jpg", "jpeg", "png"},
+    "tangan_kanan_atas": {"png"},
+    "tangan_kanan_bawah": {"png"},
+    "tangan_kiri_atas": {"png"},
+    "tangan_kiri_bawah": {"png"},
+}
+
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+def save_wayanggame_file(file, part="file"):
+    """
+    Simpan file WayangGame dengan validasi format & size.
+    part = 'thumbnail', 'badan', 'tangan_kanan_atas', dll
+    """
+    try:
+        if part not in WAYANGGAME_ALLOWED:
+            return None, f"Part '{part}' tidak dikenali!"
+
+        # Cek ekstensi
+        ext = file.filename.rsplit('.', 1)[-1].lower()
+        if ext not in WAYANGGAME_ALLOWED[part]:
+            return None, f"Format file {ext} tidak didukung untuk {part}. Hanya {', '.join(WAYANGGAME_ALLOWED[part])}."
+
+        # Cek ukuran file
+        file.seek(0, os.SEEK_END)
+        size = file.tell()
+        file.seek(0)
+        if size > MAX_FILE_SIZE:
+            return None, f"Ukuran file maksimal {MAX_FILE_SIZE // (1024*1024)}MB!"
+
+        # Simpan file dengan timestamp
+        from datetime import datetime
+        filename = secure_filename(file.filename)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"{part}_{timestamp}_{filename}"
+        save_path = os.path.join(UPLOAD_FOLDER_WAYANGGAME, filename)
+        file.save(save_path)
+
+        return f"uploads/wayanggame/{filename}", None
+
+    except Exception as e:
+        return None, str(e)
+
+
+# --- LIST WAYANGGAME ---
 @web_routes.route('/admin/wayanggame')
 @admin_login_required
 def admin_wayanggame_list():
-    wayangs = WayangGame.query.order_by(WayangGame.id.asc()).all()
-    return render_template("admin/wayanggame_list.html", wayangs=wayangs)
+    games = WayangGame.query.order_by(WayangGame.nama).all()
+    return render_template('admin/wayanggame_list.html', games=games)
 
-# =========================
-# ADD WAYANG GAME
-# =========================
+# --- ADD WAYANGGAME ---
 @web_routes.route('/admin/wayanggame/add', methods=['GET', 'POST'])
 @admin_login_required
 def admin_wayanggame_add():
-    if request.method == "POST":
-        nama = request.form.get("nama")
-        file = request.files.get("file")
+    if request.method == 'POST':
+        nama = request.form.get('nama')
 
-        if not nama or not file or not file.filename:
-            flash("Nama dan file gambar wajib diisi!", "error")
-            return redirect(url_for("web.admin_wayanggame_add"))
+        # Cek duplikat nama
+        if WayangGame.query.filter_by(nama=nama).first():
+            flash('Nama WayangGame sudah ada!', 'danger')
+            return redirect(url_for('web.admin_wayanggame_add'))
 
-        filename, error = save_wayang_file(file)
-        if error:
-            flash(f"Error upload file: {error}", "error")
-            return redirect(url_for("web.admin_wayanggame_add"))
+        # Upload semua file
+        files_data = {}
+        for part in ['thumbnail', 'badan', 'tangan_kanan_atas', 'tangan_kanan_bawah', 'tangan_kiri_atas', 'tangan_kiri_bawah']:
+            file = request.files.get(part)
+            if file and file.filename:
+                path, error = save_wayanggame_file(file, part=part)
+                if error:
+                    flash(f'Error upload {part}: {error}', 'error')
+                    return redirect(url_for('web.admin_wayanggame_add'))
+                files_data[part] = path
+            else:
+                files_data[part] = None
 
-        new_wayang = WayangGame(
+        new_game = WayangGame(
             nama=nama,
-            file_path=f"uploads/wayanggame/{filename}"
+            thumbnail=files_data['thumbnail'],
+            badan=files_data['badan'],
+            tangan_kanan_atas=files_data['tangan_kanan_atas'],
+            tangan_kanan_bawah=files_data['tangan_kanan_bawah'],
+            tangan_kiri_atas=files_data['tangan_kiri_atas'],
+            tangan_kiri_bawah=files_data['tangan_kiri_bawah']
         )
-        db.session.add(new_wayang)
-        db.session.commit()
-        flash("Wayang berhasil ditambahkan!", "success")
-        return redirect(url_for("web.admin_wayanggame_list"))
+        try:
+            db.session.add(new_game)
+            db.session.commit()
+            flash('WayangGame berhasil ditambahkan!', 'success')
+            return redirect(url_for('web.admin_wayanggame_list'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error saving to database: {str(e)}', 'error')
+            return redirect(url_for('web.admin_wayanggame_add'))
 
-    return render_template("admin/wayanggame_add.html", wayang=None)
+    return render_template('admin/wayanggame_form.html', game=None, files={})
 
-# =========================
-# EDIT WAYANG GAME
-# =========================
+# --- EDIT WAYANGGAME ---
 @web_routes.route('/admin/wayanggame/edit/<int:id>', methods=['GET', 'POST'])
 @admin_login_required
 def admin_wayanggame_edit(id):
-    item = WayangGame.query.get_or_404(id)
+    game = WayangGame.query.get_or_404(id)
 
-    if request.method == "POST":
-        nama = request.form.get("nama")
-        if not nama:
-            flash("Nama wayang wajib diisi!", "error")
-            return redirect(url_for("web.admin_wayanggame_edit", id=id))
-        item.nama = nama
+    if request.method == 'POST':
+        game.nama = request.form.get('nama')
 
-        file = request.files.get("file")
-        if file and file.filename:
-            # Hapus file lama jika ada
-            old_path = os.path.join("static", item.file_path)
-            if os.path.exists(old_path):
-                os.remove(old_path)
-
-            filename, error = save_wayang_file(file)
-            if error:
-                flash(f"Error upload file: {error}", "error")
-                return redirect(url_for("web.admin_wayanggame_edit", id=id))
-            item.file_path = f"uploads/wayanggame/{filename}"
+        # Upload file baru jika ada
+        for part in ['thumbnail', 'badan', 'tangan_kanan_atas', 'tangan_kanan_bawah', 'tangan_kiri_atas', 'tangan_kiri_bawah']:
+            file = request.files.get(part)
+            if file and file.filename:
+                # Hapus file lama jika ada
+                old_path = getattr(game, part)
+                if old_path:
+                    old_full = os.path.join("static", old_path)
+                    if os.path.exists(old_full):
+                        os.remove(old_full)
+                # Simpan file baru
+                path, error = save_wayanggame_file(file, part=part)
+                if error:
+                    flash(f'Error upload {part}: {error}', 'error')
+                    return redirect(url_for('web.admin_wayanggame_edit', id=id))
+                setattr(game, part, path)
 
         db.session.commit()
-        flash("Wayang berhasil diperbarui!", "success")
-        return redirect(url_for("web.admin_wayanggame_list"))
+        flash('WayangGame berhasil diperbarui!', 'success')
+        return redirect(url_for('web.admin_wayanggame_list'))
 
     return render_template("admin/wayanggame_edit.html", item=item)
 
-# =========================
-# DELETE WAYANG GAME
-# =========================
+    return render_template('admin/wayanggame_form.html', game=game, files=files)
+
+# --- DELETE WAYANGGAME ---
 @web_routes.route('/admin/wayanggame/delete/<int:id>')
 @admin_login_required
 def admin_wayanggame_delete(id):
-    item = WayangGame.query.get_or_404(id)
+    game = WayangGame.query.get_or_404(id)
 
-    # Hapus file fisik jika ada
-    file_path = os.path.join("static", item.file_path)
-    if os.path.exists(file_path):
-        os.remove(file_path)
+    # Hapus semua file fisik
+    for part in ['thumbnail', 'badan', 'tangan_kanan_atas', 'tangan_kanan_bawah', 'tangan_kiri_atas', 'tangan_kiri_bawah']:
+        path = getattr(game, part)
+        if path:
+            full_path = os.path.join("static", path)
+            if os.path.exists(full_path):
+                os.remove(full_path)
 
-    db.session.delete(item)
+    db.session.delete(game)
     db.session.commit()
-    flash("Wayang berhasil dihapus!", "success")
-    return redirect(url_for("web.admin_wayanggame_list"))
+    flash('WayangGame berhasil dihapus!', 'success')
+    return redirect(url_for('web.admin_wayanggame_list'))
 
 # ================================
 # ULASAN USER
@@ -967,3 +1078,65 @@ def admin_user_list():
         admins=admins
     )
 
+# @web_routes.route('/smart_wayang')
+# def smart_wayang():
+#     return render_template('smart_wayang.html')
+
+# @web_routes.route('/pengenalan_wayang')
+# def pengenalan_wayang():
+#     return render_template('pengenalan_wayang.html')
+
+# @web_routes.route('/quiz')
+# def quiz():
+#     return render_template('quiz.html')
+
+# @web_routes.route('/mencari_dalang')
+# def mencari_dalang():
+#     return render_template('mencari_dalang.html')
+
+# @web_routes.route('/quiz_play')
+# def quiz_play():
+#     return render_template('quiz_play.html')
+
+# @web_routes.route('/artikel')
+# def artikel():
+#     artikels = Article.query.order_by(Article.created_at.desc()).all()
+#     return render_template('artikel.html', artikels=artikels)
+
+# @web_routes.route('/pertunjukan_wayang')
+# def pertunjukan_wayang():
+#     videos = Video.query.all()
+#     return render_template('pertunjukan_wayang.html', videos=videos)
+
+# @web_routes.route('/leaderboard_wayang')
+# def leaderboard_wayang():
+#     return render_template('leaderboard_wayang.html')
+
+# @web_routes.route('/simulasi_dalang')
+# def simulasi_dalang():
+#     wayangs = WayangGame.query.all()
+#     return render_template('simulasi_dalang.html', wayangs=wayangs)
+
+# @web_routes.route('/uploaded_file/<path:filename>')
+# def uploaded_file(filename):
+#     return send_from_directory('static/uploads', filename)
+
+# @web_routes.route('/search_video', methods=['GET'])
+# def search_video():
+#     query = request.args.get('q', '')
+#     if query:
+#         videos = Video.query.filter(Video.judul.contains(query)).all()
+#     else:
+#         videos = Video.query.all()
+#     return render_template('search_video.html', videos=videos, query=query)
+
+# @web_routes.route('/video_detail/<int:id>')
+# def video_detail(id):
+#     video = Video.query.get_or_404(id)
+#     related_videos = Video.query.filter(Video.id != id).limit(5).all()
+#     return render_template('video_detail.html', video=video, related_videos=related_videos)
+
+# @web_routes.route('/artikel_detail/<int:id>')
+# def artikel_detail(id):
+#     artikel = Article.query.get_or_404(id)
+#     return render_template('artikel_detail.html', artikel=artikel)

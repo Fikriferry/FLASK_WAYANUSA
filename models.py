@@ -26,7 +26,6 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relasi User -> QuizResult
     quiz_results = db.relationship("QuizResult", backref="user", lazy=True)
@@ -45,7 +44,6 @@ class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     @property
     def password(self):
@@ -181,7 +179,12 @@ class Wayang(db.Model):
 class WayangGame(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(100), nullable=False)
-    file_path = db.Column(db.String(200), nullable=False)
+    thumbnail = db.Column(db.String(200), nullable=True)
+    badan = db.Column(db.String(200), nullable=True)
+    tangan_kanan_atas = db.Column(db.String(200), nullable=True)
+    tangan_kanan_bawah = db.Column(db.String(200), nullable=True)
+    tangan_kiri_atas = db.Column(db.String(200), nullable=True)
+    tangan_kiri_bawah = db.Column(db.String(200), nullable=True)
 
 # ===================================================
 # =============== MODEL ULASAN APLIKASI ==============
