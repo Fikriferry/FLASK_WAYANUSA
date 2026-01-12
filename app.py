@@ -14,8 +14,8 @@ from routes.quiz_routes import quiz_routes  # <<--- Tambahkan ini
 from routes.leaderboard_wayang_routes import leaderboard_wayang_bp  # <<--- Tambahkan ini
 
 
-os.environ["TF_USE_LEGACY_KERAS"] = "1"
-os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+# os.environ["TF_USE_LEGACY_KERAS"] = "1"
+# os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 # ================================ #
 #          LOAD ENV FILE           #
 # ================================ #

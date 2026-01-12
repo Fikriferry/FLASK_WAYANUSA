@@ -1,7 +1,9 @@
+# ai_manager.py
 import os
 import tensorflow as tf
-# Pastikan pakai tf_keras agar kompatibel dengan model lama (h5)
-from tf_keras.models import load_model 
+from tensorflow.keras.models import load_model # <--- GUNAKAN INI (Standard)
+# JANGAN PAKAI: from tf_keras.models import load_model (Ini untuk model jadul .h5)
+
 from models import AIModel
 
 # Variabel global
@@ -11,19 +13,18 @@ def init_ai_model(app):
     """Dipanggil saat aplikasi start (di app.py)"""
     global _current_model
     
-    # Bungkus dengan try-except agar jika error tidak bikin server crash
     try:
         with app.app_context():
-            # Cari model yang aktif di database
             active_data = AIModel.query.filter_by(is_active=True).first()
             
             if active_data and os.path.exists(active_data.file_path):
                 print(f"✅ [AI MANAGER] Memuat model: {active_data.version_name}")
                 
-                # GUNAKAN load_model DARI tf_keras LANGSUNG
+                # Load model .keras
+                # compile=False membuat load lebih cepat (karena kita cuma butuh predict)
                 _current_model = load_model(active_data.file_path, compile=False)
                 
-                print("✅ [AI MANAGER] Model berhasil dimuat ke memori.")
+                print("✅ [AI MANAGER] Model .keras berhasil dimuat.")
             else:
                 print("⚠️ [AI MANAGER] Tidak ada model aktif atau file hilang.")
                 
@@ -41,7 +42,6 @@ def reload_model(model_id):
             # Load model baru
             new_model = load_model(model_entry.file_path, compile=False)
             
-            # Replace variabel global
             _current_model = new_model
             return True
             
@@ -51,5 +51,4 @@ def reload_model(model_id):
     return False
 
 def get_model():
-    """Getter untuk route prediksi"""
     return _current_model
