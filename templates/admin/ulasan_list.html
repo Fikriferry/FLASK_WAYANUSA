@@ -1,0 +1,74 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block title %}Ulasan Pengguna{% endblock %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+
+        <!-- Header -->
+        <div class="row mb-3">
+            <div class="col-sm-6">
+                <h4 class="font-weight-bold">Ulasan Pengguna</h4>
+                <p class="text-muted">Daftar seluruh ulasan yang diberikan oleh pengguna</p>
+            </div>
+            <div class="col-sm-6 text-right">
+                <a href="{{ url_for('web.admin_ulasan_statistik') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-chart-pie mr-1"></i> Statistik Ulasan
+                </a>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover table-striped text-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Rating</th>
+                            <th>Kategori</th>
+                            <th>Komentar</th>
+                            <th>Tanggal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in ulasan_list %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ u.nama_user or 'Guest' }}</td>
+                            <td>{{ u.email_user or '-' }}</td>
+                            <td>
+                                {% for i in range(u.rating) %}
+                                    ⭐
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% if u.kategori == 'positif' %}
+                                    <span class="badge badge-success">Positif</span>
+                                {% elif u.kategori == 'netral' %}
+                                    <span class="badge badge-warning">Netral</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Negatif</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ u.komentar }}</td>
+                            <td>{{ u.created_at.strftime('%d %b %Y') }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                Belum ada ulasan pengguna
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

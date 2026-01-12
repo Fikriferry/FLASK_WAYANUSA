@@ -181,6 +181,15 @@
                                 <p>Kuis Wayang</p>
                             </a>
                         </li>
+                        
+                        <li class="nav-item">
+                            <a href="{{ url_for('web.admin_user_list') }}"
+                            class="nav-link {% if 'admin_user_list' in request.endpoint %}active{% endif %}">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Daftar Pengguna</p>
+                            </a>
+                        </li>
+
 
                         <li class="nav-item">
                             <a href="{{ url_for('web.admin_wayanggame_list') }}" class="nav-link {% if 'game' in request.endpoint %}active{% endif %}">
@@ -195,6 +204,16 @@
                             <a href="{{ url_for('web.admin_models') }}" class="nav-link {% if 'models' in request.endpoint %}active{% endif %}">
                                 <i class="nav-icon fas fa-brain"></i>
                                 <p>Kelola Model AI</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-header text-uppercase text-xs font-weight-bold text-muted mt-3">Fedback</li>
+                        
+                        <li class="nav-item">
+                            <a href="{{ url_for('web.admin_ulasan') }}"
+                            class="nav-link {% if 'ulasan' in request.endpoint %}active{% endif %}">
+                                <i class="nav-icon fas fa-star"></i>
+                                <p>Ulasan Pengguna</p>
                             </a>
                         </li>
 

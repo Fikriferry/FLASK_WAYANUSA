@@ -2,8 +2,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 from functools import wraps
 import os
-from models import Video, db, AIModel, Dalang, User, Admin, QuizLevel, QuizQuestion, Article, QuizResult, Wayang, WayangGame
+from models import Video, db, AIModel, Dalang, User, Admin, QuizLevel, QuizQuestion, Article, QuizResult, Wayang, WayangGame, UlasanAplikasi
 from ai_manager import reload_model
+from sqlalchemy import func
 
 web_routes = Blueprint("web", __name__)
 
@@ -200,8 +201,9 @@ def login_admin():
 def admin_dashboard():
     dalang_count = Dalang.query.count()
     artikel_count = Article.query.count()
+    ulasan_count = UlasanAplikasi.query.count()
     dalangs = Dalang.query.all()
-    return render_template('admin/index.html', dalang_count=dalang_count, artikel_count=artikel_count, dalangs=dalangs)
+    return render_template('admin/index.html', dalang_count=dalang_count, artikel_count=artikel_count, ulasan_count=ulasan_count, dalangs=dalangs)
 
 @web_routes.route('/admin/logout')
 @admin_login_required
@@ -860,4 +862,108 @@ def admin_wayanggame_delete(id):
     return redirect(url_for("web.admin_wayanggame_list"))
 
 # ================================
+# ULASAN USER
+# ================================
+
+@web_routes.route('/ulasan', methods=['GET', 'POST'])
+def ulasan():
+
+    if request.method == 'POST':
+        rating = request.form.get('rating')
+        komentar = request.form.get('komentar')
+
+        if not rating or not komentar:
+            flash('Rating dan komentar wajib diisi', 'danger')
+            return redirect(url_for('web.ulasan'))
+
+        rating = int(rating)
+
+        if rating <= 2:
+            kategori = 'negatif'
+        elif rating == 3:
+            kategori = 'netral'
+        else:
+            kategori = 'positif'
+
+        ulasan = UlasanAplikasi(
+            user_id=session.get('user_id'),
+            nama_user=session.get('user_name', 'Guest'),
+            email_user=session.get('user_email'),
+            rating=rating,
+            kategori=kategori,
+            komentar=komentar
+        )
+
+        db.session.add(ulasan)
+        db.session.commit()
+
+        flash('Terima kasih atas ulasan Anda 🙏', 'success')
+        return redirect(url_for('web.ulasan'))
+
+    ulasan_list = UlasanAplikasi.query.order_by(
+        UlasanAplikasi.created_at.desc()
+    ).all()
+
+    total_ulasan = UlasanAplikasi.query.count()
+    rata_rating = round(
+        db.session.query(func.avg(UlasanAplikasi.rating)).scalar() or 0,
+        1
+    )
+
+    return render_template(
+        'ulasan.html',
+        ulasan_list=ulasan_list,
+        total_ulasan=total_ulasan,
+        rata_rating=rata_rating
+    )
+
+# ================================
+# ULASAN ADMIN
+# ================================
+
+@web_routes.route('/admin/ulasan')
+def admin_ulasan():
+    ulasan_list = UlasanAplikasi.query.order_by(
+        UlasanAplikasi.created_at.desc()
+    ).all()
+
+    return render_template(
+        'admin/ulasan_list.html',
+        ulasan_list=ulasan_list
+    )
+
+@web_routes.route('/admin/ulasan/statistik')
+def admin_ulasan_statistik():
+
+    total = UlasanAplikasi.query.count()
+
+    positif = UlasanAplikasi.query.filter_by(kategori='positif').count()
+    netral  = UlasanAplikasi.query.filter_by(kategori='netral').count()
+    negatif = UlasanAplikasi.query.filter_by(kategori='negatif').count()
+
+    rata_rating = round(
+        db.session.query(func.avg(UlasanAplikasi.rating)).scalar() or 0,
+        1
+    )
+
+    return render_template(
+        'admin/ulasan_statistik.html',
+        total=total,
+        positif=positif,
+        netral=netral,
+        negatif=negatif,
+        rata_rating=rata_rating
+    )
+
+@web_routes.route("/admin/users")
+@admin_login_required
+def admin_user_list():
+    users = User.query.order_by(User.created_at.desc()).all()
+    admins = Admin.query.order_by(Admin.created_at.desc()).all()
+
+    return render_template(
+        "admin/user_list.html",
+        users=users,
+        admins=admins
+    )
 

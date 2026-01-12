@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 # --- PERBAIKAN IMPORT ---
 # Gunakan import standar ini (setelah update library, ini yang paling stabil)
 from langchain.chains import RetrievalQA 
+# try:
+#     from langchain.chains import RetrievalQA
+# except ImportError:
+#     RetrievalQA = None
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Import untuk Model Lokal & Google
