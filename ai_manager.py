@@ -1,6 +1,6 @@
 # ai_manager.py
 import os
-from tensorflow.keras.models import load_model
+import tensorflow as tf
 from models import AIModel
 
 # Variabel global untuk menyimpan model yang sedang jalan
@@ -15,7 +15,7 @@ def init_ai_model(app):
         
         if active_data and os.path.exists(active_data.file_path):
             print(f"[AI MANAGER] Memuat model aktif: {active_data.version_name}")
-            _current_model = load_model(active_data.file_path)
+            _current_model = tf.keras.models.load_model(active_data.file_path)
         else:
             print("[AI MANAGER] Belum ada model aktif atau file tidak ditemukan.")
 
@@ -26,8 +26,7 @@ def reload_model(model_id):
     model_entry = AIModel.query.get(model_id)
     if model_entry and os.path.exists(model_entry.file_path):
         print(f"[AI MANAGER] Mengganti model ke: {model_entry.version_name}")
-        # Load model baru ke memori menggantikan yang lama
-        _current_model = load_model(model_entry.file_path)
+        _current_model = tf.keras.models.load_model(model_entry.file_path)
         return True
     return False
 

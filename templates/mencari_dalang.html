@@ -40,6 +40,7 @@
                     <div class="dalang-grid">
 
                         {% for dalang in dalangs %}
+                    <a href="{{ url_for('web.dalang_detail', dalang_id=dalang.id) }}" class="dalang-link">
                         <div class="dalang-card">
 
                             <!-- FOTO -->
@@ -76,8 +77,9 @@
                                 </p>
                                 {% endif %}
                             </div>
-
                         </div>
+                    </a>
+
                         {% endfor %}
 
                     </div>
