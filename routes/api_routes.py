@@ -1,12 +1,13 @@
 import os
 from flask import Blueprint, jsonify, request, Flask, url_for
-from models import db, User, Dalang, Wayang, AIModel, Video, Article
+from models import db, User, Dalang, Wayang, AIModel, Video, Article, UlasanAplikasi
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
     get_jwt_identity
 )
 from ai_manager import get_model
+from datetime import datetime
 import numpy as np
 import io
 from PIL import Image
@@ -501,3 +502,67 @@ def delete_article(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# =========================
+# POST ULASAN (FLUTTER)
+# =========================
+@api.route('/ulasan', methods=['POST'])
+def post_ulasan():
+    data = request.get_json()
+
+    if not data or 'rating' not in data or 'komentar' not in data:
+        return jsonify({'message': 'Data tidak lengkap'}), 400
+
+    rating = int(data['rating'])
+
+    if rating <= 2:
+        kategori = 'negatif'
+    elif rating == 3:
+        kategori = 'netral'
+    else:
+        kategori = 'positif'
+
+    ulasan = UlasanAplikasi(
+        user_id=None,
+        nama_user=data.get('nama_user', 'Guest'),
+        email_user=None,
+        rating=rating,
+        kategori=kategori,
+        komentar=data['komentar'],
+        created_at=datetime.utcnow()
+    )
+
+    db.session.add(ulasan)
+    db.session.commit()
+
+    return jsonify({'message': 'Ulasan berhasil dikirim'}), 201
+
+
+# =========================
+# GET ULASAN (OPTIONAL)
+# =========================
+@api.route('/ulasan', methods=['GET'])
+def get_ulasan():
+    ulasan = UlasanAplikasi.query.order_by(
+        UlasanAplikasi.created_at.desc()
+    ).all()
+
+    total = len(ulasan)
+    rata = round(
+        db.session.query(func.avg(UlasanAplikasi.rating)).scalar() or 0,
+        1
+    )
+
+    return jsonify({
+        'total_ulasan': total,
+        'rata_rating': rata,
+        'data': [
+            {
+                'nama_user': u.nama_user,
+                'rating': u.rating,
+                'kategori': u.kategori,
+                'komentar': u.komentar,
+                'created_at': u.created_at.strftime('%d %b %Y')
+            } for u in ulasan
+        ]
+    })
