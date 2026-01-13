@@ -81,7 +81,12 @@ def save_wayang_file(file):
 # =========================
 @web_routes.route('/')
 def home():
-    return render_template('index.html')
+    # Ambil 4 atau 8 dalang terbaru untuk ditampilkan di Home
+    # Kita limit biar halaman tidak berat load-nya
+    dalangs = Dalang.query.order_by(Dalang.id.desc()).limit(4).all()
+    
+    # Kirim variable 'dalangs' ke template
+    return render_template('index.html', dalangs=dalangs)
 
 # User login/register/logout
 @web_routes.route('/login', methods=['GET','POST'])
