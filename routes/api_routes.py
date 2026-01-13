@@ -15,7 +15,12 @@ from cepot_controller import cepot_system
 from dotenv import load_dotenv
 from functools import wraps
 from sqlalchemy import func
-from services.rag_service import rag_service
+# from services.rag_service import rag_service
+try:
+    from services.rag_service import rag_service
+except Exception as e:
+    rag_service = None
+    print("⚠️ RAG Service dimatikan sementara:", e)
 import re # Import Regex untuk parsing link Youtube
 from werkzeug.utils import secure_filename
 import uuid
@@ -179,86 +184,57 @@ def predict_wayang():
         "deskripsi": wayang.deskripsi if wayang else "Deskripsi belum tersedia."
     })
 
-
 # ================================
-# CHATBOT CEPOT (FIXED)
+# CHATBOT CEPOT (SAFE MODE)
 # ================================
 @api.route('/chat-smart', methods=['POST'])
 def chat_smart():
+    if rag_service is None:
+        return jsonify({
+            "response": "🤖 Fitur chatbot sedang dinonaktifkan sementara."
+        }), 503
+
     data = request.get_json()
     message = data.get("message")
-    
-    # Ambil mode dari frontend (default 'rag' jika tidak ada)
-    # 'rag' = Wayanusa (Data PDF)
-    # 'gemini' = Umum (Otak Gemini Murni)
-    mode = data.get("mode", "rag") 
+    mode = data.get("mode", "rag")
 
     if not message:
         return jsonify({"response": "Waduh, kok meneng bae? (Pesan kosong)"}), 400
 
     try:
-        reply_text = ""
-
         if mode == 'gemini':
-            # ==========================================
-            # MODE 1: GEMINI (UMUM / CURHAT)
-            # ==========================================
-            # Kita gunakan LLM yang ada di rag_service tapi kita bypass database vektornya.
-            # Kita inject persona Cepot agar tetap lucu.
-            
+            from langchain.schema import SystemMessage, HumanMessage
+
             messages = [
                 SystemMessage(content=SYSTEM_PROMPT),
                 HumanMessage(content=message)
             ]
-            
-            # Tembak langsung ke Gemini
+
             ai_response = rag_service.llm.invoke(messages)
             reply_text = ai_response.content
-
         else:
-            # ==========================================
-            # MODE 2: RAG (WAYANUSA / DATA SPESIFIK)
-            # ==========================================
-            # Ini akan mencari jawaban di dalam PDF/TXT data wayang kamu.
-            # Persona "Ki Sabda" atau "Cepot" untuk mode ini sudah diatur di dalam file rag_service.py
-            
             reply_text = rag_service.get_answer(message)
 
-        # Bersihkan format bold (opsional, karena HTML frontend sudah handle)
         clean_reply = reply_text.replace("*", "")
-
         return jsonify({"response": clean_reply})
 
     except Exception as e:
         print(f"Error Chat Smart: {e}")
-        return jsonify({"response": "Waduh, Cepot lagi pusing euy (Error Server)."}), 500
+        return jsonify({"response": "Cepot lagi pusing euy 😵"}), 500
 
-# --- API 1: Build Database (Jalankan ini dulu via Postman/Browser) ---
+
 @api.route("/rag/build", methods=["GET"])
 def build_rag():
-    try:
-        rag_service.build_index()
-        return jsonify({"message": "Database Wayang berhasil dibangun!"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify({
+        "message": "Fitur RAG sedang dinonaktifkan sementara."
+    }), 503
 
-# --- API 2: Chatbot Versi 2 (RAG) ---
 @api.route("/chat-rag", methods=["POST"])
-# @jwt_required(optional=True) # Aktifkan jwt jika perlu
 def chat_rag_api():
-    data = request.get_json()
-    message = data.get("message")
+    return jsonify({
+        "response": "Fitur AI sedang nonaktif."
+    }), 503
 
-    if not message:
-        return jsonify({"response": "Waduh, kok meneng bae?"}), 400
-
-    try:
-        # Panggil fungsi RAG
-        reply = rag_service.get_answer(message)
-        return jsonify({"response": reply})
-    except Exception as e:
-        print(e)
-        return jsonify({"response": "Maaf, Ki Sabda sedang pusing (Error Server)."}), 500
 
 
 # ================================

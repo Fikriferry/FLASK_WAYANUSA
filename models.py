@@ -26,6 +26,7 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relasi User -> QuizResult
     quiz_results = db.relationship("QuizResult", backref="user", lazy=True)
@@ -44,6 +45,7 @@ class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     @property
     def password(self):
@@ -179,4 +181,36 @@ class Wayang(db.Model):
 class WayangGame(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(100), nullable=False)
-    file_path = db.Column(db.String(200), nullable=False)
+    thumbnail = db.Column(db.String(200), nullable=True)
+    badan = db.Column(db.String(200), nullable=True)
+    tangan_kanan_atas = db.Column(db.String(200), nullable=True)
+    tangan_kanan_bawah = db.Column(db.String(200), nullable=True)
+    tangan_kiri_atas = db.Column(db.String(200), nullable=True)
+    tangan_kiri_bawah = db.Column(db.String(200), nullable=True)
+
+# ===================================================
+# =============== MODEL ULASAN APLIKASI ==============
+# ===================================================
+
+class UlasanAplikasi(db.Model):
+    __tablename__ = "ulasan_aplikasi"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Relasi user (boleh null jika guest)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+
+    nama_user = db.Column(db.String(100), nullable=True)
+    email_user = db.Column(db.String(100), nullable=True)
+
+    rating = db.Column(db.Integer, nullable=False)
+    kategori = db.Column(
+        db.Enum("negatif", "netral", "positif", name="kategori_ulasan"),
+        nullable=False
+    )
+
+    komentar = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Ulasan {self.rating}⭐ - {self.kategori}>"

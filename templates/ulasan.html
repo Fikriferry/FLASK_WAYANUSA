@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="container">
+
+    <h2>Ulasan Pengguna</h2>
+
+    <p>⭐ {{ rata_rating }} dari {{ total_ulasan }} ulasan</p>
+
+    <hr>
+
+    {% for u in ulasan_list %}
+        <div class="ulasan-card">
+            <strong>{{ u.nama_user or 'Guest' }}</strong>
+            <span>⭐ {{ u.rating }}</span>
+            <p>{{ u.komentar }}</p>
+            <small>{{ u.created_at.strftime('%d %b %Y') }}</small>
+        </div>
+    {% else %}
+        <p>Belum ada ulasan.</p>
+    {% endfor %}
+
+    <hr>
+
+    <h3>Kirim Ulasan</h3>
+
+    <form method="POST">
+        <!-- INPUT NILAI (hidden) -->
+        <input type="hidden" name="rating" id="ratingValue" required>
+
+        <!-- STAR RATING -->
+        <div class="star-rating">
+            <i class="fas fa-star" data-value="1"></i>
+            <i class="fas fa-star" data-value="2"></i>
+            <i class="fas fa-star" data-value="3"></i>
+            <i class="fas fa-star" data-value="4"></i>
+            <i class="fas fa-star" data-value="5"></i>
+        </div>
+
+        <textarea name="komentar" placeholder="Tulis ulasan kamu..." required></textarea>
+
+        <button type="submit">Kirim</button>
+    </form>
+
+
+</section>
+{% block scripts_extra %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const stars = document.querySelectorAll(".star-rating i");
+    const ratingInput = document.getElementById("ratingValue");
+
+    stars.forEach(star => {
+        star.addEventListener("click", function () {
+            const value = this.getAttribute("data-value");
+            ratingInput.value = value;
+
+            stars.forEach(s => {
+                s.classList.toggle("active", s.getAttribute("data-value") <= value);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% endblock %}

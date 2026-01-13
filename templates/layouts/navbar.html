@@ -17,7 +17,8 @@
                     <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Pertunjukan</a></li>
                     <li><a href="{{ url_for('web.artikel') }}">Artikel</a></li>
                     <li><a href="{{ url_for('web.simulasi_dalang') }}">Simulasi</a></li>
-                    
+                    <li><a href="{{ url_for('web.ulasan') }}">Ulasan</a></li>
+
                     <li class="mobile-only-action">
                         {% if session.get('user_logged_in') %}
                             <a href="{{ url_for('web.logout_user') }}" class="btn-mobile-auth">Logout</a>
