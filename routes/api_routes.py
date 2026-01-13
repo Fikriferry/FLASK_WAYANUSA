@@ -16,12 +16,12 @@ from cepot_controller import cepot_system
 from dotenv import load_dotenv
 from functools import wraps
 from sqlalchemy import func
-# from services.rag_service import rag_service
-try:
-    from services.rag_service import rag_service
-except Exception as e:
-    rag_service = None
-    print("⚠️ RAG Service dimatikan sementara:", e)
+from services.rag_service import rag_service
+# try:
+#     from services.rag_service import rag_service
+# except Exception as e:
+#     rag_service = None
+#     print("⚠️ RAG Service dimatikan sementara:", e)
 import re # Import Regex untuk parsing link Youtube
 from werkzeug.utils import secure_filename
 import uuid
@@ -104,6 +104,34 @@ def profile():
         "name": user.name,
         "email": user.email
     }), 200
+
+@auth_api.route("/profile", methods=["PUT"])
+@jwt_required()
+def update_profile():
+    uid = int(get_jwt_identity())
+    user = User.query.get(uid)
+
+    if not user:
+        return jsonify({"status": "error", "message": "User tidak ditemukan"}), 404
+
+    data = request.get_json()
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")  # opsional
+
+    if name:
+        user.name = name
+    if email:
+        user.email = email
+    if password:
+        user.password = generate_password_hash(password)
+
+    try:
+        db.session.commit()  # ini wajib diganti dari user.save()
+        return jsonify({"status": "success", "message": "Profile berhasil diperbarui"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": f"Gagal update profile: {str(e)}"}), 500
 
 
 
