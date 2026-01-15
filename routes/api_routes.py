@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, jsonify, request, Flask, url_for
-from models import db, User, Dalang, Wayang, AIModel, Video, Article, UlasanAplikasi
+from models import db, User, Dalang, Wayang, AIModel, Video, Article, UlasanAplikasi, WayangGame
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
@@ -594,3 +594,58 @@ def get_ulasan():
             } for u in ulasan
         ]
     })
+
+
+# =========================
+# WAYANG GAME API (FLUTTER)
+# =========================
+@api.route("/wayang-game", methods=["GET"])
+def get_wayang_game():
+    data = WayangGame.query.order_by(WayangGame.nama.asc()).all()
+
+    return jsonify({
+        "status": "success",
+        "total": len(data),
+        "data": [
+            {
+                "id": w.id,
+                "nama": w.nama,
+                "thumbnail": (
+                    f"{request.host_url}static/uploads/wayang/{w.thumbnail}"
+                    if w.thumbnail else None
+                ),
+                "badan": w.badan,
+                "tangan_kanan_atas": w.tangan_kanan_atas,
+                "tangan_kanan_bawah": w.tangan_kanan_bawah,
+                "tangan_kiri_atas": w.tangan_kiri_atas,
+                "tangan_kiri_bawah": w.tangan_kiri_bawah,
+            } for w in data
+        ]
+    }), 200
+
+@api.route("/wayang-game/<int:id>", methods=["GET"])
+def get_wayang_game_detail(id):
+    w = WayangGame.query.get(id)
+
+    if not w:
+        return jsonify({
+            "status": "error",
+            "message": "Wayang tidak ditemukan"
+        }), 404
+
+    return jsonify({
+        "status": "success",
+        "data": {
+            "id": w.id,
+            "nama": w.nama,
+            "thumbnail": (
+                f"{request.host_url}static/uploads/wayang/{w.thumbnail}"
+                if w.thumbnail else None
+            ),
+            "badan": w.badan,
+            "tangan_kanan_atas": w.tangan_kanan_atas,
+            "tangan_kanan_bawah": w.tangan_kanan_bawah,
+            "tangan_kiri_atas": w.tangan_kiri_atas,
+            "tangan_kiri_bawah": w.tangan_kiri_bawah,
+        }
+    }), 200

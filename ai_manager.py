@@ -1,7 +1,9 @@
 # ai_manager.py
 import os
 import tensorflow as tf
-from tensorflow.keras.models import load_model # <--- GUNAKAN INI (Standard)
+# from tensorflow.keras.models import load_model # <--- GUNAKAN INI (Standard)
+from keras.models import load_model
+
 # JANGAN PAKAI: from tf_keras.models import load_model (Ini untuk model jadul .h5)
 
 from models import AIModel
