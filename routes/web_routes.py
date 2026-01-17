@@ -955,8 +955,7 @@ def admin_wayanggame_edit(id):
         flash('WayangGame berhasil diperbarui!', 'success')
         return redirect(url_for('web.admin_wayanggame_list'))
 
-    return render_template("admin/wayanggame_edit.html", item=item)
-
+    return render_template("admin/wayanggame_edit.html", item=game)
     return render_template('admin/wayanggame_form.html', game=game, files=files)
 
 # --- DELETE WAYANGGAME ---
