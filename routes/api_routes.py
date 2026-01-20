@@ -2,27 +2,29 @@ import os
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from flask import Blueprint, jsonify, request, Flask, url_for
-from models import db, User, Dalang, Wayang, AIModel, Video, Article
+from models import db, User, Dalang, Wayang, AIModel, Video, Article, UlasanAplikasi, WayangGame
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
     get_jwt_identity
 )
 from ai_manager import get_model
+from datetime import datetime
 import numpy as np
 import io
-from PIL import Image
+from PIL import Image, ImageOps # <--- Pastikan import ImageOps
+from werkzeug.security import generate_password_hash
 import google.generativeai as genai
 from cepot_controller import cepot_system
 from dotenv import load_dotenv
 from functools import wraps
 from sqlalchemy import func
-# from services.rag_service import rag_service
-try:
-    from services.rag_service import rag_service
-except Exception as e:
-    rag_service = None
-    print("⚠️ RAG Service dimatikan sementara:", e)
+from services.rag_service import rag_service
+# try:
+#     from services.rag_service import rag_service
+# except Exception as e:
+#     rag_service = None
+#     print("⚠️ RAG Service dimatikan sementara:", e)
 import re # Import Regex untuk parsing link Youtube
 from werkzeug.utils import secure_filename
 import uuid
@@ -152,6 +154,34 @@ def google_login_android():
 
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 401
+@auth_api.route("/profile", methods=["PUT"])
+@jwt_required()
+def update_profile():
+    uid = int(get_jwt_identity())
+    user = User.query.get(uid)
+
+    if not user:
+        return jsonify({"status": "error", "message": "User tidak ditemukan"}), 404
+
+    data = request.get_json()
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")  # opsional
+
+    if name:
+        user.name = name
+    if email:
+        user.email = email
+    if password:
+        user.password = generate_password_hash(password)
+
+    try:
+        db.session.commit()  # ini wajib diganti dari user.save()
+        return jsonify({"status": "success", "message": "Profile berhasil diperbarui"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": f"Gagal update profile: {str(e)}"}), 500
+
 
 
 # ================================
@@ -189,48 +219,79 @@ def get_wayang():
 # ================================
 @api.route("/predict-wayang", methods=["POST"])
 def predict_wayang():
-    print("PREDICT CALLED")
+    print("\n📸 [API] Menerima Request Predict Wayang...")
+    
     active_model = AIModel.query.filter_by(is_active=True).first()
     if not active_model:
         return jsonify({"error": "Model AI belum diaktifkan"}), 503
 
     model = get_model()
     if model is None:
-        return jsonify({"error": "Model gagal dimuat"}), 500
+        return jsonify({"error": "Model gagal dimuat di server"}), 500
 
     if "image" not in request.files:
-        return jsonify({"error": "File tidak ditemukan"}), 400
+        return jsonify({"error": "File gambar tidak dikirim"}), 400
 
-    img = Image.open(io.BytesIO(request.files["image"].read())).convert("RGB")
-    img = img.resize((150, 150))
-    x = np.expand_dims(np.array(img) / 255.0, axis=0)
+    try:
+        # 1. Buka Gambar
+        file = request.files["image"]
+        img = Image.open(file).convert("RGB")
+        
+        # 2. FIX ROTASI OTOMATIS (Penting buat Kamera HP)
+        # Kamera HP sering nyimpen rotasi di metadata, harus di-apply biar tegak
+        img = ImageOps.exif_transpose(img) 
 
-    prediction = model.predict(x)
-    idx = int(np.argmax(prediction))
-    confidence = float(np.max(prediction))
+        # 3. Preprocessing (Samakan persis dengan Training)
+        target_size = (150, 150)  # Pastikan ini sama dengan training Anda! (150 atau 224?)
+        img = img.resize(target_size)
+        
+        x = np.array(img)
+        x = np.expand_dims(x, axis=0)
+        
+        # Normalisasi (Cek saat training pakai /255.0 atau mobilenet_preprocess?)
+        # Asumsi pakai rescale 1./255
+        x = x / 255.0 
 
-    labels = [l.strip() for l in active_model.labels.split(",")]
-    
-    # === SOLUSI: LOGIC THRESHOLD ===
-    # Jika confidence di bawah 70%, anggap bukan wayang
-    THRESHOLD = 0.75
-    
-    if confidence < THRESHOLD:
+        # 4. Prediksi
+        prediction = model.predict(x)
+        idx = int(np.argmax(prediction))
+        confidence = float(np.max(prediction))
+        
+        # Ambil Label
+        labels_raw = active_model.labels
+        labels = [l.strip() for l in labels_raw.split(",") if l.strip()]
+        
+        predicted_label = labels[idx] if idx < len(labels) else "Unknown"
+
+        # 5. DEBUGGING DI TERMINAL (Lihat ini saat test)
+        print(f"🔍 [AI DEBUG] Prediksi: {predicted_label}")
+        print(f"📊 [AI DEBUG] Confidence: {confidence:.4f} ({confidence*100:.2f}%)")
+        print(f"Labels tersedia: {labels}")
+
+        # 6. LOGIC THRESHOLD (Kita turunkan jadi 55% biar lebih toleran)
+        THRESHOLD = 0.55 
+        
+        if confidence < THRESHOLD:
+            print("⚠️ [AI DEBUG] Confidence terlalu rendah, dianggap Unknown.")
+            return jsonify({
+                "prediksi": "Objek Tidak Dikenali",
+                "confidence": f"{confidence*100:.2f}% (Kurang Yakin)",
+                "deskripsi": "Gambar kurang jelas atau mirip dengan beberapa tokoh sekaligus. Coba foto lebih dekat dengan cahaya yang cukup."
+            })
+
+        # Ambil data deskripsi dari Database Wayang
+        wayang_db = Wayang.query.filter(func.lower(Wayang.nama) == func.lower(predicted_label)).first()
+        deskripsi_text = wayang_db.deskripsi if wayang_db else "Deskripsi belum tersedia di database."
+
         return jsonify({
-            "prediksi": "Objek Tidak Dikenali",
-            "confidence": f"{confidence*100:.2f}% (Terlalu Rendah)",
-            "deskripsi": "Maaf, sistem tidak yakin ini gambar wayang. Pastikan foto wayang terlihat jelas, pencahayaan cukup, dan background tidak terlalu ramai."
+            "prediksi": predicted_label,
+            "confidence": f"{confidence*100:.1f}%",
+            "deskripsi": deskripsi_text
         })
 
-    # Jika lolos threshold, baru ambil data dari DB
-    label = labels[idx] if idx < len(labels) else "Unknown"
-    wayang = Wayang.query.filter(func.lower(Wayang.nama) == func.lower(label)).first()
-
-    return jsonify({
-        "prediksi": label,
-        "confidence": f"{confidence*100:.2f}%",
-        "deskripsi": wayang.deskripsi if wayang else "Deskripsi belum tersedia."
-    })
+    except Exception as e:
+        print(f"❌ [API ERROR] {e}")
+        return jsonify({"error": str(e)}), 500
 
 # ================================
 # CHATBOT CEPOT (SAFE MODE)
@@ -549,3 +610,122 @@ def delete_article(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# =========================
+# POST ULASAN (FLUTTER)
+# =========================
+@api.route('/ulasan', methods=['POST'])
+def post_ulasan():
+    data = request.get_json()
+
+    if not data or 'rating' not in data or 'komentar' not in data:
+        return jsonify({'message': 'Data tidak lengkap'}), 400
+
+    rating = int(data['rating'])
+
+    if rating <= 2:
+        kategori = 'negatif'
+    elif rating == 3:
+        kategori = 'netral'
+    else:
+        kategori = 'positif'
+
+    ulasan = UlasanAplikasi(
+        user_id=None,
+        nama_user=data.get('nama_user', 'Guest'),
+        email_user=None,
+        rating=rating,
+        kategori=kategori,
+        komentar=data['komentar'],
+        created_at=datetime.utcnow()
+    )
+
+    db.session.add(ulasan)
+    db.session.commit()
+
+    return jsonify({'message': 'Ulasan berhasil dikirim'}), 201
+
+
+# =========================
+# GET ULASAN (OPTIONAL)
+# =========================
+@api.route('/ulasan', methods=['GET'])
+def get_ulasan():
+    ulasan = UlasanAplikasi.query.order_by(
+        UlasanAplikasi.created_at.desc()
+    ).all()
+
+    total = len(ulasan)
+    rata = round(
+        db.session.query(func.avg(UlasanAplikasi.rating)).scalar() or 0,
+        1
+    )
+
+    return jsonify({
+        'total_ulasan': total,
+        'rata_rating': rata,
+        'data': [
+            {
+                'nama_user': u.nama_user,
+                'rating': u.rating,
+                'kategori': u.kategori,
+                'komentar': u.komentar,
+                'created_at': u.created_at.strftime('%d %b %Y')
+            } for u in ulasan
+        ]
+    })
+
+
+# =========================
+# WAYANG GAME API (FLUTTER)
+# =========================
+@api.route("/wayang-game", methods=["GET"])
+def get_wayang_game():
+    data = WayangGame.query.order_by(WayangGame.nama.asc()).all()
+
+    return jsonify({
+        "status": "success",
+        "total": len(data),
+        "data": [
+            {
+                "id": w.id,
+                "nama": w.nama,
+                "thumbnail": (
+                    f"{request.host_url}static/uploads/wayang/{w.thumbnail}"
+                    if w.thumbnail else None
+                ),
+                "badan": w.badan,
+                "tangan_kanan_atas": w.tangan_kanan_atas,
+                "tangan_kanan_bawah": w.tangan_kanan_bawah,
+                "tangan_kiri_atas": w.tangan_kiri_atas,
+                "tangan_kiri_bawah": w.tangan_kiri_bawah,
+            } for w in data
+        ]
+    }), 200
+
+@api.route("/wayang-game/<int:id>", methods=["GET"])
+def get_wayang_game_detail(id):
+    w = WayangGame.query.get(id)
+
+    if not w:
+        return jsonify({
+            "status": "error",
+            "message": "Wayang tidak ditemukan"
+        }), 404
+
+    return jsonify({
+        "status": "success",
+        "data": {
+            "id": w.id,
+            "nama": w.nama,
+            "thumbnail": (
+                f"{request.host_url}static/uploads/wayang/{w.thumbnail}"
+                if w.thumbnail else None
+            ),
+            "badan": w.badan,
+            "tangan_kanan_atas": w.tangan_kanan_atas,
+            "tangan_kanan_bawah": w.tangan_kanan_bawah,
+            "tangan_kiri_atas": w.tangan_kiri_atas,
+            "tangan_kiri_bawah": w.tangan_kiri_bawah,
+        }
+    }), 200

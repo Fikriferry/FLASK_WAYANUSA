@@ -6,6 +6,7 @@ import os
 from models import Video, db, AIModel, Dalang, User, Admin, QuizLevel, QuizQuestion, Article, QuizResult, Wayang, WayangGame, UlasanAplikasi
 from ai_manager import reload_model
 from sqlalchemy import func
+from datetime import datetime
 
 web_routes = Blueprint("web", __name__)
 
@@ -80,7 +81,12 @@ def save_wayang_file(file):
 # =========================
 @web_routes.route('/')
 def home():
-    return render_template('index.html')
+    # Ambil 4 atau 8 dalang terbaru untuk ditampilkan di Home
+    # Kita limit biar halaman tidak berat load-nya
+    dalangs = Dalang.query.order_by(Dalang.id.desc()).limit(4).all()
+    
+    # Kirim variable 'dalangs' ke template
+    return render_template('index.html', dalangs=dalangs)
 
 # User login/register/logout
 @web_routes.route('/login', methods=['GET','POST'])
@@ -949,8 +955,7 @@ def admin_wayanggame_edit(id):
         flash('WayangGame berhasil diperbarui!', 'success')
         return redirect(url_for('web.admin_wayanggame_list'))
 
-    return render_template("admin/wayanggame_edit.html", item=item)
-
+    return render_template("admin/wayanggame_edit.html", item=game)
     return render_template('admin/wayanggame_form.html', game=game, files=files)
 
 # --- DELETE WAYANGGAME ---
