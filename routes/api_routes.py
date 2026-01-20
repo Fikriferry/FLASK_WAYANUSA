@@ -631,8 +631,33 @@ def get_ulasan():
 # =========================
 # WAYANG GAME API (FLUTTER)
 # =========================
+# Helper function biar tidak koding ulang
+def get_asset_url(filename_or_path):
+    if not filename_or_path:
+        return None
+    
+    # 1. Normalisasi slash (ubah backslash Windows \ jadi /)
+    clean_path = filename_or_path.replace('\\', '/')
+
+    # 2. LOGIKA CERDAS:
+    # Jika di database sudah ada tanda garis miring (/), berarti itu path lengkap
+    # Contoh DB: "images/wayang/arjuna.png" -> Langsung tempel ke static
+    if "/" in clean_path:
+        # Hapus slash di depan jika ada biar gak double slash
+        if clean_path.startswith('/'):
+            clean_path = clean_path[1:]
+        return f"{request.host_url}static/{clean_path}"
+    
+    # 3. JIKA CUMA NAMA FILE:
+    # Contoh DB: "arjuna.png" -> Masukkan ke folder default
+    else:
+        # Pastikan folder default ini benar-benar ada di komputer kamu!
+        # Opsinya biasanya: 'static/uploads/wayanggame/' atau 'static/uploads/wayang/'
+        return f"{request.host_url}static/uploads/wayanggame/{clean_path}"
+
 @api.route("/wayang-game", methods=["GET"])
 def get_wayang_game():
+    # Sortir berdasarkan nama biar rapi di list
     data = WayangGame.query.order_by(WayangGame.nama.asc()).all()
 
     return jsonify({
@@ -642,15 +667,15 @@ def get_wayang_game():
             {
                 "id": w.id,
                 "nama": w.nama,
-                "thumbnail": (
-                    f"{request.host_url}static/uploads/wayang/{w.thumbnail}"
-                    if w.thumbnail else None
-                ),
-                "badan": w.badan,
-                "tangan_kanan_atas": w.tangan_kanan_atas,
-                "tangan_kanan_bawah": w.tangan_kanan_bawah,
-                "tangan_kiri_atas": w.tangan_kiri_atas,
-                "tangan_kiri_bawah": w.tangan_kiri_bawah,
+                # "deskripsi": w.deskripsi, # Tambahkan deskripsi jika ada
+                
+                # --- SEMUA ASET JADI FULL URL ---
+                "thumbnail": get_asset_url(w.thumbnail),
+                "badan": get_asset_url(w.badan),
+                "tangan_kanan_atas": get_asset_url(w.tangan_kanan_atas),
+                "tangan_kanan_bawah": get_asset_url(w.tangan_kanan_bawah),
+                "tangan_kiri_atas": get_asset_url(w.tangan_kiri_atas),
+                "tangan_kiri_bawah": get_asset_url(w.tangan_kiri_bawah),
             } for w in data
         ]
     }), 200
@@ -670,14 +695,14 @@ def get_wayang_game_detail(id):
         "data": {
             "id": w.id,
             "nama": w.nama,
-            "thumbnail": (
-                f"{request.host_url}static/uploads/wayang/{w.thumbnail}"
-                if w.thumbnail else None
-            ),
-            "badan": w.badan,
-            "tangan_kanan_atas": w.tangan_kanan_atas,
-            "tangan_kanan_bawah": w.tangan_kanan_bawah,
-            "tangan_kiri_atas": w.tangan_kiri_atas,
-            "tangan_kiri_bawah": w.tangan_kiri_bawah,
+            # "deskripsi": w.deskripsi,
+            
+            # --- SEMUA ASET JADI FULL URL ---
+            "thumbnail": get_asset_url(w.thumbnail),
+            "badan": get_asset_url(w.badan),
+            "tangan_kanan_atas": get_asset_url(w.tangan_kanan_atas),
+            "tangan_kanan_bawah": get_asset_url(w.tangan_kanan_bawah),
+            "tangan_kiri_atas": get_asset_url(w.tangan_kiri_atas),
+            "tangan_kiri_bawah": get_asset_url(w.tangan_kiri_bawah),
         }
     }), 200
