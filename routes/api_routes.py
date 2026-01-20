@@ -1,4 +1,6 @@
 import os
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 from flask import Blueprint, jsonify, request, Flask, url_for
 from models import db, User, Dalang, Wayang, AIModel, Video, Article, UlasanAplikasi, WayangGame
 from flask_jwt_extended import (
@@ -29,12 +31,6 @@ import uuid
 from langchain_core.messages import HumanMessage, SystemMessage
 
 # ================================
-# KONFIGURASI BLUEPRINT
-# ================================
-api = Blueprint("api", __name__, url_prefix="/api")
-auth_api = Blueprint("auth_api", __name__, url_prefix="/api/auth")
-
-# ================================
 # GEMINI CONFIG
 # ================================
 load_dotenv(override=True)
@@ -51,6 +47,13 @@ Instruksi: Kamu adalah Asisten Pintar bernama "Cepot" yang ahli tentang budaya W
         Jawab pertanyaan berdasarkan konteks berikut ini. Jika jawaban di luar konteks wayang,
         katakan "Maaf, Cepot tidak bisa menjawab karena pertanyaan di luar konteks wayang.
 """
+
+# ================================
+# BLUEPRINT DEFINITIONS (WAJIB)
+# ================================
+api = Blueprint("api", __name__)
+auth_api = Blueprint("auth_api", __name__)
+
 
 # ================================
 # AUTH API
@@ -106,6 +109,51 @@ def profile():
         "email": user.email
     }), 200
 
+@auth_api.route("/google/android", methods=["POST"])
+def google_login_android():
+    data = request.get_json()
+    token = data.get("id_token")
+
+    try:
+        # Load client_id from environment variable and parse JSON
+        client_config = json.loads(os.getenv("GOOGLE_CLIENT_ID_ANDROID"))
+        client_id = client_config["installed"]["client_id"]
+
+        idinfo = id_token.verify_oauth2_token(
+            token,
+            google_requests.Request(),
+            client_id
+        )
+
+        email = idinfo["email"]
+        name = idinfo.get("name")
+        google_id = idinfo["sub"]
+
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            user = User(
+                name=name,
+                email=email,
+                google_id=google_id,
+                password_hash="-"
+            )
+            db.session.add(user)
+            db.session.commit()
+
+        access_token = create_access_token(identity=user.id)
+
+        return jsonify({
+            "success": True,
+            "access_token": access_token,
+            "user": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email
+            }
+        })
+
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 401
 @auth_api.route("/profile", methods=["PUT"])
 @jwt_required()
 def update_profile():
