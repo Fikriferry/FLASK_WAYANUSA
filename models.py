@@ -17,15 +17,22 @@ class Dalang(db.Model):
 
 
 # ---------------------------------------------------
-# MODEL USER (Untuk login user biasa)
+# MODEL USER (Diperbarui untuk mendukung Google Login)
 # ---------------------------------------------------
 class User(db.Model):
-    __tablename__ = "user"  # (perbaikan biar tidak bentrok dengan SQL reserved word)
+    __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
+    profile_pic = db.Column(db.String(255), nullable=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(200), nullable=False)
+    
+    # 1. Tambahkan kolom google_id (unik dan boleh kosong)
+    google_id = db.Column(db.String(255), unique=True, nullable=True)
+    
+    # 2. Ubah nullable menjadi True agar user Google bisa masuk tanpa password
+    password_hash = db.Column(db.String(255), nullable=True) 
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relasi User -> QuizResult
@@ -35,6 +42,9 @@ class User(db.Model):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
+        # Jika user Google (tidak punya password), langsung return False
+        if not self.password_hash or self.password_hash == "-":
+            return False
         return check_password_hash(self.password_hash, password)
 
 

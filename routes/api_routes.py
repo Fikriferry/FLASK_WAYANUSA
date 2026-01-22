@@ -1,7 +1,7 @@
 import os
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-from flask import Blueprint, jsonify, request, Flask, url_for
+from flask import Blueprint, app, jsonify, request, Flask, url_for, current_app
 from models import db, User, Dalang, Wayang, AIModel, Video, Article, UlasanAplikasi, WayangGame
 from flask_jwt_extended import (
     create_access_token,
@@ -20,16 +20,24 @@ from dotenv import load_dotenv
 from functools import wraps
 from sqlalchemy import func
 from services.rag_service import rag_service
-# try:
-#     from services.rag_service import rag_service
-# except Exception as e:
-#     rag_service = None
-#     print("⚠️ RAG Service dimatikan sementara:", e)
 import re # Import Regex untuk parsing link Youtube
 from werkzeug.utils import secure_filename
 import uuid
 from langchain_core.messages import HumanMessage, SystemMessage
+import json
+from google.auth.transport import requests
+from werkzeug.utils import secure_filename
 
+# UPLOAD_FOLDER = 'static/uploads/profile_pics'
+# ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+# Pastikan folder sudah ada saat server jalan
+# if not os.path.exists(UPLOAD_FOLDER):
+#     os.makedirs(UPLOAD_FOLDER)
+
+def allowed_file(filename):
+    allowed_extensions = {'png', 'jpg', 'jpeg'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 # ================================
 # GEMINI CONFIG
 # ================================
@@ -53,6 +61,8 @@ Instruksi: Kamu adalah Asisten Pintar bernama "Cepot" yang ahli tentang budaya W
 # ================================
 api = Blueprint("api", __name__)
 auth_api = Blueprint("auth_api", __name__)
+
+
 
 
 # ================================
@@ -92,55 +102,50 @@ def login():
         "user": {"id": user.id, "name": user.name, "email": user.email}
     })
 
-
-@auth_api.route("/profile", methods=["GET"])
-@jwt_required()
-def profile():
-    uid = int(get_jwt_identity())
-    user = User.query.get(uid)
-
-
-    if not user:
-        return jsonify({"message": "User tidak ditemukan"}), 404
-
-    return jsonify({
-        "id": user.id,
-        "name": user.name,
-        "email": user.email
-    }), 200
-
 @auth_api.route("/google/android", methods=["POST"])
 def google_login_android():
+    print(">>> SERVER SUDAH PAKAI KODE TERBARU! <<<")
     data = request.get_json()
-    token = data.get("id_token")
+    token = data.get("idToken") 
+
+    if not token:
+        return jsonify({"success": False, "message": "Token is missing"}), 400
 
     try:
-        # Load client_id from environment variable and parse JSON
-        client_config = json.loads(os.getenv("GOOGLE_CLIENT_ID_ANDROID"))
-        client_id = client_config["installed"]["client_id"]
+        # PENTING: Isi ini harus WEB CLIENT ID
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
+        print(f"DEBUG: Client ID yang dimuat adalah {client_id}")
 
         idinfo = id_token.verify_oauth2_token(
             token,
-            google_requests.Request(),
-            client_id
+            requests.Request(),
+            client_id,
+            clock_skew_in_seconds=60 # Toleransi 60 detik
         )
 
         email = idinfo["email"]
         name = idinfo.get("name")
-        google_id = idinfo["sub"]
+        google_id = idinfo["sub"] # ID Unik dari Google
 
         user = User.query.filter_by(email=email).first()
+        
         if not user:
+            # Jika user baru, buat akun otomatis
             user = User(
                 name=name,
                 email=email,
                 google_id=google_id,
-                password_hash="-"
+                password_hash="-" # Penanda user Google
             )
             db.session.add(user)
             db.session.commit()
+        elif not user.google_id:
+            # Jika user sudah ada (daftar via email), hubungkan dengan Google ID
+            user.google_id = google_id
+            db.session.commit()
 
-        access_token = create_access_token(identity=user.id)
+        # Gunakan str(user.id) agar konsisten dengan login email
+        access_token = create_access_token(identity=str(user.id))
 
         return jsonify({
             "success": True,
@@ -148,39 +153,86 @@ def google_login_android():
             "user": {
                 "id": user.id,
                 "name": user.name,
-                "email": user.email
+                "email": user.email,
+                "profile_pic": user.profile_pic # <--- TAMBAHKAN JUGA DI SINI
             }
         })
 
     except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 401
-@auth_api.route("/profile", methods=["PUT"])
+        # Log di terminal Flask tetap ada
+        print(f"❌ Verifikasi Gagal: {str(e)}") 
+        
+        # Kirim error aslinya ke Flutter agar kamu tidak menebak-nebak
+        return jsonify({
+            "success": False, 
+            "message": f"Server Error: {str(e)}" 
+        }), 500 # Gunakan 500 untuk error internal server
+
+
+@auth_api.route("/profile", methods=["GET"])
 @jwt_required()
-def update_profile():
+def profile():
     uid = int(get_jwt_identity())
     user = User.query.get(uid)
 
     if not user:
-        return jsonify({"status": "error", "message": "User tidak ditemukan"}), 404
+        return jsonify({"message": "User tidak ditemukan"}), 404
 
-    data = request.get_json()
-    name = data.get("name")
-    email = data.get("email")
-    password = data.get("password")  # opsional
+    return jsonify({
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "profile_pic": user.profile_pic  # <--- WAJIB TAMBAHKAN INI
+    }), 200
 
-    if name:
-        user.name = name
-    if email:
-        user.email = email
-    if password:
-        user.password = generate_password_hash(password)
+@auth_api.route("/profile", methods=["PUT"])
+@jwt_required()
+def update_profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    
+    if not user:
+        return jsonify({"success": False, "message": "User tidak ditemukan"}), 404
+
+    # 1. AMBIL PASSWORD LAMA DARI REQUEST
+    old_password = request.form.get("old_password")
+    
+    if not old_password:
+        return jsonify({"success": False, "message": "Password lama wajib diisi untuk verifikasi"}), 400
+
+    # 2. VALIDASI PASSWORD LAMA
+    # Pastikan model User kamu punya fungsi check_password
+    if not user.check_password(old_password):
+        return jsonify({"success": False, "message": "Password lama salah!"}), 401
+
+    # 3. JIKA LULUS VALIDASI, BARU PROSES UPDATE SEPERTI BIASA
+    name = request.form.get("name")
+    email = request.form.get("email")
+    new_password = request.form.get("password") # Ini password baru
+
+    if name: user.name = name
+    if email: user.email = email
+    if new_password: user.password_hash = generate_password_hash(new_password)
+
+    # Update Foto Profil
+    if 'profile_pic' in request.files:
+        file = request.files['profile_pic']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(f"user_{user.id}_{file.filename}")
+            filepath = os.path.join(current_app.config['UPLOAD_FOTO'], filename)
+            file.save(filepath)
+            user.profile_pic = f"uploads/profile_pics/{filename}"
 
     try:
-        db.session.commit()  # ini wajib diganti dari user.save()
-        return jsonify({"status": "success", "message": "Profile berhasil diperbarui"}), 200
+        db.session.commit()
+        return jsonify({
+            "success": True, 
+            "message": "Profil berhasil diperbarui",
+            "profile_pic": user.profile_pic
+        }), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"status": "error", "message": f"Gagal update profile: {str(e)}"}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 

@@ -46,7 +46,7 @@ def login_google():
         redirect_uri = f"{scheme}://{host}/login/google/authorized"
     else:
         # For other IPs, use localhost (though Google blocks private IPs anyway)
-        redirect_uri = "http://localhost:8000/login/google/authorized"
+        redirect_uri = "https://monoclinic-superboldly-tobi.ngrok-free.dev/login/google/authorized"
 
     print(f"DEBUG: Host accessed: {host}, Redirect URI: {redirect_uri}")
     return google.authorize_redirect(redirect_uri)
