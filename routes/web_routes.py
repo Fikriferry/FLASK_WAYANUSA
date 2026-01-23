@@ -273,8 +273,11 @@ def admin_dashboard():
     dalang_count = Dalang.query.count()
     artikel_count = Article.query.count()
     ulasan_count = UlasanAplikasi.query.count()
+    quiz_count = QuizQuestion.query.count()
+    video_count = Video.query.count()
     dalangs = Dalang.query.all()
-    return render_template('admin/index.html', dalang_count=dalang_count, artikel_count=artikel_count, ulasan_count=ulasan_count, dalangs=dalangs)
+    print(f"DEBUG: video_count = {video_count}")  # Debug print
+    return render_template('admin/index.html', dalang_count=dalang_count, artikel_count=artikel_count, ulasan_count=ulasan_count, quiz_count=quiz_count, video_count=video_count, dalangs=dalangs)
 
 # =========================
 # DALANG CRUD
@@ -523,19 +526,31 @@ def delete_model(id):
 @web_routes.route('/admin/quiz/list')
 @admin_login_required
 def quiz_list():
-    # PERBAIKAN: Tambahkan option_a, b, c, d ke dalam query
-    questions = QuizQuestion.query.join(QuizLevel).add_columns(
-        QuizQuestion.id,
-        QuizQuestion.question,
-        QuizQuestion.option_a, # <--- WAJIB ADA
-        QuizQuestion.option_b, # <--- WAJIB ADA
-        QuizQuestion.option_c, # <--- WAJIB ADA
-        QuizQuestion.option_d, # <--- WAJIB ADA
-        QuizQuestion.correct_answer,
-        QuizLevel.name.label('level_name')
-    ).all()
-    
-    return render_template('admin/quiz_list.html', questions=questions)
+
+    questions = (
+        QuizQuestion.query
+        .join(QuizLevel)
+        .add_columns(
+            QuizQuestion.id,
+            QuizQuestion.question,
+            QuizQuestion.option_a,
+            QuizQuestion.option_b,
+            QuizQuestion.option_c,
+            QuizQuestion.option_d,
+            QuizQuestion.correct_answer,
+            QuizQuestion.level_id,   # ✅ INI KUNCI UTAMA
+            QuizLevel.name.label('level_name')
+        )
+        .all()
+    )
+
+    levels = QuizLevel.query.all()
+
+    return render_template(
+        'admin/quiz_list.html',
+        questions=questions,
+        levels=levels
+    )
 
 
 @web_routes.route('/admin/quiz/add', methods=['GET', 'POST'])
