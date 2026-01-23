@@ -136,22 +136,30 @@ def logout_user():
 
 @web_routes.route('/pengenalan-wayang')
 def pengenalan_wayang():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     return render_template('pengenalan_wayang.html')
 
 @web_routes.route('/pertunjukan-wayang')
 def pertunjukan_wayang():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     videos = Video.query.filter_by(tampil=True).all()
     return render_template('pertunjukan_wayang.html', videos=videos)
 
 @web_routes.route('/quiz')
 @user_login_required
 def quiz():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     levels = QuizLevel.query.all()
     return render_template('quiz.html', levels=levels)
 
 @web_routes.route('/quiz/play')
 @user_login_required
 def quiz_play():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     level_id = request.args.get('level', type=int)
     if not level_id:
         flash('Level quiz tidak valid!', 'error')
@@ -166,11 +174,15 @@ def quiz_play():
 
 @web_routes.route('/mencari-dalang')
 def mencari_dalang():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     dalangs = Dalang.query.all()   
     return render_template('mencari_dalang.html', dalangs=dalangs)
 
 @web_routes.route('/dalang/<int:dalang_id>')
 def dalang_detail(dalang_id):
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     dalang = Dalang.query.get_or_404(dalang_id)
     return render_template('dalang_detail.html', dalang=dalang)
 
@@ -185,6 +197,8 @@ def video_detail(id):
 
 @web_routes.route('/search')
 def search_video():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     q = request.args.get("q", "")
 
     # HINDARI: q kosong tapi masih tampil ""
@@ -199,16 +213,22 @@ def search_video():
 
 @web_routes.route('/artikel')
 def artikel():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     artikels = Article.query.order_by(Article.created_at.desc()).all()
     return render_template('artikel.html', artikels=artikels)
 
 @web_routes.route('/artikel/<int:id>')
 def artikel_detail(id):
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     artikel = Article.query.get_or_404(id)
     return render_template('artikel_detail.html', artikel=artikel)
 
 @web_routes.route('/s-dalang')
 def simulasi_dalang():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     wayangs = WayangGame.query.order_by(WayangGame.id.asc()).all()
     print("Jumlah wayang:", len(wayangs))  # Debug: cek di console server
     return render_template("simulasi_dalang.html", wayangs=wayangs)
@@ -976,14 +996,12 @@ def admin_wayanggame_delete(id):
     db.session.commit()
     flash('WayangGame berhasil dihapus!', 'success')
     return redirect(url_for('web.admin_wayanggame_list'))
-
-# ================================
-# ULASAN USER
-# ================================
-
 @web_routes.route('/ulasan', methods=['GET', 'POST'])
 def ulasan():
 
+    # ========================
+    # SUBMIT ULASAN
+    # ========================
     if request.method == 'POST':
         rating = request.form.get('rating')
         komentar = request.form.get('komentar')
@@ -993,21 +1011,27 @@ def ulasan():
             return redirect(url_for('web.ulasan'))
 
         rating = int(rating)
+        if rating < 1 or rating > 5:
+            flash('Rating harus antara 1 sampai 5', 'danger')
+            return redirect(url_for('web.ulasan'))
 
-        if rating <= 2:
-            kategori = 'negatif'
-        elif rating == 3:
-            kategori = 'netral'
-        else:
-            kategori = 'positif'
+        # ========================
+        # AI SENTIMENT ANALYSIS
+        # ========================
+        try:
+            kategori, confidence = predict_sentiment(komentar)
+        except Exception as e:
+            print('[SENTIMENT ERROR]', e)
+            kategori, confidence = 'netral', 0.0
 
         ulasan = UlasanAplikasi(
             user_id=session.get('user_id'),
             nama_user=session.get('user_name', 'Guest'),
             email_user=session.get('user_email'),
             rating=rating,
-            kategori=kategori,
-            komentar=komentar
+            kategori=kategori,   # 🔥 DARI AI
+            komentar=komentar,
+            created_at=datetime.utcnow()
         )
 
         db.session.add(ulasan)
@@ -1016,6 +1040,9 @@ def ulasan():
         flash('Terima kasih atas ulasan Anda 🙏', 'success')
         return redirect(url_for('web.ulasan'))
 
+    # ========================
+    # LOAD DATA ULASAN
+    # ========================
     ulasan_list = UlasanAplikasi.query.order_by(
         UlasanAplikasi.created_at.desc()
     ).all()
@@ -1034,21 +1061,38 @@ def ulasan():
     )
 
 
-
 # ================================
 # ULASAN ADMIN
 # ================================
 
 @web_routes.route('/admin/ulasan')
+@admin_login_required
 def admin_ulasan():
+
     ulasan_list = UlasanAplikasi.query.order_by(
         UlasanAplikasi.created_at.desc()
     ).all()
 
+    total = UlasanAplikasi.query.count()
+    positif = UlasanAplikasi.query.filter_by(kategori='positif').count()
+    netral  = UlasanAplikasi.query.filter_by(kategori='netral').count()
+    negatif = UlasanAplikasi.query.filter_by(kategori='negatif').count()
+
+    rata_rating = round(
+        db.session.query(func.avg(UlasanAplikasi.rating)).scalar() or 0,
+        1
+    )
+
     return render_template(
         'admin/ulasan_list.html',
-        ulasan_list=ulasan_list
+        ulasan_list=ulasan_list,
+        total=total,
+        positif=positif,
+        netral=netral,
+        negatif=negatif,
+        rata_rating=rata_rating
     )
+
 
 @web_routes.route('/admin/ulasan/statistik')
 def admin_ulasan_statistik():

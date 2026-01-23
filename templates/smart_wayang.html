@@ -1,11 +1,27 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block title %}Smart Wayang - WAYANUSA{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>smart wayang</title>
 
-{% block head_extra %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/wayang.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
 
+    <!-- AOS -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
     <style>
         /* Override background body jadi hitam total khusus halaman ini */
         body {
@@ -14,7 +30,8 @@
 
         /* Section Utama */
         .smart-wayang-section {
-            padding-top: 100px; /* Jarak dari Navbar */
+            padding-top: 100px;
+            /* Jarak dari Navbar */
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -34,7 +51,7 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(212, 163, 115, 0.2);
             border-radius: 20px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
             overflow: hidden;
             margin: 0 20px;
         }
@@ -47,7 +64,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            border-right: 1px solid rgba(255,255,255,0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
             background: rgba(255, 255, 255, 0.02);
         }
 
@@ -70,24 +87,46 @@
         }
 
         @keyframes pulse-talking {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .mic-status-wrapper {
             background: rgba(0, 0, 0, 0.6);
             padding: 10px 25px;
             border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .mic-dot { width: 10px; height: 10px; background: #555; border-radius: 50%; transition: 0.3s; }
-        .mic-dot.listening { background: #dc3545; box-shadow: 0 0 10px #dc3545; }
-        .mic-dot.processing { background: #ffc107; box-shadow: 0 0 10px #ffc107; }
+        .mic-dot {
+            width: 10px;
+            height: 10px;
+            background: #555;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .mic-dot.listening {
+            background: #dc3545;
+            box-shadow: 0 0 10px #dc3545;
+        }
+
+        .mic-dot.processing {
+            background: #ffc107;
+            box-shadow: 0 0 10px #ffc107;
+        }
 
         /* PANEL KANAN */
         .interaction-panel {
@@ -98,19 +137,28 @@
         }
 
         .panel-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
         }
 
         .hardware-status {
-            font-size: 0.8rem; font-weight: 600; background: rgba(0,0,0,0.4);
-            padding: 6px 14px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); color: #888;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #888;
         }
 
         .live-transcript {
             flex: 1;
             background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
@@ -118,56 +166,138 @@
             overflow-y: auto;
             font-family: 'Consolas', monospace;
             font-size: 0.9rem;
-            display: flex; flex-direction: column; gap: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .log-item { opacity: 0; animation: fadeIn 0.3s forwards; line-height: 1.5; }
-        @keyframes fadeIn { to { opacity: 1; } }
-        .log-user { color: #aaa; border-left: 2px solid #444; padding-left: 12px; }
-        .log-bot { color: #D4A373; border-left: 2px solid #D4A373; padding-left: 12px; font-weight: 600; }
-        .log-sys { color: #dc3545; font-style: italic; font-size: 0.8rem; text-align: center; margin: 10px 0; }
+        .log-item {
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+            line-height: 1.5;
+        }
 
-        .controls-group { display: flex; gap: 10px; }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .log-user {
+            color: #aaa;
+            border-left: 2px solid #444;
+            padding-left: 12px;
+        }
+
+        .log-bot {
+            color: #D4A373;
+            border-left: 2px solid #D4A373;
+            padding-left: 12px;
+            font-weight: 600;
+        }
+
+        .log-sys {
+            color: #dc3545;
+            font-style: italic;
+            font-size: 0.8rem;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .controls-group {
+            display: flex;
+            gap: 10px;
+        }
+
         select.port-select {
-            flex: 1; background: #151515; color: #eee; border: 1px solid #333;
-            padding: 12px; border-radius: 8px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;
+            flex: 1;
+            background: #151515;
+            color: #eee;
+            border: 1px solid #333;
+            padding: 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
         }
+
         .icon-btn {
-            width: 48px; background: #222; color: #ccc; border: 1px solid #333;
-            border-radius: 8px; cursor: pointer; transition: 0.2s;
+            width: 48px;
+            background: #222;
+            color: #ccc;
+            border: 1px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .icon-btn:hover { background: #333; color: white; }
-        
+
+        .icon-btn:hover {
+            background: #333;
+            color: white;
+        }
+
         .btn-connect {
             background: linear-gradient(135deg, #D4A373, #B88656);
-            color: #000; font-weight: 700; border: none;
-            padding: 0 30px; border-radius: 8px; cursor: pointer; transition: 0.3s;
-            text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px;
+            color: #000;
+            font-weight: 700;
+            border: none;
+            padding: 0 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
         }
-        .btn-connect:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(212, 163, 115, 0.3); }
-        .btn-connect.connected { background: linear-gradient(135deg, #dc3545, #a71d2a); color: white; }
+
+        .btn-connect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(212, 163, 115, 0.3);
+        }
+
+        .btn-connect.connected {
+            background: linear-gradient(135deg, #dc3545, #a71d2a);
+            color: white;
+        }
 
         @media (max-width: 900px) {
-            .control-deck { grid-template-columns: 1fr; border: none; background: transparent; box-shadow: none; }
-            .visual-panel { border: none; padding: 20px; }
-            .smart-wayang-section { padding-top: 80px; }
+            .control-deck {
+                grid-template-columns: 1fr;
+                border: none;
+                background: transparent;
+                box-shadow: none;
+            }
+
+            .visual-panel {
+                border: none;
+                padding: 20px;
+            }
+
+            .smart-wayang-section {
+                padding-top: 80px;
+            }
         }
     </style>
-{% endblock %}
 
-{% block content %}
+    <!-- NAVBAR -->
+    {% include 'layouts/navbar.html' %}
+
+    <!-- MAIN SECTION -->
     <section class="smart-wayang-section">
         <div class="control-deck">
-            
+
             <div class="visual-panel">
-                <h2 style="color: #D4A373; margin-bottom: 5px; font-family: 'Playfair Display', serif; font-size: 2rem;">Smart Wayang</h2>
-                <p style="color: #888; font-size: 0.85rem; margin-bottom: 40px; letter-spacing: 3px; text-transform: uppercase;">AI Physical Interface</p>
-                
-                <img src="{{ url_for('static', filename='images/cepot avatar.png') }}" 
-                     onerror="this.src='https://via.placeholder.com/300x300/D4A373/000000?text=Cepot+AI'"
-                     id="cepotAvatar" class="wayang-avatar" 
-                     alt="Cepot Avatar">
-                
+                <h2
+                    style="color: #D4A373; margin-bottom: 5px; font-family: 'Playfair Display', serif; font-size: 2rem;">
+                    Smart Wayang</h2>
+                <p
+                    style="color: #888; font-size: 0.85rem; margin-bottom: 40px; letter-spacing: 3px; text-transform: uppercase;">
+                    AI Physical Interface</p>
+
+                <img src="{{ url_for('static', filename='images/cepot avatar.png') }}"
+                    onerror="this.src='https://via.placeholder.com/300x300/D4A373/000000?text=Cepot+AI'"
+                    id="cepotAvatar" class="wayang-avatar" alt="Cepot Avatar">
+
                 <div class="mic-status-wrapper">
                     <div class="mic-dot" id="micDot"></div>
                     <span id="statusText" style="font-size: 0.9rem; color: #ccc;">Standby (Panggil "Halo Cepot")</span>
@@ -180,7 +310,7 @@
                         <i class="fas fa-terminal" style="margin-right: 8px; color: #D4A373;"></i> LIVE LOG
                     </div>
                     <div class="hardware-status">
-                        <i class="fas fa-microchip" style="margin-right: 5px;"></i> 
+                        <i class="fas fa-microchip" style="margin-right: 5px;"></i>
                         <span id="hardwareStatusText">TERPUTUS</span>
                     </div>
                 </div>
@@ -195,7 +325,7 @@
                     <select id="portSelect" class="port-select">
                         <option value="">-- Mencari Port USB... --</option>
                     </select>
-                    
+
                     <button onclick="refreshPorts()" class="icon-btn" title="Refresh Port">
                         <i class="fas fa-sync-alt"></i>
                     </button>
@@ -204,172 +334,174 @@
                         CONNECT
                     </button>
                 </div>
-                
+
                 <p style="font-size: 0.75rem; color: #555; margin-top: 15px; text-align: center; font-style: italic;">
                     *Pastikan Serial Monitor Arduino IDE ditutup.
                 </p>
             </div>
         </div>
     </section>
-{% endblock %}
 
-{% block scripts_extra %}
-<script>
-    // --- VARIABLES ---
-    let isConnected = false;
-    let recognition = null;
-    let isListening = false;
-    let wakeWordActive = false;
-    const WAKE_WORDS = ["cepot", "halo cepot", "he cepot", "si cepot", "pot", "wayang"];
+    <!-- AOS Script -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // --- VARIABLES ---
+        let isConnected = false;
+        let recognition = null;
+        let isListening = false;
+        let wakeWordActive = false;
+        const WAKE_WORDS = ["cepot", "halo cepot", "he cepot", "si cepot", "pot", "wayang"];
 
-    // DOM Elements
-    const statusText = document.getElementById('statusText');
-    const micDot = document.getElementById('micDot');
-    const transcriptBox = document.getElementById('transcriptBox');
-    const avatar = document.getElementById('cepotAvatar');
-    const hardwareText = document.getElementById('hardwareStatusText');
-    const btnConnect = document.getElementById('btnConnect');
-    const portSelect = document.getElementById('portSelect');
+        // DOM Elements
+        const statusText = document.getElementById('statusText');
+        const micDot = document.getElementById('micDot');
+        const transcriptBox = document.getElementById('transcriptBox');
+        const avatar = document.getElementById('cepotAvatar');
+        const hardwareText = document.getElementById('hardwareStatusText');
+        const btnConnect = document.getElementById('btnConnect');
+        const portSelect = document.getElementById('portSelect');
 
-    // 1. SETUP WEB SPEECH API
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        // 1. SETUP WEB SPEECH API
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'id-ID';
-        recognition.continuous = true;
-        recognition.interimResults = false;
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'id-ID';
+            recognition.continuous = true;
+            recognition.interimResults = false;
 
-        recognition.onstart = () => { isListening = true; micDot.classList.add('listening'); };
-        recognition.onend = () => { isListening = false; micDot.classList.remove('listening'); if (!wakeWordActive) setTimeout(() => { try { recognition.start(); } catch(e){} }, 1000); };
-        recognition.onresult = (event) => {
-            const text = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-            processVoiceInput(text);
-        };
-        setTimeout(() => { try { recognition.start(); } catch(e) {} }, 1000);
-    } else {
-        addLog("Browser tidak support suara.", "log-sys");
-    }
-
-    // 2. PROSES SUARA
-    function processVoiceInput(text) {
-        if (!wakeWordActive) {
-            if (WAKE_WORDS.some(word => text.includes(word))) {
-                wakeWordActive = true;
-                playBeep();
-                statusText.innerText = "Mendengarkan... 🎤";
-                statusText.style.color = "#D4A373";
-                micDot.classList.add('listening');
-                addLog("[Wake Word Terdeteksi]", "log-user");
-            }
+            recognition.onstart = () => { isListening = true; micDot.classList.add('listening'); };
+            recognition.onend = () => { isListening = false; micDot.classList.remove('listening'); if (!wakeWordActive) setTimeout(() => { try { recognition.start(); } catch (e) { } }, 1000); };
+            recognition.onresult = (event) => {
+                const text = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+                processVoiceInput(text);
+            };
+            setTimeout(() => { try { recognition.start(); } catch (e) { } }, 1000);
         } else {
-            if (text.includes("batal") || text.includes("stop")) {
-                wakeWordActive = false; resetMicUI(); return;
+            addLog("Browser tidak support suara.", "log-sys");
+        }
+
+        // 2. PROSES SUARA
+        function processVoiceInput(text) {
+            if (!wakeWordActive) {
+                if (WAKE_WORDS.some(word => text.includes(word))) {
+                    wakeWordActive = true;
+                    playBeep();
+                    statusText.innerText = "Mendengarkan... 🎤";
+                    statusText.style.color = "#D4A373";
+                    micDot.classList.add('listening');
+                    addLog("[Wake Word Terdeteksi]", "log-user");
+                }
+            } else {
+                if (text.includes("batal") || text.includes("stop")) {
+                    wakeWordActive = false; resetMicUI(); return;
+                }
+                addLog(`User: "${text}"`, "log-user");
+                statusText.innerText = "Sedang Berpikir...";
+                micDot.classList.remove('listening');
+                micDot.classList.add('processing');
+                sendToBackend(text);
+                wakeWordActive = false;
             }
-            addLog(`User: "${text}"`, "log-user");
-            statusText.innerText = "Sedang Berpikir...";
+        }
+
+        function resetMicUI() {
+            statusText.innerText = 'Standby (Panggil "Halo Cepot")';
+            statusText.style.color = "#ccc";
+            micDot.classList.remove('processing');
             micDot.classList.remove('listening');
-            micDot.classList.add('processing');
-            sendToBackend(text);
-            wakeWordActive = false;
         }
-    }
 
-    function resetMicUI() {
-        statusText.innerText = 'Standby (Panggil "Halo Cepot")';
-        statusText.style.color = "#ccc";
-        micDot.classList.remove('processing');
-        micDot.classList.remove('listening');
-    }
-
-    // 3. KOMUNIKASI API
-    async function sendToBackend(message) {
-        avatar.classList.add('talking');
-        try {
-            const response = await fetch('/api/cepot/talk', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message })
-            });
-            const data = await response.json();
-            if (data.response) addLog(`Cepot: "${data.response}"`, "log-bot");
-        } catch (error) { addLog("Error server.", "log-sys"); } 
-        finally { 
-            setTimeout(() => { avatar.classList.remove('talking'); resetMicUI(); }, 3000); 
-        }
-    }
-
-    // 4. KONEKSI HARDWARE
-    window.refreshPorts = async function() {
-        try {
-            portSelect.innerHTML = '<option>...</option>';
-            const res = await fetch('/api/cepot/ports');
-            const data = await res.json();
-            portSelect.innerHTML = '<option value="">-- Pilih Port --</option>';
-            if(data.ports) data.ports.forEach(p => portSelect.innerHTML += `<option value="${p}">${p}</option>`);
-        } catch(e) {}
-    };
-
-    window.toggleConnect = async function() {
-        const port = portSelect.value;
-        if (!isConnected) {
-            if (!port) return alert("Pilih Port!");
-            btnConnect.innerText = "...";
+        // 3. KOMUNIKASI API
+        async function sendToBackend(message) {
+            avatar.classList.add('talking');
             try {
-                const res = await fetch('/api/cepot/connect', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ port: port })
+                const response = await fetch('/api/cepot/talk', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
                 });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    isConnected = true;
-                    setHardwareConnected(true);
-                    addLog(`Terhubung: ${port}`, "log-sys");
-                } else { alert(data.message); btnConnect.innerText = "CONNECT"; }
-            } catch(e) { btnConnect.innerText = "CONNECT"; }
-        } else {
+                const data = await response.json();
+                if (data.response) addLog(`Cepot: "${data.response}"`, "log-bot");
+            } catch (error) { addLog("Error server.", "log-sys"); }
+            finally {
+                setTimeout(() => { avatar.classList.remove('talking'); resetMicUI(); }, 3000);
+            }
+        }
+
+        // 4. KONEKSI HARDWARE
+        window.refreshPorts = async function () {
             try {
-                await fetch('/api/cepot/disconnect', { method: 'POST' });
-                isConnected = false;
-                setHardwareConnected(false);
-                addLog("Terputus.", "log-sys");
-            } catch(e) {}
+                portSelect.innerHTML = '<option>...</option>';
+                const res = await fetch('/api/cepot/ports');
+                const data = await res.json();
+                portSelect.innerHTML = '<option value="">-- Pilih Port --</option>';
+                if (data.ports) data.ports.forEach(p => portSelect.innerHTML += `<option value="${p}">${p}</option>`);
+            } catch (e) { }
+        };
+
+        window.toggleConnect = async function () {
+            const port = portSelect.value;
+            if (!isConnected) {
+                if (!port) return alert("Pilih Port!");
+                btnConnect.innerText = "...";
+                try {
+                    const res = await fetch('/api/cepot/connect', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ port: port })
+                    });
+                    const data = await res.json();
+                    if (data.status === 'success') {
+                        isConnected = true;
+                        setHardwareConnected(true);
+                        addLog(`Terhubung: ${port}`, "log-sys");
+                    } else { alert(data.message); btnConnect.innerText = "CONNECT"; }
+                } catch (e) { btnConnect.innerText = "CONNECT"; }
+            } else {
+                try {
+                    await fetch('/api/cepot/disconnect', { method: 'POST' });
+                    isConnected = false;
+                    setHardwareConnected(false);
+                    addLog("Terputus.", "log-sys");
+                } catch (e) { }
+            }
+        };
+
+        function setHardwareConnected(status) {
+            if (status) {
+                btnConnect.innerText = "DISCONNECT";
+                btnConnect.classList.add('connected');
+                hardwareText.innerText = "TERHUBUNG";
+                hardwareText.style.color = "#28a745";
+            } else {
+                btnConnect.innerText = "CONNECT";
+                btnConnect.classList.remove('connected');
+                hardwareText.innerText = "TERPUTUS";
+                hardwareText.style.color = "#666";
+            }
         }
-    };
 
-    function setHardwareConnected(status) {
-        if (status) {
-            btnConnect.innerText = "DISCONNECT";
-            btnConnect.classList.add('connected');
-            hardwareText.innerText = "TERHUBUNG";
-            hardwareText.style.color = "#28a745";
-        } else {
-            btnConnect.innerText = "CONNECT";
-            btnConnect.classList.remove('connected');
-            hardwareText.innerText = "TERPUTUS";
-            hardwareText.style.color = "#666";
+        function addLog(text, className) {
+            const div = document.createElement('div');
+            div.className = `log-item ${className}`;
+            div.innerText = text;
+            transcriptBox.appendChild(div);
+            transcriptBox.scrollTop = transcriptBox.scrollHeight;
         }
-    }
 
-    function addLog(text, className) {
-        const div = document.createElement('div');
-        div.className = `log-item ${className}`;
-        div.innerText = text;
-        transcriptBox.appendChild(div);
-        transcriptBox.scrollTop = transcriptBox.scrollHeight;
-    }
+        function playBeep() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 600; gain.gain.value = 0.1;
+                osc.start(); setTimeout(() => osc.stop(), 150);
+            } catch (e) { }
+        }
 
-    function playBeep() {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.frequency.value = 600; gain.gain.value = 0.1;
-            osc.start(); setTimeout(() => osc.stop(), 150);
-        } catch(e) {}
-    }
+        refreshPorts();
+    </script>
+</body>
 
-    refreshPorts();
-</script>
-{% endblock %}
+</html>

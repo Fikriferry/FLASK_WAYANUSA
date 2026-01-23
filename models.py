@@ -223,4 +223,4 @@ class UlasanAplikasi(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"<Ulasan {self.rating}⭐ - {self.kategori}>"
+        return f'<UlasanAplikasi {self.id} - {self.rating} stars>'

@@ -9,6 +9,7 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 from ai_manager import get_model
+from services.sentiment_service import predict_sentiment
 from datetime import datetime
 import numpy as np
 import io
@@ -321,7 +322,7 @@ def predict_wayang():
         print(f"Labels tersedia: {labels}")
 
         # 6. LOGIC THRESHOLD (Kita turunkan jadi 55% biar lebih toleran)
-        THRESHOLD = 0.55 
+        THRESHOLD = 0.65
         
         if confidence < THRESHOLD:
             print("⚠️ [AI DEBUG] Confidence terlalu rendah, dianggap Unknown.")
@@ -662,25 +663,28 @@ def delete_article(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+# ==========================================
+# API ENDPOINTS: ULASAN APLIKASI
+# ==========================================
 
-# =========================
-# POST ULASAN (FLUTTER)
-# =========================
 @api.route('/ulasan', methods=['POST'])
 def post_ulasan():
     data = request.get_json()
 
-    if not data or 'rating' not in data or 'komentar' not in data:
+    if not data or 'komentar' not in data or 'rating' not in data:
         return jsonify({'message': 'Data tidak lengkap'}), 400
 
+    komentar = data['komentar']
     rating = int(data['rating'])
 
-    if rating <= 2:
-        kategori = 'negatif'
-    elif rating == 3:
-        kategori = 'netral'
-    else:
-        kategori = 'positif'
+    if not (1 <= rating <= 5):
+        return jsonify({'message': 'Rating harus 1-5'}), 400
+
+    try:
+        kategori, confidence = predict_sentiment(komentar)
+    except Exception:
+        kategori, confidence = 'netral', 0.0
 
     ulasan = UlasanAplikasi(
         user_id=None,
@@ -688,14 +692,18 @@ def post_ulasan():
         email_user=None,
         rating=rating,
         kategori=kategori,
-        komentar=data['komentar'],
+        komentar=komentar,
         created_at=datetime.utcnow()
     )
 
     db.session.add(ulasan)
     db.session.commit()
 
-    return jsonify({'message': 'Ulasan berhasil dikirim'}), 201
+    return jsonify({
+        'message': 'Ulasan berhasil dikirim',
+        'kategori_ai': kategori,
+        'confidence': confidence
+    }), 201
 
 
 # =========================
@@ -726,7 +734,6 @@ def get_ulasan():
             } for u in ulasan
         ]
     })
-
 
 # =========================
 # WAYANG GAME API (FLUTTER)
