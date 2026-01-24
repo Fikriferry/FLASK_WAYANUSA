@@ -46,10 +46,25 @@
             padding-bottom: 0;
         }
 
-        h1, h2, h3, h4 { font-weight: 700; line-height: 1.2; }
-        p { color: #ccc; font-weight: 300; line-height: 1.6; }
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-weight: 700;
+            line-height: 1.2;
+        }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        p {
+            color: #ccc;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
         .text-gradient {
             background: linear-gradient(to right, #D4A373, #FFD700, #D4A373);
@@ -59,180 +74,724 @@
             animation: shine 5s linear infinite;
         }
 
-        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
 
-        section { padding: 80px 0; }
+        section {
+            padding: 80px 0;
+        }
 
         /* BUTTONS */
         .btn-glow {
-            display: inline-flex; align-items: center; padding: 12px 35px;
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 35px;
             background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
-            color: #000; border-radius: 50px; font-weight: 600; text-decoration: none;
-            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.3); transition: all 0.3s ease;
+            color: #000;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.3);
+            transition: all 0.3s ease;
         }
-        .btn-glow:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(212, 163, 115, 0.5); color: #fff; }
+
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(212, 163, 115, 0.5);
+            color: #fff;
+        }
 
         .btn-outline {
-            display: inline-flex; align-items: center; padding: 12px 30px;
-            border: 2px solid rgba(255, 255, 255, 0.2); color: #fff;
-            border-radius: 50px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
             margin-left: 10px;
         }
-        .btn-outline:hover { border-color: var(--primary-gold); color: var(--primary-gold); background: rgba(212, 163, 115, 0.1); }
+
+        .btn-outline:hover {
+            border-color: var(--primary-gold);
+            color: var(--primary-gold);
+            background: rgba(212, 163, 115, 0.1);
+        }
 
         /* HERO */
         .hero {
-            position: relative; min-height: 100vh; display: flex; align-items: center;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
             background: radial-gradient(circle at 70% 20%, rgba(212, 163, 115, 0.15) 0%, #000 60%);
             padding-top: 80px;
         }
-        .hero-content { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
-        .hero-tag {
-            display: inline-block; padding: 8px 20px; background: rgba(212, 163, 115, 0.1);
-            border: 1px solid rgba(212, 163, 115, 0.3); border-radius: 30px;
-            color: var(--primary-gold); font-size: 0.85rem; font-weight: 600; margin-bottom: 20px;
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
         }
-        .hero-text h1 { font-size: 3.5rem; margin-bottom: 20px; }
-        .hero-image { display: flex; justify-content: center; }
-        .hero-image img { width: 100%; max-width: 500px; filter: drop-shadow(0 0 50px rgba(212, 163, 115, 0.2)); animation: float 6s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(212, 163, 115, 0.1);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            border-radius: 30px;
+            color: var(--primary-gold);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-image {
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-image img {
+            width: 100%;
+            max-width: 500px;
+            filter: drop-shadow(0 0 50px rgba(212, 163, 115, 0.2));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
 
         /* STATS */
-        .stats-bar { background: linear-gradient(90deg, #0f0f0f, #181818, #0f0f0f); padding: 40px 0; border-top: 1px solid #222; border-bottom: 1px solid #222; }
-        .stats-grid { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 20px; }
-        .stat-item h3 { font-size: 2.5rem; color: var(--primary-gold); margin: 0; }
-        .stat-item p { margin: 5px 0 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .stats-bar {
+            background: linear-gradient(90deg, #0f0f0f, #181818, #0f0f0f);
+            padding: 40px 0;
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            color: var(--primary-gold);
+            margin: 0;
+        }
+
+        .stat-item p {
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
         /* FEATURES */
-        .features { background-color: #080808; }
-        .section-header { text-align: center; max-width: 700px; margin: 0 auto 60px; }
-        .section-subtitle { color: var(--primary-gold); font-weight: 600; letter-spacing: 2px; font-size: 0.9rem; text-transform: uppercase; display: block; margin-bottom: 10px; }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .features {
+            background-color: #080808;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        .section-subtitle {
+            color: var(--primary-gold);
+            font-weight: 600;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
         .feature-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);
-            border-radius: 20px; padding: 35px; transition: 0.4s ease; position: relative; overflow: hidden; text-decoration: none; display: block;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 35px;
+            transition: 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: block;
         }
-        .feature-card:hover { transform: translateY(-10px); border-color: var(--primary-gold); background: rgba(255, 255, 255, 0.05); }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-gold);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
         .feature-icon-wrapper {
-            width: 60px; height: 60px; background: rgba(212, 163, 115, 0.1); border-radius: 15px;
-            display: flex; align-items: center; justify-content: center; margin-bottom: 25px;
-            color: var(--primary-gold); font-size: 1.5rem; transition: 0.3s;
+            width: 60px;
+            height: 60px;
+            background: rgba(212, 163, 115, 0.1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            color: var(--primary-gold);
+            font-size: 1.5rem;
+            transition: 0.3s;
         }
-        .feature-card:hover .feature-icon-wrapper { background: var(--primary-gold); color: #000; }
-        .feature-title { color: #fff; font-size: 1.25rem; margin-bottom: 10px; }
-        .feature-desc { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+
+        .feature-card:hover .feature-icon-wrapper {
+            background: var(--primary-gold);
+            color: #000;
+        }
+
+        .feature-title {
+            color: #fff;
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
 
         /* PHILOSOPHY */
-        .philosophy { background: #050505; position: relative; }
-        .philosophy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
-        .phil-card { background: #111; padding: 30px; border-radius: 15px; border-left: 3px solid var(--primary-gold); margin-bottom: 20px; }
-        .phil-card h3 { color: var(--primary-gold); margin-top: 0; }
+        .philosophy {
+            background: #050505;
+            position: relative;
+        }
+
+        .philosophy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .phil-card {
+            background: #111;
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 3px solid var(--primary-gold);
+            margin-bottom: 20px;
+        }
+
+        .phil-card h3 {
+            color: var(--primary-gold);
+            margin-top: 0;
+        }
 
         /* DALANG */
-        .dalang-showcase { background: radial-gradient(circle at 50% 50%, #1a100a 0%, #000 100%); }
-        .showcase-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
-        .dalang-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
-        .dalang-card { background: var(--card-bg); border: 1px solid #333; border-radius: 15px; overflow: hidden; transition: 0.3s; text-decoration: none; display: block; }
-        .dalang-card:hover { border-color: var(--primary-gold); transform: scale(1.02); }
-        .dalang-photo-wrapper { height: 220px; overflow: hidden; }
-        .dalang-photo { width: 100%; height: 100%; object-fit: cover; }
-        .dalang-info { padding: 20px; }
-        .dalang-info h4 { color: #fff; margin: 0 0 5px; font-size: 1.1rem; }
-        .dalang-info p { color: #aaa; font-size: 0.85rem; margin: 0; display: flex; align-items: center; gap: 5px; }
+        .dalang-showcase {
+            background: radial-gradient(circle at 50% 50%, #1a100a 0%, #000 100%);
+        }
+
+        .showcase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+        }
+
+        .dalang-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        .dalang-card {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: 0.3s;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dalang-card:hover {
+            border-color: var(--primary-gold);
+            transform: scale(1.02);
+        }
+
+        .dalang-photo-wrapper {
+            height: 220px;
+            overflow: hidden;
+        }
+
+        .dalang-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dalang-info {
+            padding: 20px;
+        }
+
+        .dalang-info h4 {
+            color: #fff;
+            margin: 0 0 5px;
+            font-size: 1.1rem;
+        }
+
+        .dalang-info p {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
         /* MOBILE APP */
         .mobile-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%); border: 1px solid rgba(212, 163, 115, 0.2);
-            border-radius: 30px; padding: 60px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 50px; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 1px solid rgba(212, 163, 115, 0.2);
+            border-radius: 30px;
+            padding: 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 50px;
+            position: relative;
+            overflow: hidden;
         }
+
         .mobile-card::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
             background: radial-gradient(circle, rgba(212, 163, 115, 0.1) 0%, transparent 60%);
-            animation: rotateGlow 15s linear infinite; pointer-events: none;
+            animation: rotateGlow 15s linear infinite;
+            pointer-events: none;
         }
-        @keyframes rotateGlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .mobile-content { z-index: 2; }
-        .mobile-image { z-index: 2; text-align: center; }
+
+        @keyframes rotateGlow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .mobile-content {
+            z-index: 2;
+        }
+
+        .mobile-image {
+            z-index: 2;
+            text-align: center;
+        }
+
         .phone-mockup {
-            max-width: 280px; filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
-            animation: floatPhone 4s ease-in-out infinite; transform: rotate(-5deg);
+            max-width: 280px;
+            filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
+            animation: floatPhone 4s ease-in-out infinite;
+            transform: rotate(-5deg);
         }
-        @keyframes floatPhone { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-15px) rotate(-5deg); } }
+
+        @keyframes floatPhone {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-5deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(-5deg);
+            }
+        }
+
         .btn-store {
-            display: inline-flex; align-items: center; background: #fff; color: #000; padding: 10px 20px;
-            border-radius: 12px; text-decoration: none; transition: 0.3s; border: 2px solid transparent; margin-top: 30px;
+            display: inline-flex;
+            align-items: center;
+            background: #fff;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: 0.3s;
+            border: 2px solid transparent;
+            margin-top: 30px;
         }
-        .btn-store:hover { background: #000; color: #fff; border-color: #fff; transform: translateY(-3px); }
-        .store-text { display: flex; flex-direction: column; line-height: 1.2; margin-left: 10px; }
+
+        .btn-store:hover {
+            background: #000;
+            color: #fff;
+            border-color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .store-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            margin-left: 10px;
+        }
 
         /* TESTIMONIALS */
-        .testimonials { background: #0a0a0a; }
-        .testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .testi-card { background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #222; }
-        .testi-user { display: flex; align-items: center; margin-bottom: 15px; }
-        .testi-avatar { width: 50px; height: 50px; background: #333; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: var(--primary-gold); }
+        .testimonials {
+            background: #0a0a0a;
+        }
+
+        .testi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .testi-card {
+            background: #151515;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #222;
+        }
+
+        .testi-user {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .testi-avatar {
+            width: 50px;
+            height: 50px;
+            background: #333;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-gold);
+        }
 
         /* FAQ */
-        .faq-section { background-color: #080808; }
-        .faq-container { max-width: 800px; margin: 0 auto; }
-        .faq-item { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 15px; margin-bottom: 15px; transition: 0.3s; }
-        .faq-item:hover { border-color: var(--primary-gold); background: rgba(255, 255, 255, 0.05); }
-        .faq-question { padding: 20px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: #fff; list-style: none; }
-        .faq-question::-webkit-details-marker { display: none; }
-        .faq-question::after { content: '+'; font-size: 1.5rem; color: var(--primary-gold); transition: 0.3s; }
-        details[open] .faq-question::after { content: '-'; transform: rotate(180deg); }
-        .faq-answer { padding: 0 25px 25px; color: #aaa; line-height: 1.6; border-top: 1px solid rgba(255, 255, 255, 0.05); display: none; }
-        details[open] .faq-answer { display: block; animation: slideDown 0.3s ease-out; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .faq-section {
+            background-color: #080808;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        .faq-item:hover {
+            border-color: var(--primary-gold);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .faq-question {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #fff;
+            list-style: none;
+        }
+
+        .faq-question::-webkit-details-marker {
+            display: none;
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            transition: 0.3s;
+        }
+
+        details[open] .faq-question::after {
+            content: '-';
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 25px 25px;
+            color: #aaa;
+            line-height: 1.6;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: none;
+        }
+
+        details[open] .faq-answer {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         /* CTA */
-        .cta-footer { text-align: center; background: linear-gradient(to bottom, #000, #1f1209); padding: 100px 0; }
+        .cta-footer {
+            text-align: center;
+            background: linear-gradient(to bottom, #000, #1f1209);
+            padding: 100px 0;
+        }
 
         /* MAIN FOOTER */
-        .main-footer { background-color: #050505; border-top: 1px solid #222; padding: 80px 0 30px; margin-bottom: 80px; }
-        .footer-content { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 40px; margin-bottom: 60px; }
-        .footer-brand h2 { font-size: 1.8rem; color: #fff; margin-bottom: 20px; }
-        .social-links { display: flex; gap: 15px; margin-top: 25px; }
-        .social-links a { width: 40px; height: 40px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; transition: 0.3s; text-decoration: none; }
-        .social-links a:hover { background: var(--primary-gold); color: #000; transform: translateY(-3px); }
-        .footer-links h4, .footer-contact h4 { color: #fff; margin-bottom: 25px; font-size: 1.1rem; }
-        .footer-links ul { list-style: none; padding: 0; margin: 0; }
-        .footer-links li { margin-bottom: 12px; }
-        .footer-links a { color: #888; text-decoration: none; transition: 0.3s; }
-        .footer-links a:hover { color: var(--primary-gold); padding-left: 5px; }
-        .footer-contact p { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: #888; }
-        .footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 30px; text-align: center; display: flex; justify-content: space-between; flex-wrap: wrap; color: #555; font-size: 0.9rem; }
+        .main-footer {
+            background-color: #050505;
+            border-top: 1px solid #222;
+            padding: 80px 0 30px;
+            margin-bottom: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand h2 {
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: #fff;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            background: var(--primary-gold);
+            color: #000;
+            transform: translateY(-3px);
+        }
+
+        .footer-links h4,
+        .footer-contact h4 {
+            color: #fff;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #888;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-gold);
+            padding-left: 5px;
+        }
+
+        .footer-contact p {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #888;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 30px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #555;
+            font-size: 0.9rem;
+        }
 
         /* TASKBAR */
-        .taskbar-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: auto; }
+        .taskbar-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: auto;
+        }
+
         .taskbar {
-            display: flex; gap: 20px; background: rgba(20, 20, 20, 0.85);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            padding: 12px 30px; border-radius: 50px;
+            display: flex;
+            gap: 20px;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 12px 30px;
+            border-radius: 50px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
+
         .taskbar-item {
-            display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #888; font-size: 0.75rem; transition: 0.3s; position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #888;
+            font-size: 0.75rem;
+            transition: 0.3s;
+            position: relative;
         }
-        .taskbar-item i { font-size: 1.4rem; margin-bottom: 4px; transition: 0.3s; }
-        .taskbar-item:hover, .taskbar-item.active { color: var(--primary-gold); }
-        .taskbar-item:hover i, .taskbar-item.active i { transform: translateY(-3px); text-shadow: 0 0 10px rgba(212, 163, 115, 0.5); }
-        .taskbar-item.active::after { content: ''; position: absolute; bottom: -5px; width: 5px; height: 5px; background: var(--primary-gold); border-radius: 50%; }
+
+        .taskbar-item i {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+            transition: 0.3s;
+        }
+
+        .taskbar-item:hover,
+        .taskbar-item.active {
+            color: var(--primary-gold);
+        }
+
+        .taskbar-item:hover i,
+        .taskbar-item.active i {
+            transform: translateY(-3px);
+            text-shadow: 0 0 10px rgba(212, 163, 115, 0.5);
+        }
+
+        .taskbar-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            width: 5px;
+            height: 5px;
+            background: var(--primary-gold);
+            border-radius: 50%;
+        }
 
         /* RESPONSIVE */
         @media (max-width: 992px) {
-            .hero-content { grid-template-columns: 1fr; text-align: center; display: flex; flex-direction: column-reverse; }
-            .hero-text h1 { font-size: 2.5rem; }
-            .hero-buttons { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-            .btn-outline { margin-left: 0; }
-            .mobile-card { grid-template-columns: 1fr; text-align: center; padding: 40px 20px; }
-            .app-badges { justify-content: center; }
-            .philosophy-grid { grid-template-columns: 1fr; }
-            .footer-content { grid-template-columns: 1fr; text-align: center; }
-            .social-links { justify-content: center; }
-            .footer-contact p { justify-content: center; }
-            .footer-bottom { flex-direction: column; gap: 10px; }
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                display: flex;
+                flex-direction: column-reverse;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .btn-outline {
+                margin-left: 0;
+            }
+
+            .mobile-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding: 40px 20px;
+            }
+
+            .app-badges {
+                justify-content: center;
+            }
+
+            .philosophy-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+
+            .footer-contact p {
+                justify-content: center;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 
@@ -259,14 +818,18 @@
                 <div class="hero-text" data-aos="fade-right" data-aos-duration="1000">
                     <span class="hero-tag">✨ Platform Edukasi Budaya #1</span>
                     <h1>Warisan Leluhur dalam <br><span class="text-gradient">Genggaman Teknologi</span></h1>
-                    <p class="hero-description">Eksplorasi dunia wayang kulit Mahabarata dengan kecerdasan buatan (AI). Identifikasi tokoh, bermain kuis, hingga berinteraksi langsung dengan Cepot.</p>
+                    <p class="hero-description">Eksplorasi dunia wayang kulit Mahabarata dengan kecerdasan buatan (AI).
+                        Identifikasi tokoh, bermain kuis, hingga berinteraksi langsung dengan Cepot.</p>
                     <div class="hero-buttons">
-                        <a href="{{ url_for('web.smart_wayang') }}" class="btn-glow"><i class="fas fa-robot" style="margin-right: 8px;"></i> Coba AI Sekarang</a>
+                        <a href="{{ url_for('web.smart_wayang') }}" class="btn-glow"><i class="fas fa-robot"
+                                style="margin-right: 8px;"></i> Coba AI Sekarang</a>
                         <a href="#features" class="btn-outline">Fitur Lainnya</a>
                     </div>
                 </div>
                 <div class="hero-image" data-aos="fade-left" data-aos-duration="1000">
-                    <img src="{{ url_for('static', filename='images/banner_wayang.png') }}" onerror="this.src='https://via.placeholder.com/600x600/1a1a1a/D4A373?text=Wayang+Visual'" alt="Wayang Digital Art">
+                    <img src="{{ url_for('static', filename='images/banner_wayang.png') }}"
+                        onerror="this.src='https://via.placeholder.com/600x600/1a1a1a/D4A373?text=Wayang+Visual'"
+                        alt="Wayang Digital Art">
                 </div>
             </div>
         </div>
@@ -275,26 +838,91 @@
     <div class="stats-bar">
         <div class="container">
             <div class="stats-grid" id="statsSection">
-                <div class="stat-item" data-aos="fade-up" data-aos-delay="0"><h3><span class="counter" data-target="150">0</span>+</h3><p>Tokoh Wayang</p></div>
-                <div class="stat-item" data-aos="fade-up" data-aos-delay="100"><h3>AI</h3><p>Powered Tech</p></div>
-                <div class="stat-item" data-aos="fade-up" data-aos-delay="200"><h3><span class="counter" data-target="100">0</span>%</h3><p>Budaya Indonesia</p></div>
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="0">
+                    <h3><span class="counter" data-target="22">0</span>+</h3>
+                    <p>Tokoh Wayang</p>
+                </div>
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                    <h3>AI</h3>
+                    <p>Powered Tech</p>
+                </div>
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                    <h3><span class="counter" data-target="100">0</span>%</h3>
+                    <p>Budaya Indonesia</p>
+                </div>
             </div>
         </div>
     </div>
+
+    <section class="mobile-cta-section" style="padding: 100px 0;" id="mobile-app">
+        <div class="container">
+            <div class="mobile-card" data-aos="flip-up">
+                <div class="mobile-content">
+                    <span
+                        style="display: inline-block; padding: 5px 15px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; color: #fff; font-size: 0.8rem; margin-bottom: 15px;"><i
+                            class="fab fa-android"></i> Tersedia di Android</span>
+                    <h2 style="font-size: 2.5rem; color: #fff; margin-bottom: 20px;">Bawa Budaya Wayang <br> ke dalam
+                        <span class="text-gradient">Saku Anda</span></h2>
+                    <p>Download aplikasi <strong>Wayanusa Mobile</strong> untuk pengalaman yang lebih lancar. Scan
+                        wayang langsung dari kamera HP, notifikasi kuis terbaru, dan fitur AR (Augmented Reality).</p>
+                    <div class="app-badges"><a href="https://appdistribution.firebase.dev/i/2b3d9b469074fc10"
+                            class="btn-store"><i class="fab fa-google-play" style="font-size: 2rem;"></i>
+                            <div class="store-text"><span style="font-size: 0.7rem; text-transform: uppercase;">GET IT
+                                    ON</span><span style="font-size: 1.1rem; font-weight: bold;">Google Play</span>
+                            </div>
+                        </a></div>
+                </div>
+                <div class="mobile-image"><img src="{{ url_for('static', filename='images/hp_mockup.png') }}"
+                        onerror="this.src='https://via.placeholder.com/300x600/111/D4A373?text=App+Mockup'"
+                        alt="Wayanusa Mobile App" class="phone-mockup"></div>
+            </div>
+        </div>
+    </section>
 
     <section class="features" id="features">
         <div class="container">
             <div class="section-header" data-aos="fade-up">
                 <span class="section-subtitle">FITUR UNGGULAN</span>
-                <h2 style="font-size: 2.5rem; color: white;">Teknologi Bertemu <span class="text-gradient">Tradisi</span></h2>
+                <h2 style="font-size: 2.5rem; color: white;">Teknologi Bertemu <span
+                        class="text-gradient">Tradisi</span></h2>
             </div>
             <div class="features-grid">
-                <a href="{{ url_for('web.smart_wayang') }}" class="feature-card" data-aos="fade-up" data-aos-delay="100"><div class="feature-icon-wrapper"><i class="fas fa-microchip"></i></div><h3 class="feature-title">Smart Wayang</h3><p class="feature-desc">Interaksi fisik dengan wayang golek menggunakan kontrol suara dan Arduino.</p></a>
-                <a href="{{ url_for('web.pengenalan_wayang') }}" class="feature-card" data-aos="fade-up" data-aos-delay="200"><div class="feature-icon-wrapper"><i class="fas fa-camera"></i></div><h3 class="feature-title">Scan Wayang AI</h3><p class="feature-desc">Foto wayang kulit apapun, AI kami akan memberitahu siapa tokoh tersebut.</p></a>
-                <a href="{{ url_for('web.quiz') }}" class="feature-card" data-aos="fade-up" data-aos-delay="300"><div class="feature-icon-wrapper"><i class="fas fa-gamepad"></i></div><h3 class="feature-title">Kuis & Leaderboard</h3><p class="feature-desc">Uji pengetahuan budaya Anda dan bersaing skor dengan pengguna lain.</p></a>
-                <a href="{{ url_for('web.mencari_dalang') }}" class="feature-card" data-aos="fade-up" data-aos-delay="400"><div class="feature-icon-wrapper"><i class="fas fa-map-marker-alt"></i></div><h3 class="feature-title">Cari Dalang</h3><p class="feature-desc">Temukan profil dan lokasi dalang profesional di sekitar wilayah Anda.</p></a>
-                <a href="{{ url_for('web.pertunjukan_wayang') }}" class="feature-card" data-aos="fade-up" data-aos-delay="500"><div class="feature-icon-wrapper"><i class="fas fa-theater-masks"></i></div><h3 class="feature-title">Pertunjukan</h3><p class="feature-desc">Koleksi video pertunjukan wayang kulit pilihan yang memukau.</p></a>
-                <a href="{{ url_for('web.simulasi_dalang') }}" class="feature-card" data-aos="fade-up" data-aos-delay="600"><div class="feature-icon-wrapper"><i class="fas fa-vr-cardboard"></i></div><h3 class="feature-title">Simulasi Dalang</h3><p class="feature-desc">Rasakan sensasi menjadi dalang dengan mengontrol wayang secara virtual.</p></a>
+                <a href="{{ url_for('web.smart_wayang') }}" class="feature-card" data-aos="fade-up"
+                    data-aos-delay="100">
+                    <div class="feature-icon-wrapper"><i class="fas fa-microchip"></i></div>
+                    <h3 class="feature-title">Smart Wayang</h3>
+                    <p class="feature-desc">Interaksi fisik dengan wayang golek menggunakan kontrol suara dan Arduino.
+                    </p>
+                </a>
+                <a href="{{ url_for('web.pengenalan_wayang') }}" class="feature-card" data-aos="fade-up"
+                    data-aos-delay="200">
+                    <div class="feature-icon-wrapper"><i class="fas fa-camera"></i></div>
+                    <h3 class="feature-title">Scan Wayang AI</h3>
+                    <p class="feature-desc">Foto wayang kulit apapun, AI kami akan memberitahu siapa tokoh tersebut.</p>
+                </a>
+                <a href="{{ url_for('web.quiz') }}" class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon-wrapper"><i class="fas fa-gamepad"></i></div>
+                    <h3 class="feature-title">Kuis & Leaderboard</h3>
+                    <p class="feature-desc">Uji pengetahuan budaya Anda dan bersaing skor dengan pengguna lain.</p>
+                </a>
+                <a href="{{ url_for('web.mencari_dalang') }}" class="feature-card" data-aos="fade-up"
+                    data-aos-delay="400">
+                    <div class="feature-icon-wrapper"><i class="fas fa-map-marker-alt"></i></div>
+                    <h3 class="feature-title">Cari Dalang</h3>
+                    <p class="feature-desc">Temukan profil dan lokasi dalang profesional di sekitar wilayah Anda.</p>
+                </a>
+                <a href="{{ url_for('web.pertunjukan_wayang') }}" class="feature-card" data-aos="fade-up"
+                    data-aos-delay="500">
+                    <div class="feature-icon-wrapper"><i class="fas fa-theater-masks"></i></div>
+                    <h3 class="feature-title">Pertunjukan</h3>
+                    <p class="feature-desc">Koleksi video pertunjukan wayang kulit pilihan yang memukau.</p>
+                </a>
+                <a href="{{ url_for('web.simulasi_dalang') }}" class="feature-card" data-aos="fade-up"
+                    data-aos-delay="600">
+                    <div class="feature-icon-wrapper"><i class="fas fa-vr-cardboard"></i></div>
+                    <h3 class="feature-title">Simulasi Dalang</h3>
+                    <p class="feature-desc">Rasakan sensasi menjadi dalang dengan mengontrol wayang secara virtual.</p>
+                </a>
             </div>
         </div>
     </section>
@@ -304,13 +932,24 @@
             <div class="philosophy-grid">
                 <div data-aos="fade-right">
                     <span class="section-subtitle">KEDALAMAN MAKNA</span>
-                    <h2 style="font-size: 2.5rem; color: white; margin-bottom: 20px;">Filosofi di Balik <span class="text-gradient">Bayangan</span></h2>
-                    <p style="margin-bottom: 30px;">Wayang bukan sekadar tontonan, melainkan tuntunan. Setiap bentuk ukiran dan karakter memiliki makna mendalam tentang kehidupan manusia.</p>
-                    <div class="phil-card"><h3>Gunungan</h3><p style="font-size: 0.9rem;">Melambangkan isi alam semesta. Sebelum wayang dimainkan, gunungan ditancapkan di tengah kelir, melambangkan bahwa cerita belum dimulai.</p></div>
-                    <div class="phil-card"><h3>Punakawan</h3><p style="font-size: 0.9rem;">Semar, Gareng, Petruk, dan Bagong. Mereka adalah representasi rakyat jelata yang bijaksana, penasihat para ksatria, dan penghibur di kala duka.</p></div>
+                    <h2 style="font-size: 2.5rem; color: white; margin-bottom: 20px;">Filosofi di Balik <span
+                            class="text-gradient">Bayangan</span></h2>
+                    <p style="margin-bottom: 30px;">Wayang bukan sekadar tontonan, melainkan tuntunan. Setiap bentuk
+                        ukiran dan karakter memiliki makna mendalam tentang kehidupan manusia.</p>
+                    <div class="phil-card">
+                        <h3>Gunungan</h3>
+                        <p style="font-size: 0.9rem;">Melambangkan isi alam semesta. Sebelum wayang dimainkan, gunungan
+                            ditancapkan di tengah kelir, melambangkan bahwa cerita belum dimulai.</p>
+                    </div>
+                    <div class="phil-card">
+                        <h3>Punakawan</h3>
+                        <p style="font-size: 0.9rem;">Semar, Gareng, Petruk, dan Bagong. Mereka adalah representasi
+                            rakyat jelata yang bijaksana, penasihat para ksatria, dan penghibur di kala duka.</p>
+                    </div>
                 </div>
                 <div data-aos="fade-left" style="display: flex; justify-content: center;">
-                    <img src="{{ url_for('static', filename='images/gunungan_Wayang.png') }}" alt="Gunungan Wayang" style="border-radius: 20px; box-shadow: 0 0 30px rgba(212, 163, 115, 0.2); max-width: 100%; height: fit-content;">
+                    <img src="{{ url_for('static', filename='images/gunungan_Wayang.png') }}" alt="Gunungan Wayang"
+                        style="border-radius: 20px; box-shadow: 0 0 30px rgba(212, 163, 115, 0.2); max-width: 100%; height: fit-content;">
                 </div>
             </div>
         </div>
@@ -319,21 +958,34 @@
     <section class="dalang-showcase" id="dalang">
         <div class="container">
             <div class="showcase-header" data-aos="fade-right">
-                <div><h2 style="color: white; font-size: 2rem;">Mitra <span class="text-gradient">Seniman</span></h2><p style="margin: 0;">Para penjaga tradisi yang bekerjasama dengan kami.</p></div>
+                <div>
+                    <h2 style="color: white; font-size: 2rem;">Mitra <span class="text-gradient">Seniman</span></h2>
+                    <p style="margin: 0;">Para penjaga tradisi yang bekerjasama dengan kami.</p>
+                </div>
                 <a href="{{ url_for('web.mencari_dalang') }}" class="btn-outline">Lihat Semua</a>
             </div>
             <div class="dalang-list-section">
                 {% if dalangs %}
                 <div class="dalang-grid">
                     {% for dalang in dalangs %}
-                    <a href="{{ url_for('web.dalang_detail', dalang_id=dalang.id) }}" class="dalang-card" data-aos="zoom-in" data-aos-delay="{{ loop.index * 100 }}">
-                        <div class="dalang-photo-wrapper"><img src="{{ url_for('web.uploaded_file', filename=dalang.foto) if dalang.foto else 'https://via.placeholder.com/300x400/333/D4A373?text=No+Image' }}" alt="Foto {{ dalang.nama }}" class="dalang-photo"></div>
-                        <div class="dalang-info"><h4>{{ dalang.nama }}</h4><p><i class="fas fa-map-pin" style="color: #D4A373;"></i> {{ dalang.alamat[:25] }}...</p></div>
+                    <a href="{{ url_for('web.dalang_detail', dalang_id=dalang.id) }}" class="dalang-card"
+                        data-aos="zoom-in" data-aos-delay="{{ loop.index * 100 }}">
+                        <div class="dalang-photo-wrapper"><img
+                                src="{{ url_for('web.uploaded_file', filename=dalang.foto) if dalang.foto else 'https://via.placeholder.com/300x400/333/D4A373?text=No+Image' }}"
+                                alt="Foto {{ dalang.nama }}" class="dalang-photo"></div>
+                        <div class="dalang-info">
+                            <h4>{{ dalang.nama }}</h4>
+                            <p><i class="fas fa-map-pin" style="color: #D4A373;"></i> {{ dalang.alamat[:25] }}...</p>
+                        </div>
                     </a>
                     {% endfor %}
                 </div>
                 {% else %}
-                <div style="text-align: center; padding: 60px; border: 1px dashed #333; border-radius: 10px; background: rgba(255,255,255,0.02);"><i class="fas fa-user-slash" style="font-size: 3rem; color: #333; margin-bottom: 15px;"></i><p style="color: #666;">Belum ada data dalang yang ditampilkan saat ini.</p></div>
+                <div
+                    style="text-align: center; padding: 60px; border: 1px dashed #333; border-radius: 10px; background: rgba(255,255,255,0.02);">
+                    <i class="fas fa-user-slash" style="font-size: 3rem; color: #333; margin-bottom: 15px;"></i>
+                    <p style="color: #666;">Belum ada data dalang yang ditampilkan saat ini.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -341,36 +993,78 @@
 
     <section class="testimonials">
         <div class="container">
-            <div class="section-header" data-aos="fade-up"><span class="section-subtitle">APA KATA MEREKA</span><h2 style="font-size: 2.5rem; color: white;">Suara <span class="text-gradient">Sobat Wayang</span></h2></div>
-            <div class="testi-grid">
-                <div class="testi-card" data-aos="fade-up" data-aos-delay="100"><div class="testi-user"><div class="testi-avatar"><i class="fas fa-user"></i></div><div><h4 style="margin: 0; font-size: 1rem;">Budi Santoso</h4><span style="color: #666; font-size: 0.8rem;">Mahasiswa Sastra</span></div></div><p style="font-size: 0.9rem;">"Fitur Scan Wayang AI-nya keren banget! Membantu saya mengenali tokoh wayang yang jarang diketahui."</p></div>
-                <div class="testi-card" data-aos="fade-up" data-aos-delay="200"><div class="testi-user"><div class="testi-avatar"><i class="fas fa-user"></i></div><div><h4 style="margin: 0; font-size: 1rem;">Siti Aminah</h4><span style="color: #666; font-size: 0.8rem;">Guru Sejarah</span></div></div><p style="font-size: 0.9rem;">"Sangat edukatif. Kuisnya seru dan membuat murid-murid saya lebih tertarik belajar budaya lokal."</p></div>
-                <div class="testi-card" data-aos="fade-up" data-aos-delay="300"><div class="testi-user"><div class="testi-avatar"><i class="fas fa-user"></i></div><div><h4 style="margin: 0; font-size: 1rem;">Dimas Anggara</h4><span style="color: #666; font-size: 0.8rem;">Penggemar Wayang</span></div></div><p style="font-size: 0.9rem;">"Akhirnya ada platform yang menghubungkan kita dengan dalang lokal. Fitur cari dalang sangat bermanfaat."</p></div>
+            <div class="section-header" data-aos="fade-up"><span class="section-subtitle">APA KATA MEREKA</span>
+                <h2 style="font-size: 2.5rem; color: white;">Suara <span class="text-gradient">Sobat Wayang</span></h2>
             </div>
-        </div>
-    </section>
-
-    <section class="mobile-cta-section" style="padding: 100px 0;" id="mobile-app">
-        <div class="container">
-            <div class="mobile-card" data-aos="flip-up">
-                <div class="mobile-content">
-                    <span style="display: inline-block; padding: 5px 15px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; color: #fff; font-size: 0.8rem; margin-bottom: 15px;"><i class="fab fa-android"></i> Tersedia di Android</span>
-                    <h2 style="font-size: 2.5rem; color: #fff; margin-bottom: 20px;">Bawa Budaya Wayang <br> ke dalam <span class="text-gradient">Saku Anda</span></h2>
-                    <p>Download aplikasi <strong>Wayanusa Mobile</strong> untuk pengalaman yang lebih lancar. Scan wayang langsung dari kamera HP, notifikasi kuis terbaru, dan fitur AR (Augmented Reality).</p>
-                    <div class="app-badges"><a href="#" class="btn-store"><i class="fab fa-google-play" style="font-size: 2rem;"></i><div class="store-text"><span style="font-size: 0.7rem; text-transform: uppercase;">GET IT ON</span><span style="font-size: 1.1rem; font-weight: bold;">Google Play</span></div></a></div>
+            <div class="testi-grid">
+                <div class="testi-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="testi-user">
+                        <div class="testi-avatar"><i class="fas fa-user"></i></div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 1rem;">Budi Santoso</h4><span
+                                style="color: #666; font-size: 0.8rem;">Mahasiswa Sastra</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.9rem;">"Fitur Scan Wayang AI-nya keren banget! Membantu saya mengenali tokoh
+                        wayang yang jarang diketahui."</p>
                 </div>
-                <div class="mobile-image"><img src="{{ url_for('static', filename='images/hp_mockup.png') }}" onerror="this.src='https://via.placeholder.com/300x600/111/D4A373?text=App+Mockup'" alt="Wayanusa Mobile App" class="phone-mockup"></div>
+                <div class="testi-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="testi-user">
+                        <div class="testi-avatar"><i class="fas fa-user"></i></div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 1rem;">Siti Aminah</h4><span
+                                style="color: #666; font-size: 0.8rem;">Guru Sejarah</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.9rem;">"Sangat edukatif. Kuisnya seru dan membuat murid-murid saya lebih
+                        tertarik belajar budaya lokal."</p>
+                </div>
+                <div class="testi-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="testi-user">
+                        <div class="testi-avatar"><i class="fas fa-user"></i></div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 1rem;">Dimas Anggara</h4><span
+                                style="color: #666; font-size: 0.8rem;">Penggemar Wayang</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.9rem;">"Akhirnya ada platform yang menghubungkan kita dengan dalang lokal.
+                        Fitur cari dalang sangat bermanfaat."</p>
+                </div>
             </div>
         </div>
     </section>
 
     <section class="faq-section" id="faq">
         <div class="container">
-            <div class="section-header" data-aos="fade-up"><h2 style="font-size: 2.5rem; color: white;">Pertanyaan <span class="text-gradient">Umum</span></h2><p>Jawaban untuk pertanyaan yang sering diajukan pengguna.</p></div>
+            <div class="section-header" data-aos="fade-up">
+                <h2 style="font-size: 2.5rem; color: white;">Pertanyaan <span class="text-gradient">Umum</span></h2>
+                <p>Jawaban untuk pertanyaan yang sering diajukan pengguna.</p>
+            </div>
             <div class="faq-container">
-                <div class="faq-item" data-aos="fade-up" data-aos-delay="100"><details><summary class="faq-question">Apa itu Teknologi Smart Wayang?</summary><div class="faq-answer"><p>Smart Wayang adalah integrasi antara wayang golek fisik dengan teknologi IoT dan AI.</p></div></details></div>
-                <div class="faq-item" data-aos="fade-up" data-aos-delay="200"><details><summary class="faq-question">Bagaimana cara menggunakan fitur Scan AI?</summary><div class="faq-answer"><p>Buka menu "Scan Wayang", izinkan akses kamera, lalu arahkan kamera ke wayang.</p></div></details></div>
-                <div class="faq-item" data-aos="fade-up" data-aos-delay="300"><details><summary class="faq-question">Apakah aplikasi ini berbayar?</summary><div class="faq-answer"><p>Aplikasi Wayanusa dapat diunduh dan digunakan secara GRATIS.</p></div></details></div>
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="100">
+                    <details>
+                        <summary class="faq-question">Apa itu Teknologi Smart Wayang?</summary>
+                        <div class="faq-answer">
+                            <p>Smart Wayang adalah integrasi antara wayang golek fisik dengan teknologi IoT dan AI.</p>
+                        </div>
+                    </details>
+                </div>
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="200">
+                    <details>
+                        <summary class="faq-question">Bagaimana cara menggunakan fitur Scan AI?</summary>
+                        <div class="faq-answer">
+                            <p>Buka menu "Scan Wayang", izinkan akses kamera, lalu arahkan kamera ke wayang.</p>
+                        </div>
+                    </details>
+                </div>
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="300">
+                    <details>
+                        <summary class="faq-question">Apakah aplikasi ini berbayar?</summary>
+                        <div class="faq-answer">
+                            <p>Aplikasi Wayanusa dapat diunduh dan digunakan secara GRATIS.</p>
+                        </div>
+                    </details>
+                </div>
             </div>
         </div>
     </section>
@@ -389,7 +1083,9 @@
                 <div class="footer-brand">
                     <h2>WAYA<span class="text-gradient">NUSA</span></h2>
                     <p>Melestarikan warisan budaya Indonesia melalui inovasi teknologi kecerdasan buatan dan IoT.</p>
-                    <div class="social-links"><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div>
+                    <div class="social-links"><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i
+                                class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-facebook-f"></i></a><a
+                            href="#"><i class="fab fa-youtube"></i></a></div>
                 </div>
                 <div class="footer-links">
                     <h4>Jelajahi</h4>
@@ -416,7 +1112,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Wayanusa. All rights reserved.</p>
+                <p>&copy; 2026 Wayanusa. All rights reserved.</p>
                 <p>Made with <i class="fas fa-heart" style="color: var(--primary-gold);"></i> for Culture.</p>
             </div>
         </div>
@@ -425,9 +1121,9 @@
     <nav class="taskbar-container">
         <div class="taskbar">
             <a href="#home" class="taskbar-item active"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="#mobile-app" class="taskbar-item"><i class="fas fa-mobile-alt"></i><span>App</span></a>
             <a href="#features" class="taskbar-item"><i class="fas fa-th-large"></i><span>Fitur</span></a>
             <a href="#dalang" class="taskbar-item"><i class="fas fa-users"></i><span>Dalang</span></a>
-            <a href="#mobile-app" class="taskbar-item"><i class="fas fa-mobile-alt"></i><span>App</span></a>
             <a href="#faq" class="taskbar-item"><i class="fas fa-question-circle"></i><span>FAQ</span></a>
         </div>
     </nav>
@@ -499,4 +1195,5 @@
     </script>
 
 </body>
+
 </html>
