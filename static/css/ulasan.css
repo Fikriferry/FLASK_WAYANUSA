@@ -1,160 +1,148 @@
 /* ================================
-   HALAMAN ULASAN PENGGUNA
+   ROOT VARIABLES
    ================================ */
-
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 40px 20px;
-}
-
-.container h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 32px;
-    margin-bottom: 10px;
-    color: #222;
-}
-
-.container h3 {
-    margin-top: 40px;
-    font-size: 22px;
-    color: #222;
-}
-
-.container p {
-    color: #555;
-    margin-bottom: 20px;
+:root {
+    --primary-color: #b6783d;
+    --star-color: #f5a623;
+    --text-dark: #222;
+    --text-muted: #666;
+    --radius: 12px;
+    --shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 /* ================================
-   LIST ULASAN
+   CONTAINER & GRID LOGIC
    ================================ */
+.container {
+    max-width: 1000px; /* Sedikit lebih lebar agar 3 box muat nyaman */
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: 'Inter', sans-serif;
+    
+    /* Mengaktifkan Grid pada Container */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Default 3 Kolom */
+    gap: 20px;
+}
 
+/* Memaksa elemen selain Card untuk memanjang penuh (3 kolom) */
+.container > *:not(.ulasan-card) {
+    grid-column: 1 / -1;
+}
+
+/* ================================
+   ULASAN CARD (Kotak-Kotak Kecil)
+   ================================ */
 .ulasan-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-    border-left: 5px solid #b6783d;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 18px;
+    border: 1px solid #eee;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease;
 }
 
 .ulasan-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
 }
 
 .ulasan-card strong {
-    font-size: 16px;
-    color: #222;
+    display: block;
+    font-size: 15px;
+    color: var(--text-dark);
+    margin-bottom: 4px;
 }
 
+/* Styling Rating (Span di HTML kamu) */
 .ulasan-card span {
-    float: right;
-    font-size: 15px;
-    color: #f5a623;
+    font-size: 13px;
+    color: var(--star-color);
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .ulasan-card p {
-    margin: 10px 0;
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.5;
     color: #444;
+    margin: 0 0 15px 0;
+    flex-grow: 1; /* Biar teks ulasan ngisi ruang */
 }
 
 .ulasan-card small {
-    color: #888;
-    font-size: 13px;
+    font-size: 11px;
+    color: #999;
+    border-top: 1px solid #f5f5f5;
+    padding-top: 8px;
 }
 
 /* ================================
-   FORM ULASAN
+   STYLING FORM & INPUT
    ================================ */
-
 form {
-    background: #f9f9f9;
+    background: #fdfdfd;
     padding: 25px;
-    border-radius: 14px;
+    border-radius: var(--radius);
+    border: 1px solid #eee;
     margin-top: 20px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.05);
 }
 
-form select,
 form textarea {
     width: 100%;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    margin-bottom: 15px;
-    font-size: 15px;
-    font-family: 'Inter', sans-serif;
-    outline: none;
-    transition: border 0.2s ease;
-}
-
-form select:focus,
-form textarea:focus {
-    border-color: #b6783d;
-}
-
-form textarea {
-    min-height: 120px;
-    resize: vertical;
+    min-height: 100px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin: 15px 0;
+    font-family: inherit;
+    box-sizing: border-box; /* Penting agar tidak pecah layout */
 }
 
 form button {
-    background: #b6783d;
-    color: #fff;
+    background: var(--primary-color);
+    color: white;
     border: none;
-    padding: 12px 28px;
-    border-radius: 30px;
-    font-size: 15px;
-    font-weight: 600;
+    padding: 12px 25px;
+    border-radius: 25px;
     cursor: pointer;
-    transition: background 0.25s ease, transform 0.2s ease;
+    font-weight: 600;
+    transition: 0.3s;
 }
 
 form button:hover {
     background: #9e6533;
-    transform: translateY(-2px);
+}
+
+/* ================================
+   STAR RATING INTERAKTIF
+   ================================ */
+.star-rating {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.star-rating i {
+    color: #ddd;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.star-rating i.active {
+    color: var(--star-color);
 }
 
 /* ================================
    RESPONSIVE
    ================================ */
-
-@media (max-width: 600px) {
-    .container {
-        padding: 30px 15px;
-    }
-
-    .ulasan-card span {
-        float: none;
-        display: block;
-        margin-top: 5px;
-    }
-}
-/* ================================
-   STAR RATING INTERAKTIF
-   ================================ */
-
-.star-rating {
-    display: flex;
-    gap: 8px;
-    font-size: 28px;
-    margin-bottom: 16px;
-    cursor: pointer;
+/* Tablet: Jadi 2 kolom */
+@media (max-width: 850px) {
+    .container { grid-template-columns: repeat(2, 1fr); }
 }
 
-.star-rating i {
-    color: #ccc;
-    transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.star-rating i.active {
-    color: #f5a623;
-}
-
-.star-rating i:hover {
-    transform: scale(1.15);
+/* HP: Jadi 1 kolom */
+@media (max-width: 550px) {
+    .container { grid-template-columns: 1fr; }
 }

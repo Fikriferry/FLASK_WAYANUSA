@@ -90,9 +90,7 @@ class RagService:
             self.embeddings, 
             allow_dangerous_deserialization=True
         )
-        
         retriever = self.vector_store.as_retriever(search_kwargs={"k": 3})
-        
         prompt_template = """
         Kamu adalah Asisten Pintar bernama "Cepot" yang ahli tentang budaya Wayang.
         Jawab pertanyaan berdasarkan konteks berikut ini. Jika jawaban tidak ada di konteks,
@@ -105,11 +103,9 @@ class RagService:
 
         Jawaban (Bahasa Indonesia yang sopan):
         """
-        
         PROMPT = PromptTemplate(
             template=prompt_template, input_variables=["context", "question"]
         )
-
         self.qa_chain = RetrievalQA.from_chain_type(
             llm=self.llm,
             chain_type="stuff",

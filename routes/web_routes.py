@@ -83,7 +83,12 @@ def save_wayang_file(file):
 # =========================
 @web_routes.route('/')
 def home():
-    return render_template('index.html')
+    # Ambil 4 atau 8 dalang terbaru untuk ditampilkan di Home
+    # Kita limit biar halaman tidak berat load-nya
+    dalangs = Dalang.query.order_by(Dalang.id.desc()).limit(4).all()
+    
+    # Kirim variable 'dalangs' ke template
+    return render_template('index.html', dalangs=dalangs)
 
 # User login/register/logout
 @web_routes.route('/login', methods=['GET','POST'])
@@ -133,22 +138,30 @@ def logout_user():
 
 @web_routes.route('/pengenalan-wayang')
 def pengenalan_wayang():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     return render_template('pengenalan_wayang.html')
 
 @web_routes.route('/pertunjukan-wayang')
 def pertunjukan_wayang():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     videos = Video.query.filter_by(tampil=True).all()
     return render_template('pertunjukan_wayang.html', videos=videos)
 
 @web_routes.route('/quiz')
 @user_login_required
 def quiz():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     levels = QuizLevel.query.all()
     return render_template('quiz.html', levels=levels)
 
 @web_routes.route('/quiz/play')
 @user_login_required
 def quiz_play():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     level_id = request.args.get('level', type=int)
     if not level_id:
         flash('Level quiz tidak valid!', 'error')
@@ -163,11 +176,15 @@ def quiz_play():
 
 @web_routes.route('/mencari-dalang')
 def mencari_dalang():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     dalangs = Dalang.query.all()   
     return render_template('mencari_dalang.html', dalangs=dalangs)
 
 @web_routes.route('/dalang/<int:dalang_id>')
 def dalang_detail(dalang_id):
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     dalang = Dalang.query.get_or_404(dalang_id)
     return render_template('dalang_detail.html', dalang=dalang)
 
@@ -182,6 +199,8 @@ def video_detail(id):
 
 @web_routes.route('/search')
 def search_video():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     q = request.args.get("q", "")
 
     # HINDARI: q kosong tapi masih tampil ""
@@ -196,16 +215,22 @@ def search_video():
 
 @web_routes.route('/artikel')
 def artikel():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     artikels = Article.query.order_by(Article.created_at.desc()).all()
     return render_template('artikel.html', artikels=artikels)
 
 @web_routes.route('/artikel/<int:id>')
 def artikel_detail(id):
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     artikel = Article.query.get_or_404(id)
     return render_template('artikel_detail.html', artikel=artikel)
 
 @web_routes.route('/s-dalang')
 def simulasi_dalang():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('web.login_user'))
     wayangs = WayangGame.query.order_by(WayangGame.id.asc()).all()
     print("Jumlah wayang:", len(wayangs))  # Debug: cek di console server
     return render_template("simulasi_dalang.html", wayangs=wayangs)
@@ -250,8 +275,11 @@ def admin_dashboard():
     dalang_count = Dalang.query.count()
     artikel_count = Article.query.count()
     ulasan_count = UlasanAplikasi.query.count()
+    quiz_count = QuizQuestion.query.count()
+    video_count = Video.query.count()
     dalangs = Dalang.query.all()
-    return render_template('admin/index.html', dalang_count=dalang_count, artikel_count=artikel_count, ulasan_count=ulasan_count, dalangs=dalangs)
+    print(f"DEBUG: video_count = {video_count}")  # Debug print
+    return render_template('admin/index.html', dalang_count=dalang_count, artikel_count=artikel_count, ulasan_count=ulasan_count, quiz_count=quiz_count, video_count=video_count, dalangs=dalangs)
 
 # =========================
 # DALANG CRUD
@@ -500,19 +528,31 @@ def delete_model(id):
 @web_routes.route('/admin/quiz/list')
 @admin_login_required
 def quiz_list():
-    # PERBAIKAN: Tambahkan option_a, b, c, d ke dalam query
-    questions = QuizQuestion.query.join(QuizLevel).add_columns(
-        QuizQuestion.id,
-        QuizQuestion.question,
-        QuizQuestion.option_a, # <--- WAJIB ADA
-        QuizQuestion.option_b, # <--- WAJIB ADA
-        QuizQuestion.option_c, # <--- WAJIB ADA
-        QuizQuestion.option_d, # <--- WAJIB ADA
-        QuizQuestion.correct_answer,
-        QuizLevel.name.label('level_name')
-    ).all()
-    
-    return render_template('admin/quiz_list.html', questions=questions)
+
+    questions = (
+        QuizQuestion.query
+        .join(QuizLevel)
+        .add_columns(
+            QuizQuestion.id,
+            QuizQuestion.question,
+            QuizQuestion.option_a,
+            QuizQuestion.option_b,
+            QuizQuestion.option_c,
+            QuizQuestion.option_d,
+            QuizQuestion.correct_answer,
+            QuizQuestion.level_id,   # ✅ INI KUNCI UTAMA
+            QuizLevel.name.label('level_name')
+        )
+        .all()
+    )
+
+    levels = QuizLevel.query.all()
+
+    return render_template(
+        'admin/quiz_list.html',
+        questions=questions,
+        levels=levels
+    )
 
 
 @web_routes.route('/admin/quiz/add', methods=['GET', 'POST'])
@@ -952,8 +992,7 @@ def admin_wayanggame_edit(id):
         flash('WayangGame berhasil diperbarui!', 'success')
         return redirect(url_for('web.admin_wayanggame_list'))
 
-    return render_template("admin/wayanggame_edit.html", item=item)
-
+    return render_template("admin/wayanggame_edit.html", item=game)
     return render_template('admin/wayanggame_form.html', game=game, files=files)
 
 # --- DELETE WAYANGGAME ---
@@ -1107,3 +1146,66 @@ def admin_user_list():
         users=users,
         admins=admins
     )
+
+# @web_routes.route('/smart_wayang')
+# def smart_wayang():
+#     return render_template('smart_wayang.html')
+
+# @web_routes.route('/pengenalan_wayang')
+# def pengenalan_wayang():
+#     return render_template('pengenalan_wayang.html')
+
+# @web_routes.route('/quiz')
+# def quiz():
+#     return render_template('quiz.html')
+
+# @web_routes.route('/mencari_dalang')
+# def mencari_dalang():
+#     return render_template('mencari_dalang.html')
+
+# @web_routes.route('/quiz_play')
+# def quiz_play():
+#     return render_template('quiz_play.html')
+
+# @web_routes.route('/artikel')
+# def artikel():
+#     artikels = Article.query.order_by(Article.created_at.desc()).all()
+#     return render_template('artikel.html', artikels=artikels)
+
+# @web_routes.route('/pertunjukan_wayang')
+# def pertunjukan_wayang():
+#     videos = Video.query.all()
+#     return render_template('pertunjukan_wayang.html', videos=videos)
+
+# @web_routes.route('/leaderboard_wayang')
+# def leaderboard_wayang():
+#     return render_template('leaderboard_wayang.html')
+
+# @web_routes.route('/simulasi_dalang')
+# def simulasi_dalang():
+#     wayangs = WayangGame.query.all()
+#     return render_template('simulasi_dalang.html', wayangs=wayangs)
+
+# @web_routes.route('/uploaded_file/<path:filename>')
+# def uploaded_file(filename):
+#     return send_from_directory('static/uploads', filename)
+
+# @web_routes.route('/search_video', methods=['GET'])
+# def search_video():
+#     query = request.args.get('q', '')
+#     if query:
+#         videos = Video.query.filter(Video.judul.contains(query)).all()
+#     else:
+#         videos = Video.query.all()
+#     return render_template('search_video.html', videos=videos, query=query)
+
+# @web_routes.route('/video_detail/<int:id>')
+# def video_detail(id):
+#     video = Video.query.get_or_404(id)
+#     related_videos = Video.query.filter(Video.id != id).limit(5).all()
+#     return render_template('video_detail.html', video=video, related_videos=related_videos)
+
+# @web_routes.route('/artikel_detail/<int:id>')
+# def artikel_detail(id):
+#     artikel = Article.query.get_or_404(id)
+#     return render_template('artikel_detail.html', artikel=artikel)

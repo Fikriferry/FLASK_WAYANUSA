@@ -1,300 +1,556 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="id">
 
-{% block title %}Pengenalan Wayang - WAYANUSA{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Wayang Scanner - WAYANUSA</title>
 
-{% block head_extra %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/wayang.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+
     <style>
-        /* Agar background section menyatu dengan navbar jika transparan */
-        .wayang-recognition {
-            padding-top: 100px;
+        /* --- THEME VARIABLES --- */
+        :root {
+            --gold: #D4A373;
+            --gold-glow: rgba(212, 163, 115, 0.5);
+            --dark-bg: #050505;
+            --glass-bg: rgba(30, 30, 30, 0.6);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- BACKGROUND DECORATION --- */
+        .glow-spot {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(212, 163, 115, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .spot-1 { top: -100px; left: -100px; }
+        .spot-2 { bottom: -100px; right: -100px; }
+
+        /* --- MAIN LAYOUT --- */
+        .scanner-section {
+            min-height: 100vh;
+            padding-top: 100px; /* Space for fixed navbar */
+            padding-bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .scanner-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 0 20px;
+        }
+
+        /* --- HEADER TEXT --- */
+        .scanner-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .scanner-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .scanner-header p {
+            color: #aaa;
+            font-size: 1rem;
+        }
+
+        /* --- PROGRESS STEPS --- */
+        .steps-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .step-item {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            position: relative;
+            z-index: 2;
+            transition: 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .step-item.active {
+            background: var(--gold);
+            color: #000;
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .step-item.completed {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .step-line {
+            width: 60px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 10px;
+        }
+
+        .step-line.filled {
+            background: var(--gold);
+        }
+
+        /* --- CARDS (STAGES) --- */
+        .stage-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: none; /* Hidden by default */
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        .stage-card.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* STAGE 1: SELECTION */
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 30px 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option-btn:hover {
+            background: rgba(212, 163, 115, 0.1);
+            border-color: var(--gold);
+            transform: translateY(-5px);
+        }
+
+        .option-icon {
+            font-size: 2.5rem;
+            color: var(--gold);
+        }
+
+        .option-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* STAGE 2: PREVIEW */
+        .preview-box {
+            width: 100%;
+            height: 300px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: #000;
+            position: relative;
+            border: 1px solid var(--border-glass);
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* SCANNING EFFECT */
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gold);
+            box-shadow: 0 0 10px var(--gold), 0 0 20px var(--gold);
+            animation: scan 2s infinite linear;
+            display: none; /* Show when scanning */
+        }
+
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* STAGE 3: RESULT */
+        .result-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border-radius: 50px;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .wayang-title {
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .wayang-desc {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        /* BUTTONS */
+        .btn-main {
+            background: linear-gradient(135deg, var(--gold), #b88656);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-main:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(212, 163, 115, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Hidden File Input */
+        #fileInput { display: none; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .option-grid { grid-template-columns: 1fr; }
+            .preview-box { height: 250px; }
         }
     </style>
-{% endblock %}
+</head>
 
-{% block content %}
-    <section class="wayang-recognition">
-        <div class="recognition-wrapper">
+<body>
 
-            <div class="recognition-header">
-                <div class="back-btn-wrapper">
-                    <button class="back-btn" onclick="goBack()" title="Kembali">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                </div>
-                <h1 class="recognition-title">Identifikasi Wayang AI</h1>
-                <p style="color: #bbb; margin-top: 10px;">Gunakan teknologi AI untuk mengenali tokoh wayang favoritmu</p>
-            </div>
+    {% include 'layouts/navbar.html' %} 
 
-            <div class="recognition-card" id="recognitionCard">
-                
-                <div class="progress-indicator">
-                    <div class="progress-step"><div class="step-circle" id="step1">1</div></div>
-                    <div class="step-line" id="line1"></div>
+    <div class="glow-spot spot-1"></div>
+    <div class="glow-spot spot-2"></div>
 
-                    <div class="progress-step"><div class="step-circle" id="step2">2</div></div>
-                    <div class="step-line" id="line2"></div>
-
-                    <div class="progress-step"><div class="step-circle" id="step3">3</div></div>
-                    <div class="step-line" id="line3"></div>
-
-                    <div class="progress-step"><div class="step-circle" id="step4">4</div></div>
-                </div>
-
-                <div class="stage-content" id="stageContent">
-                    <div id="stage1" class="fade-in-up" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-                        <h3 style="margin-bottom: 30px; color: #6B4226;">Pilih Metode Pengambilan Gambar</h3>
-                        <div class="selection-grid">
-                            <div class="selection-card" onclick="selectMethod('camera')">
-                                <div class="selection-icon"><i class="fas fa-camera"></i></div>
-                                <div class="selection-title">Gunakan Kamera</div>
-                                <div class="selection-desc">Ambil foto langsung dari kamera perangkatmu</div>
-                            </div>
-                            <div class="selection-card" onclick="selectMethod('upload')">
-                                <div class="selection-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                                <div class="selection-title">Upload File</div>
-                                <div class="selection-desc">Pilih foto dari galeri (JPG/PNG)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <section class="scanner-section">
+        
+        <div class="scanner-header" data-aos="fade-down">
+            <h1>AI Scanner</h1>
+            <p>Identifikasi tokoh wayang dalam hitungan detik.</p>
         </div>
-    </section>
-{% endblock %}
 
-{% block scripts_extra %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- 1. SETUP VARIABEL GLOBAL ---
-        let currentStage = 1;
-        let selectedMethod = null;
-        let selectedFile = null;
-        let previewUrl = null;
-
-        // --- 2. FUNGSI NAVIGASI ---
-        window.goBack = function() {
-            window.history.back();
-        };
-
-        // --- 3. PILIH METODE ---
-        window.selectMethod = function(method) {
-            // Cek Login Session dari Flask (Jinja Render)
-            const isLoggedIn = {{ session.get('user_logged_in', False)|tojson }};
+        <div class="scanner-container">
             
-            if (!isLoggedIn) {
-                alert('Silakan login terlebih dahulu untuk menggunakan fitur ini.');
-                window.location.href = "{{ url_for('web.login_user') }}";
-                return;
-            }
+            <div class="steps-wrapper" data-aos="zoom-in">
+                <div class="step-item active" id="step1">1</div>
+                <div class="step-line" id="line1"></div>
+                <div class="step-item" id="step2">2</div>
+                <div class="step-line" id="line2"></div>
+                <div class="step-item" id="step3">3</div>
+            </div>
 
-            selectedMethod = method;
-            selectedFile = null;
-
-            if (selectedMethod === 'camera') {
-                showStage2();
-            } else if (selectedMethod === 'upload') {
-                showStage3();
-            }
-        };
-
-        // --- 4. UPDATE PROGRESS BAR ---
-        window.updateProgress = function(stage) {
-            currentStage = stage;
-            for (let i = 1; i <= 4; i++) {
-                const step = document.getElementById(`step${i}`);
-                const line = document.getElementById(`line${i}`);
-
-                if(step) {
-                    step.className = 'step-circle';
-                    if (i < currentStage) step.classList.add('completed');
-                    else if (i === currentStage) step.classList.add('active');
-                }
-                
-                if(line) {
-                    line.className = 'step-line';
-                    if (i < currentStage) line.classList.add('completed');
-                    else if (i === currentStage) line.classList.add('active');
-                }
-            }
-        };
-
-        // --- 5. STAGE 2: KAMERA (SIMULASI) ---
-        window.showStage2 = function() {
-            updateProgress(2);
-            const stageContent = document.getElementById('stageContent');
-            stageContent.innerHTML = `
-                <div class="fade-in-up" style="display:flex; flex-direction:column; align-items:center;">
-                    <div class="camera-frame">
-                        <div class="scanner-line"></div>
-                        <div style="width:100%; height:100%; background: #222; display:flex; align-items:center; justify-content:center;">
-                            <i class="fas fa-video" style="color:#444; font-size:3rem;"></i>
-                        </div>
-                        <div class="camera-overlay">
-                            <button class="shutter-btn" onclick="capturePhoto()" title="Ambil Foto"></button>
-                        </div>
+            <div id="stage1" class="stage-card active">
+                <h3 style="margin-bottom: 20px;">Pilih Metode Scan</h3>
+                <div class="option-grid">
+                    <div class="option-btn" onclick="openCamera()">
+                        <i class="fas fa-camera option-icon"></i>
+                        <span class="option-title">Ambil Foto</span>
                     </div>
-                    <p style="margin-top:15px; color:#666; font-size:0.9rem;">Posisikan wayang di dalam bingkai</p>
-                    <button onclick="resetToStage1()" class="action-btn btn-secondary" style="margin-top:10px;">Kembali</button>
-                </div>
-            `;
-        };
-
-        window.capturePhoto = function() {
-            // Simulasi Fetch Gambar (Placeholder)
-            fetch("https://via.placeholder.com/300x400/D4A373/FFFFFF?text=Wayang+Capture")
-                .then(res => res.blob())
-                .then(blob => {
-                    selectedFile = new File([blob], "capture.jpg", { type: "image/jpeg" });
-                    previewUrl = URL.createObjectURL(blob);
-                    showPreviewStage();
-                });
-        };
-
-        // --- 6. STAGE 3: UPLOAD ---
-        window.showStage3 = function() {
-            updateProgress(3);
-            const stageContent = document.getElementById('stageContent');
-            stageContent.innerHTML = `
-                <div class="fade-in-up" style="width:100%; display:flex; flex-direction:column; align-items:center;">
-                    <label class="upload-zone" for="fileInput">
-                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                        <div class="upload-text">Klik untuk Upload Foto</div>
-                        <div class="upload-subtext">JPG, PNG (Max 5MB)</div>
-                        <input type="file" id="fileInput" class="file-input" accept="image/*" 
-                               onclick="this.value=null" 
-                               onchange="handleFileUpload(event)">
+                    <label for="fileInput" class="option-btn">
+                        <i class="fas fa-cloud-upload-alt option-icon"></i>
+                        <span class="option-title">Upload Galeri</span>
                     </label>
-                    <button onclick="resetToStage1()" class="action-btn btn-secondary" style="margin-top:20px;">Kembali</button>
+                    <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
                 </div>
-            `;
-        };
+            </div>
 
-        window.handleFileUpload = function(event) {
-            if (event.target.files && event.target.files.length > 0) {
-                const file = event.target.files[0];
-                if (!file.type.startsWith('image/')) {
-                    alert('Mohon upload file gambar (JPG/PNG).');
-                    return;
-                }
-                selectedFile = file;
-                previewUrl = URL.createObjectURL(file);
-                showPreviewStage();
-            }
-        };
-
-        // --- 7. PREVIEW & KONFIRMASI ---
-        window.showPreviewStage = function() {
-            updateProgress(3);
-            const stageContent = document.getElementById('stageContent');
-            stageContent.innerHTML = `
-                <div class="fade-in-up" style="display:flex; flex-direction:column; align-items:center;">
-                    <div class="preview-container">
-                        <img src="${previewUrl}" class="image-preview" alt="Preview">
-                    </div>
-                    <h4 style="margin-top:20px; color:#444;">Apakah foto sudah jelas?</h4>
-                    <div style="display:flex; gap:15px;">
-                        <button class="action-btn btn-secondary" onclick="resetToStage1()">Ulangi</button>
-                        <button class="action-btn btn-primary" onclick="processImage()">
-                            <i class="fas fa-search"></i> Analisis Sekarang
+            <div id="stage2" class="stage-card">
+                <div class="preview-box">
+                    <img id="previewImg" class="preview-img" src="" alt="Preview">
+                    <div class="scanner-line" id="scanEffect"></div>
+                </div>
+                
+                <div id="actionButtons">
+                    <p style="color: #ccc; margin-bottom: 20px;">Pastikan gambar wayang terlihat jelas.</p>
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button class="btn-secondary" onclick="resetApp()">Ganti Foto</button>
+                        <button class="btn-main" onclick="processImage()">
+                            <i class="fas fa-magic"></i> Analisis AI
                         </button>
                     </div>
                 </div>
-            `;
-        };
 
-        window.resetToStage1 = function() {
-            updateProgress(1);
-            document.getElementById('stageContent').innerHTML = `
-                <div id="stage1" class="fade-in-up" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-                    <h3 style="margin-bottom: 30px; color: #6B4226;">Pilih Metode Pengambilan Gambar</h3>
-                    <div class="selection-grid">
-                        <div class="selection-card" onclick="selectMethod('camera')">
-                            <div class="selection-icon"><i class="fas fa-camera"></i></div>
-                            <div class="selection-title">Gunakan Kamera</div>
-                            <div class="selection-desc">Ambil foto langsung dari kamera perangkatmu</div>
-                        </div>
-                        <div class="selection-card" onclick="selectMethod('upload')">
-                            <div class="selection-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                            <div class="selection-title">Upload File</div>
-                            <div class="selection-desc">Pilih foto dari galeri (JPG/PNG)</div>
-                        </div>
-                    </div>
+                <div id="loadingState" style="display: none;">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--gold); margin-bottom: 15px;"></i>
+                    <h3 style="color: var(--gold);">Sedang Menganalisis...</h3>
+                    <p style="font-size: 0.9rem; color: #888;">AI sedang mencocokkan pola wayang.</p>
                 </div>
-            `;
-        };
+            </div>
 
-        // --- 8. PROSES API KE BACKEND ---
-        window.processImage = async function() {
-            if (!selectedFile) return;
-
-            // Tampilkan Loading
-            const stageContent = document.getElementById('stageContent');
-            stageContent.innerHTML = `
-                <div class="fade-in-up" style="text-align: center; padding:40px;">
-                    <div style="width: 60px; height: 60px; border: 5px solid #f3f3f3; border-top: 5px solid #D4A373; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-                    <h3 style="color: #6B4226; margin-top: 20px;">AI Sedang Berpikir...</h3>
-                    <p style="color: #888;">Menganalisis pola wayang di server</p>
+            <div id="stage3" class="stage-card">
+                <div class="result-badge" id="confidenceBadge">Akurasi: 98%</div>
+                <h2 class="wayang-title" id="resultName">Nama Wayang</h2>
+                
+                <div class="wayang-desc">
+                    <p id="resultDesc">Deskripsi wayang akan muncul di sini. AI akan menjelaskan latar belakang dan karakter dari tokoh wayang yang terdeteksi.</p>
                 </div>
-            `;
+
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button class="btn-secondary" onclick="window.location.href='{{ url_for('web.home') }}'">Ke Beranda</button>
+                    <button class="btn-main" onclick="resetApp()">
+                        <i class="fas fa-redo"></i> Scan Lagi
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer style="background: #000; color: #666; padding: 40px 0; text-align: center; border-top: 1px solid #222;">
+        <div class="container">
+            <p>&copy; 2024 WAYANUSA. Melestarikan Budaya dengan Teknologi.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Init Animation
+        AOS.init();
+
+        // Variabel Global
+        let currentFile = null;
+
+        // Navbar Logic (Burger Menu) - Wajib ada karena Standalone
+        document.addEventListener("DOMContentLoaded", function() {
+            const burger = document.getElementById('burgerMenu');
+            const menu = document.getElementById('navbarMenu');
+
+            if(burger && menu) {
+                burger.classList.remove('active');
+                menu.classList.remove('active');
+                const newBurger = burger.cloneNode(true);
+                burger.parentNode.replaceChild(newBurger, burger);
+
+                newBurger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.classList.toggle('active');
+                    menu.classList.toggle('active');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (menu.classList.contains('active') && !menu.contains(e.target) && !newBurger.contains(e.target)) {
+                        menu.classList.remove('active');
+                        newBurger.classList.remove('active');
+                    }
+                });
+            }
+        });
+
+        // --- APP LOGIC ---
+
+        function switchStage(stageNum) {
+            // Sembunyikan semua stage
+            document.querySelectorAll('.stage-card').forEach(el => el.classList.remove('active'));
+            // Tampilkan stage tujuan
+            document.getElementById(`stage${stageNum}`).classList.add('active');
+
+            // Update Progress Bar
+            updateProgress(stageNum);
+        }
+
+        function updateProgress(num) {
+            for (let i = 1; i <= 3; i++) {
+                const step = document.getElementById(`step${i}`);
+                const line = document.getElementById(`line${i-1}`); // Line sebelumnya
+                
+                step.classList.remove('active', 'completed');
+                if (line) line.classList.remove('filled');
+
+                if (i < num) {
+                    step.classList.add('completed');
+                    step.innerHTML = '<i class="fas fa-check"></i>';
+                    if (line) line.classList.add('filled');
+                } else if (i === num) {
+                    step.classList.add('active');
+                    step.innerHTML = i;
+                } else {
+                    step.innerHTML = i;
+                }
+            }
+        }
+
+        // 1. Handle Upload File
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        // 2. Handle Camera (Simulasi klik input file kamera di HP)
+        function openCamera() {
+            // Di HP, input type file bisa akses kamera
+            document.getElementById('fileInput').click();
+        }
+
+        function processFile(file) {
+            currentFile = file;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                switchStage(2);
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // 3. Process Image (Kirim ke API)
+        async function processImage() {
+            // UI Loading
+            document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('scanEffect').style.display = 'block';
 
             const formData = new FormData();
-            formData.append('image', selectedFile);
+            formData.append('image', currentFile);
 
             try {
-                // Panggil API Python
+                // Ganti URL ini dengan endpoint API Flask kamu
                 const response = await fetch('/api/predict-wayang', {
                     method: 'POST',
                     body: formData
                 });
+
                 const data = await response.json();
 
                 if (response.ok) {
-                    showResult(data);
+                    // Tampilkan Hasil
+                    setTimeout(() => {
+                        showResult(data);
+                    }, 2000); // Delay dikit biar efek scanning kelihatan keren
                 } else {
-                    alert("Gagal: " + (data.error || "Terjadi kesalahan di server."));
-                    resetToStage1();
+                    alert('Gagal: ' + (data.error || 'Server error'));
+                    resetUIState();
                 }
+
             } catch (error) {
-                console.error("API Error", error);
-                alert("Koneksi Error: Pastikan server Flask berjalan.");
-                resetToStage1();
+                console.error(error);
+                // alert('Error koneksi ke server. Memuat hasil simulasi...');
+                
+                // --- SIMULASI HASIL (HAPUS INI JIKA API SUDAH READY) ---
+                setTimeout(() => {
+                    showResult({
+                        prediksi: "Gatotkaca",
+                        confidence: "95%",
+                        deskripsi: "Gatotkaca adalah tokoh wayang ksatria berotot kawat tulang besi. Ia mampu terbang dan merupakan putra Bima."
+                    });
+                }, 2000);
+                // --------------------------------------------------------
             }
-        };
+        }
 
-        // --- 9. TAMPILKAN HASIL ---
-        window.showResult = function(data) {
-            updateProgress(4);
-            const namaWayang = data.prediksi;
-            const confidence = data.confidence;
-            const deskripsi = data.deskripsi;
+        function showResult(data) {
+            document.getElementById('resultName').innerText = data.prediksi || "Tidak Dikenali";
+            document.getElementById('confidenceBadge').innerText = `Akurasi: ${data.confidence || '0%'}`;
+            document.getElementById('resultDesc').innerText = data.deskripsi || "Tidak ada deskripsi.";
+            
+            switchStage(3);
+        }
 
-            const stageContent = document.getElementById('stageContent');
-            stageContent.innerHTML = `
-                <div class="result-layout fade-in-up">
-                    <div class="result-img-wrapper">
-                        <img src="${previewUrl}" class="result-img" alt="${namaWayang}">
-                    </div>
-                    <div class="result-info">
-                        <span class="confidence-badge"><i class="fas fa-check-circle"></i> Akurasi: ${confidence}</span>
-                        <h2 class="wayang-name">${namaWayang}</h2>
-                        <div class="wayang-desc">
-                            <p>${deskripsi}</p>
-                        </div>
-                        <button class="action-btn btn-primary" onclick="resetToStage1()">
-                            <i class="fas fa-redo"></i> Coba Lagi
-                        </button>
-                    </div>
-                </div>
-            `;
-        };
+        function resetUIState() {
+            document.getElementById('actionButtons').style.display = 'block';
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('scanEffect').style.display = 'none';
+        }
 
-        // CSS Animasi Loading (Inject Script)
-        const style = document.createElement('style');
-        style.textContent = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
-        document.head.appendChild(style);
-    });
-</script>
-{% endblock %}
+        function resetApp() {
+            currentFile = null;
+            document.getElementById('fileInput').value = ""; // Reset input
+            resetUIState();
+            switchStage(1);
+        }
+
+    </script>
+</body>
+</html>

@@ -1,39 +1,45 @@
 import os
-from flask import Blueprint, jsonify, request, Flask, url_for
-from models import db, User, Dalang, Wayang, AIModel, Video, Article, UlasanAplikasi
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from flask import Blueprint, app, jsonify, request, Flask, url_for, current_app
+from models import db, User, Dalang, Wayang, AIModel, Video, Article, UlasanAplikasi, WayangGame
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
     get_jwt_identity
 )
 from ai_manager import get_model
+from services.sentiment_service import predict_sentiment
 from datetime import datetime
 import numpy as np
 import io
-from PIL import Image
+from PIL import Image, ImageOps # <--- Pastikan import ImageOps
+from werkzeug.security import generate_password_hash
 import google.generativeai as genai
 from cepot_controller import cepot_system
 from dotenv import load_dotenv
 from functools import wraps
 from sqlalchemy import func
 from services.rag_service import rag_service
-# try:
-#     from services.rag_service import rag_service
-# except Exception as e:
-#     rag_service = None
-#     print("⚠️ RAG Service dimatikan sementara:", e)
 import re # Import Regex untuk parsing link Youtube
 from werkzeug.utils import secure_filename
 import uuid
 from langchain_core.messages import HumanMessage, SystemMessage
 from services.sentiment_service import predict_sentiment
+import json
+from google.auth.transport import requests
+from werkzeug.utils import secure_filename
 
-# ================================
-# KONFIGURASI BLUEPRINT
-# ================================
-api = Blueprint("api", __name__, url_prefix="/api")
-auth_api = Blueprint("auth_api", __name__, url_prefix="/api/auth")
+# UPLOAD_FOLDER = 'static/uploads/profile_pics'
+# ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
+# Pastikan folder sudah ada saat server jalan
+# if not os.path.exists(UPLOAD_FOLDER):
+#     os.makedirs(UPLOAD_FOLDER)
+
+def allowed_file(filename):
+    allowed_extensions = {'png', 'jpg', 'jpeg'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 # ================================
 # GEMINI CONFIG
 # ================================
@@ -51,6 +57,15 @@ Instruksi: Kamu adalah Asisten Pintar bernama "Cepot" yang ahli tentang budaya W
         Jawab pertanyaan berdasarkan konteks berikut ini. Jika jawaban di luar konteks wayang,
         katakan "Maaf, Cepot tidak bisa menjawab karena pertanyaan di luar konteks wayang.
 """
+
+# ================================
+# BLUEPRINT DEFINITIONS (WAJIB)
+# ================================
+api = Blueprint("api", __name__)
+auth_api = Blueprint("auth_api", __name__)
+
+
+
 
 # ================================
 # AUTH API
@@ -89,6 +104,72 @@ def login():
         "user": {"id": user.id, "name": user.name, "email": user.email}
     })
 
+@auth_api.route("/google/android", methods=["POST"])
+def google_login_android():
+    print(">>> SERVER SUDAH PAKAI KODE TERBARU! <<<")
+    data = request.get_json()
+    token = data.get("idToken") 
+
+    if not token:
+        return jsonify({"success": False, "message": "Token is missing"}), 400
+
+    try:
+        # PENTING: Isi ini harus WEB CLIENT ID
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
+        print(f"DEBUG: Client ID yang dimuat adalah {client_id}")
+
+        idinfo = id_token.verify_oauth2_token(
+            token,
+            requests.Request(),
+            client_id,
+            clock_skew_in_seconds=60 # Toleransi 60 detik
+        )
+
+        email = idinfo["email"]
+        name = idinfo.get("name")
+        google_id = idinfo["sub"] # ID Unik dari Google
+
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            # Jika user baru, buat akun otomatis
+            user = User(
+                name=name,
+                email=email,
+                google_id=google_id,
+                password_hash="-" # Penanda user Google
+            )
+            db.session.add(user)
+            db.session.commit()
+        elif not user.google_id:
+            # Jika user sudah ada (daftar via email), hubungkan dengan Google ID
+            user.google_id = google_id
+            db.session.commit()
+
+        # Gunakan str(user.id) agar konsisten dengan login email
+        access_token = create_access_token(identity=str(user.id))
+
+        return jsonify({
+            "success": True,
+            "access_token": access_token,
+            "user": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "profile_pic": user.profile_pic # <--- TAMBAHKAN JUGA DI SINI
+            }
+        })
+
+    except Exception as e:
+        # Log di terminal Flask tetap ada
+        print(f"❌ Verifikasi Gagal: {str(e)}") 
+        
+        # Kirim error aslinya ke Flutter agar kamu tidak menebak-nebak
+        return jsonify({
+            "success": False, 
+            "message": f"Server Error: {str(e)}" 
+        }), 500 # Gunakan 500 untuk error internal server
+
 
 @auth_api.route("/profile", methods=["GET"])
 @jwt_required()
@@ -96,43 +177,64 @@ def profile():
     uid = int(get_jwt_identity())
     user = User.query.get(uid)
 
-
     if not user:
         return jsonify({"message": "User tidak ditemukan"}), 404
 
     return jsonify({
         "id": user.id,
         "name": user.name,
-        "email": user.email
+        "email": user.email,
+        "profile_pic": user.profile_pic  # <--- WAJIB TAMBAHKAN INI
     }), 200
 
 @auth_api.route("/profile", methods=["PUT"])
 @jwt_required()
 def update_profile():
-    uid = int(get_jwt_identity())
-    user = User.query.get(uid)
-
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    
     if not user:
-        return jsonify({"status": "error", "message": "User tidak ditemukan"}), 404
+        return jsonify({"success": False, "message": "User tidak ditemukan"}), 404
 
-    data = request.get_json()
-    name = data.get("name")
-    email = data.get("email")
-    password = data.get("password")  # opsional
+    # 1. AMBIL PASSWORD LAMA DARI REQUEST
+    old_password = request.form.get("old_password")
+    
+    if not old_password:
+        return jsonify({"success": False, "message": "Password lama wajib diisi untuk verifikasi"}), 400
 
-    if name:
-        user.name = name
-    if email:
-        user.email = email
-    if password:
-        user.password = generate_password_hash(password)
+    # 2. VALIDASI PASSWORD LAMA
+    # Pastikan model User kamu punya fungsi check_password
+    if not user.check_password(old_password):
+        return jsonify({"success": False, "message": "Password lama salah!"}), 401
+
+    # 3. JIKA LULUS VALIDASI, BARU PROSES UPDATE SEPERTI BIASA
+    name = request.form.get("name")
+    email = request.form.get("email")
+    new_password = request.form.get("password") # Ini password baru
+
+    if name: user.name = name
+    if email: user.email = email
+    if new_password: user.password_hash = generate_password_hash(new_password)
+
+    # Update Foto Profil
+    if 'profile_pic' in request.files:
+        file = request.files['profile_pic']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(f"user_{user.id}_{file.filename}")
+            filepath = os.path.join(current_app.config['UPLOAD_FOTO'], filename)
+            file.save(filepath)
+            user.profile_pic = f"uploads/profile_pics/{filename}"
 
     try:
-        db.session.commit()  # ini wajib diganti dari user.save()
-        return jsonify({"status": "success", "message": "Profile berhasil diperbarui"}), 200
+        db.session.commit()
+        return jsonify({
+            "success": True, 
+            "message": "Profil berhasil diperbarui",
+            "profile_pic": user.profile_pic
+        }), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"status": "error", "message": f"Gagal update profile: {str(e)}"}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 
@@ -171,48 +273,79 @@ def get_wayang():
 # ================================
 @api.route("/predict-wayang", methods=["POST"])
 def predict_wayang():
-    print("PREDICT CALLED")
+    print("\n📸 [API] Menerima Request Predict Wayang...")
+    
     active_model = AIModel.query.filter_by(is_active=True).first()
     if not active_model:
         return jsonify({"error": "Model AI belum diaktifkan"}), 503
 
     model = get_model()
     if model is None:
-        return jsonify({"error": "Model gagal dimuat"}), 500
+        return jsonify({"error": "Model gagal dimuat di server"}), 500
 
     if "image" not in request.files:
-        return jsonify({"error": "File tidak ditemukan"}), 400
+        return jsonify({"error": "File gambar tidak dikirim"}), 400
 
-    img = Image.open(io.BytesIO(request.files["image"].read())).convert("RGB")
-    img = img.resize((150, 150))
-    x = np.expand_dims(np.array(img) / 255.0, axis=0)
+    try:
+        # 1. Buka Gambar
+        file = request.files["image"]
+        img = Image.open(file).convert("RGB")
+        
+        # 2. FIX ROTASI OTOMATIS (Penting buat Kamera HP)
+        # Kamera HP sering nyimpen rotasi di metadata, harus di-apply biar tegak
+        img = ImageOps.exif_transpose(img) 
 
-    prediction = model.predict(x)
-    idx = int(np.argmax(prediction))
-    confidence = float(np.max(prediction))
+        # 3. Preprocessing (Samakan persis dengan Training)
+        target_size = (150, 150)  # Pastikan ini sama dengan training Anda! (150 atau 224?)
+        img = img.resize(target_size)
+        
+        x = np.array(img)
+        x = np.expand_dims(x, axis=0)
+        
+        # Normalisasi (Cek saat training pakai /255.0 atau mobilenet_preprocess?)
+        # Asumsi pakai rescale 1./255
+        x = x / 255.0 
 
-    labels = [l.strip() for l in active_model.labels.split(",")]
-    
-    # === SOLUSI: LOGIC THRESHOLD ===
-    # Jika confidence di bawah 70%, anggap bukan wayang
-    THRESHOLD = 0.75
-    
-    if confidence < THRESHOLD:
+        # 4. Prediksi
+        prediction = model.predict(x)
+        idx = int(np.argmax(prediction))
+        confidence = float(np.max(prediction))
+        
+        # Ambil Label
+        labels_raw = active_model.labels
+        labels = [l.strip() for l in labels_raw.split(",") if l.strip()]
+        
+        predicted_label = labels[idx] if idx < len(labels) else "Unknown"
+
+        # 5. DEBUGGING DI TERMINAL (Lihat ini saat test)
+        print(f"🔍 [AI DEBUG] Prediksi: {predicted_label}")
+        print(f"📊 [AI DEBUG] Confidence: {confidence:.4f} ({confidence*100:.2f}%)")
+        print(f"Labels tersedia: {labels}")
+
+        # 6. LOGIC THRESHOLD (Kita turunkan jadi 55% biar lebih toleran)
+        THRESHOLD = 0.65
+        
+        if confidence < THRESHOLD:
+            print("⚠️ [AI DEBUG] Confidence terlalu rendah, dianggap Unknown.")
+            return jsonify({
+                "prediksi": "Objek Tidak Dikenali",
+                "confidence": f"{confidence*100:.2f}% (Kurang Yakin)",
+                "deskripsi": "Gambar kurang jelas atau mirip dengan beberapa tokoh sekaligus. Coba foto lebih dekat dengan cahaya yang cukup."
+            })
+
+        # Ambil data deskripsi dari Database Wayang
+        wayang_db = Wayang.query.filter(func.lower(Wayang.nama) == func.lower(predicted_label)).first()
+        deskripsi_text = wayang_db.deskripsi if wayang_db else "Deskripsi belum tersedia di database."
+
         return jsonify({
-            "prediksi": "Objek Tidak Dikenali",
-            "confidence": f"{confidence*100:.2f}% (Terlalu Rendah)",
-            "deskripsi": "Maaf, sistem tidak yakin ini gambar wayang. Pastikan foto wayang terlihat jelas, pencahayaan cukup, dan background tidak terlalu ramai."
+            "prediksi": predicted_label,
+            "confidence": f"{confidence*100:.1f}%",
+            "deskripsi": deskripsi_text
         })
 
-    # Jika lolos threshold, baru ambil data dari DB
-    label = labels[idx] if idx < len(labels) else "Unknown"
-    wayang = Wayang.query.filter(func.lower(Wayang.nama) == func.lower(label)).first()
-
-    return jsonify({
-        "prediksi": label,
-        "confidence": f"{confidence*100:.2f}%",
-        "deskripsi": wayang.deskripsi if wayang else "Deskripsi belum tersedia."
-    })
+    except Exception as e:
+        print(f"❌ [API ERROR] {e}")
+        return jsonify({"error": str(e)}), 500
 
 # ================================
 # CHATBOT CEPOT (SAFE MODE)
@@ -531,6 +664,7 @@ def delete_article(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
 # ==========================================
 # API ENDPOINTS: ULASAN APLIKASI
 # ==========================================
@@ -601,3 +735,82 @@ def get_ulasan():
             } for u in ulasan
         ]
     })
+
+# =========================
+# WAYANG GAME API (FLUTTER)
+# =========================
+# Helper function biar tidak koding ulang
+def get_asset_url(filename_or_path):
+    if not filename_or_path:
+        return None
+    
+    # 1. Normalisasi slash (ubah backslash Windows \ jadi /)
+    clean_path = filename_or_path.replace('\\', '/')
+
+    # 2. LOGIKA CERDAS:
+    # Jika di database sudah ada tanda garis miring (/), berarti itu path lengkap
+    # Contoh DB: "images/wayang/arjuna.png" -> Langsung tempel ke static
+    if "/" in clean_path:
+        # Hapus slash di depan jika ada biar gak double slash
+        if clean_path.startswith('/'):
+            clean_path = clean_path[1:]
+        return f"{request.host_url}static/{clean_path}"
+    
+    # 3. JIKA CUMA NAMA FILE:
+    # Contoh DB: "arjuna.png" -> Masukkan ke folder default
+    else:
+        # Pastikan folder default ini benar-benar ada di komputer kamu!
+        # Opsinya biasanya: 'static/uploads/wayanggame/' atau 'static/uploads/wayang/'
+        return f"{request.host_url}static/uploads/wayanggame/{clean_path}"
+
+@api.route("/wayang-game", methods=["GET"])
+def get_wayang_game():
+    # Sortir berdasarkan nama biar rapi di list
+    data = WayangGame.query.order_by(WayangGame.nama.asc()).all()
+
+    return jsonify({
+        "status": "success",
+        "total": len(data),
+        "data": [
+            {
+                "id": w.id,
+                "nama": w.nama,
+                # "deskripsi": w.deskripsi, # Tambahkan deskripsi jika ada
+                
+                # --- SEMUA ASET JADI FULL URL ---
+                "thumbnail": get_asset_url(w.thumbnail),
+                "badan": get_asset_url(w.badan),
+                "tangan_kanan_atas": get_asset_url(w.tangan_kanan_atas),
+                "tangan_kanan_bawah": get_asset_url(w.tangan_kanan_bawah),
+                "tangan_kiri_atas": get_asset_url(w.tangan_kiri_atas),
+                "tangan_kiri_bawah": get_asset_url(w.tangan_kiri_bawah),
+            } for w in data
+        ]
+    }), 200
+
+@api.route("/wayang-game/<int:id>", methods=["GET"])
+def get_wayang_game_detail(id):
+    w = WayangGame.query.get(id)
+
+    if not w:
+        return jsonify({
+            "status": "error",
+            "message": "Wayang tidak ditemukan"
+        }), 404
+
+    return jsonify({
+        "status": "success",
+        "data": {
+            "id": w.id,
+            "nama": w.nama,
+            # "deskripsi": w.deskripsi,
+            
+            # --- SEMUA ASET JADI FULL URL ---
+            "thumbnail": get_asset_url(w.thumbnail),
+            "badan": get_asset_url(w.badan),
+            "tangan_kanan_atas": get_asset_url(w.tangan_kanan_atas),
+            "tangan_kanan_bawah": get_asset_url(w.tangan_kanan_bawah),
+            "tangan_kiri_atas": get_asset_url(w.tangan_kiri_atas),
+            "tangan_kiri_bawah": get_asset_url(w.tangan_kiri_bawah),
+        }
+    }), 200

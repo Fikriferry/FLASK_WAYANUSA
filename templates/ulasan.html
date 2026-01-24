@@ -1,67 +1,485 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="id">
 
-{% block content %}
-<section class="container">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ulasan Pengguna - WAYANUSA</title>
 
-    <h2>Ulasan Pengguna</h2>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <p>⭐ {{ rata_rating }} dari {{ total_ulasan }} ulasan</p>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <hr>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 
-    {% for u in ulasan_list %}
-        <div class="ulasan-card">
-            <strong>{{ u.nama_user or 'Guest' }}</strong>
-            <span>⭐ {{ u.rating }}</span>
-            <p>{{ u.komentar }}</p>
-            <small>{{ u.created_at.strftime('%d %b %Y') }}</small>
+    <style>
+        /* --- THEME SETUP --- */
+        :root {
+            --gold: #D4A373;
+            --gold-hover: #b88656;
+            --dark-bg: #050505;
+            --card-bg: rgba(30, 30, 30, 0.6);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- LAYOUT UTAMA --- */
+        .main-content {
+            min-height: 100vh;
+            position: relative;
+            /* Pastikan konten tidak tertutup navbar fixed */
+            padding-top: 80px; 
+        }
+
+        .ulasan-section {
+            padding: 40px 20px 80px;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Background Blur Effect */
+        .blur-blob {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(212, 163, 115, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .blob-1 { top: -100px; left: -100px; }
+        .blob-2 { bottom: -100px; right: -100px; }
+
+        /* --- SUMMARY CARD --- */
+        .rating-summary {
+            background: linear-gradient(145deg, #151515, #0a0a0a);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 50px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rating-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .big-rating-number {
+            font-size: 5rem;
+            font-weight: 700;
+            color: var(--gold);
+            line-height: 1;
+            text-shadow: 0 0 30px rgba(212, 163, 115, 0.2);
+        }
+
+        .big-stars {
+            color: var(--gold);
+            font-size: 1.5rem;
+            margin: 15px 0;
+            letter-spacing: 5px;
+        }
+
+        /* --- REVIEW LIST --- */
+        .reviews-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .review-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            gap: 20px;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(212, 163, 115, 0.3);
+            background: rgba(40, 40, 40, 0.7);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #222, #111);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--gold);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            flex-shrink: 0;
+        }
+
+        .review-content {
+            flex: 1;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .review-stars-static {
+            color: var(--gold);
+            font-size: 0.9rem;
+        }
+
+        .review-text {
+            color: #d1d1d1;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .review-date {
+            font-size: 0.8rem;
+            color: #666;
+            display: block;
+            text-align: right;
+        }
+
+        /* --- FORM SECTION --- */
+        .form-wrapper {
+            background: #0f0f0f;
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+        }
+
+        .form-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .star-input-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+
+        .star-input-group i {
+            font-size: 2.2rem;
+            color: #333;
+            cursor: pointer;
+            transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .star-input-group i.active,
+        .star-input-group i.hovered {
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(212, 163, 115, 0.5);
+            transform: scale(1.2);
+        }
+
+        .custom-textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            min-height: 150px;
+            margin-bottom: 25px;
+            resize: vertical;
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+
+        .custom-textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-hover));
+            color: #000;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(212, 163, 115, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(212, 163, 115, 0.4);
+            color: #fff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 0;
+            color: var(--text-muted);
+            opacity: 0.7;
+            border: 1px dashed rgba(255,255,255,0.1);
+            border-radius: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .rating-summary { padding: 30px 20px; }
+            .big-rating-number { font-size: 3.5rem; }
+            .review-card { flex-direction: column; text-align: left; }
+            .review-header { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .avatar { width: 45px; height: 45px; font-size: 1.2rem; margin-bottom: 10px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'layouts/navbar.html' %} 
+    <div class="main-content">
+        
+        <div class="blur-blob blob-1"></div>
+        <div class="blur-blob blob-2"></div>
+
+        <section class="ulasan-section">
+
+            <div class="rating-summary" data-aos="fade-down">
+                <h2 style="margin: 0; font-weight: 500; color: #ccc; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px;">Rata-Rata Rating</h2>
+                
+                <div class="big-rating-number">
+                    {{ rata_rating if rata_rating else '0.0' }}
+                </div>
+                
+                <div class="big-stars">
+                    {% set rating_int = rata_rating|int if rata_rating else 0 %}
+                    {% for i in range(1, 6) %}
+                        <i class="{{ 'fas' if i <= rating_int else 'far' }} fa-star"></i>
+                    {% endfor %}
+                </div>
+
+                <p style="margin: 0; color: #888;">
+                    Dari total <strong>{{ total_ulasan }}</strong> ulasan sobat wayang.
+                </p>
+            </div>
+
+            <div class="reviews-container">
+                {% for u in ulasan_list %}
+                    <div class="review-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                        <div class="avatar">
+                            {{ u.nama_user[0] | upper if u.nama_user else 'G' }}
+                        </div>
+
+                        <div class="review-content">
+                            <div class="review-header">
+                                <span class="reviewer-name">{{ u.nama_user or 'Guest' }}</span>
+                                <div class="review-stars-static">
+                                    {% for i in range(1, 6) %}
+                                        <i class="fas fa-star" style="color: {% if i <= u.rating %}var(--gold){% else %}#333{% endif %};"></i>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <p class="review-text">"{{ u.komentar }}"</p>
+                            
+                            <span class="review-date">
+                                {{ u.created_at.strftime('%d %b %Y') }} • {{ u.created_at.strftime('%H:%M') }}
+                            </span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-state" data-aos="zoom-in">
+                        <i class="far fa-comment-dots" style="font-size: 3rem; margin-bottom: 20px; color: var(--gold);"></i>
+                        <h3>Belum ada ulasan</h3>
+                        <p>Jadilah yang pertama memberikan pendapatmu tentang Wayanusa!</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-wrapper" data-aos="fade-up">
+                <h3 class="form-title">Bagikan Pengalamanmu</h3>
+                <p style="text-align: center; color: #888; margin-bottom: 20px;">Berikan rating dan komentar terbaik Anda</p>
+                
+                <form method="POST" id="ulasanForm">
+                    <input type="hidden" name="rating" id="ratingValue" required>
+
+                    <div class="star-input-group" id="starGroup">
+                        <i class="fas fa-star" data-value="1" title="Sangat Buruk"></i>
+                        <i class="fas fa-star" data-value="2" title="Buruk"></i>
+                        <i class="fas fa-star" data-value="3" title="Cukup"></i>
+                        <i class="fas fa-star" data-value="4" title="Bagus"></i>
+                        <i class="fas fa-star" data-value="5" title="Sempurna!"></i>
+                    </div>
+                    
+                    <p id="ratingLabel" style="text-align: center; color: var(--gold); height: 20px; margin-top: -20px; margin-bottom: 20px; font-weight: 600;"></p>
+
+                    <textarea name="komentar" class="custom-textarea" placeholder="Apa yang kamu sukai? Ceritakan di sini..." required></textarea>
+
+                    <button type="submit" class="btn-submit">
+                        Kirim Ulasan <i class="fas fa-paper-plane" style="margin-left: 10px;"></i>
+                    </button>
+                </form>
+            </div>
+
+        </section>
+    </div>
+
+    <footer style="background: #000; color: #666; padding: 40px 0; text-align: center; border-top: 1px solid #222;">
+        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+            <p style="margin-bottom: 10px; font-weight: 600; color: #ccc; letter-spacing: 2px;">WAYANUSA</p>
+            <p style="font-size: 0.85rem;">&copy; 2024 Melestarikan Budaya dengan Teknologi.</p>
         </div>
-    {% else %}
-        <p>Belum ada ulasan.</p>
-    {% endfor %}
+    </footer>
 
-    <hr>
-
-    <h3>Kirim Ulasan</h3>
-
-    <form method="POST">
-        <!-- INPUT NILAI (hidden) -->
-        <input type="hidden" name="rating" id="ratingValue" required>
-
-        <!-- STAR RATING -->
-        <div class="star-rating">
-            <i class="fas fa-star" data-value="1"></i>
-            <i class="fas fa-star" data-value="2"></i>
-            <i class="fas fa-star" data-value="3"></i>
-            <i class="fas fa-star" data-value="4"></i>
-            <i class="fas fa-star" data-value="5"></i>
-        </div>
-
-        <textarea name="komentar" placeholder="Tulis ulasan kamu..." required></textarea>
-
-        <button type="submit">Kirim</button>
-    </form>
-
-
-</section>
-{% block scripts_extra %}
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const stars = document.querySelectorAll(".star-rating i");
-    const ratingInput = document.getElementById("ratingValue");
-
-    stars.forEach(star => {
-        star.addEventListener("click", function () {
-            const value = this.getAttribute("data-value");
-            ratingInput.value = value;
-
-            stars.forEach(s => {
-                s.classList.toggle("active", s.getAttribute("data-value") <= value);
-            });
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Init Animation
+        AOS.init({
+            once: true,
+            duration: 800,
+            offset: 50
         });
-    });
-});
-</script>
-{% endblock %}
 
-{% endblock %}
+        // Navbar Logic (Burger Menu) - Dicopy dari base.html agar jalan di standalone
+        document.addEventListener("DOMContentLoaded", function() {
+            // Logic Bintang
+            const stars = document.querySelectorAll("#starGroup i");
+            const ratingInput = document.getElementById("ratingValue");
+            const ratingLabel = document.getElementById("ratingLabel");
+            const form = document.getElementById("ulasanForm");
+            let currentRating = 0;
+
+            stars.forEach(star => {
+                const value = parseInt(star.getAttribute("data-value"));
+                const title = star.getAttribute("title");
+
+                star.addEventListener("mouseover", function () {
+                    highlightStars(value, 'hovered');
+                    if (currentRating === 0) ratingLabel.innerText = title;
+                });
+
+                star.addEventListener("mouseout", function () {
+                    resetStars();
+                    if (currentRating === 0) ratingLabel.innerText = "";
+                    else {
+                        const selectedStar = document.querySelector(`#starGroup i[data-value="${currentRating}"]`);
+                        if(selectedStar) ratingLabel.innerText = selectedStar.getAttribute("title");
+                    }
+                });
+
+                star.addEventListener("click", function () {
+                    currentRating = value;
+                    ratingInput.value = value;
+                    highlightStars(value, 'active');
+                    ratingLabel.innerText = title;
+                    
+                    this.style.transform = "scale(1.3)";
+                    setTimeout(() => this.style.transform = "scale(1.2)", 150);
+                });
+            });
+
+            function highlightStars(value, className) {
+                stars.forEach(s => {
+                    const sVal = parseInt(s.getAttribute("data-value"));
+                    s.classList.remove('hovered', 'active'); 
+                    if (sVal <= value) s.classList.add(className);
+                    if (className === 'hovered' && sVal <= currentRating) s.classList.add('active'); 
+                });
+            }
+
+            function resetStars() {
+                stars.forEach(s => {
+                    s.classList.remove('hovered');
+                    const sVal = parseInt(s.getAttribute("data-value"));
+                    if (sVal <= currentRating) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+            }
+
+            form.addEventListener("submit", function(e) {
+                if (!ratingInput.value) {
+                    e.preventDefault();
+                    const starGroup = document.getElementById("starGroup");
+                    starGroup.style.transform = "translateX(10px)";
+                    setTimeout(() => starGroup.style.transform = "translateX(-10px)", 100);
+                    setTimeout(() => starGroup.style.transform = "translateX(0)", 200);
+                    alert("Jangan lupa kasih bintang ya! ⭐");
+                }
+            });
+
+            // Logic Burger Menu (Wajib ada di standalone file)
+            const burger = document.getElementById('burgerMenu');
+            const menu = document.getElementById('navbarMenu');
+
+            if(burger && menu) {
+                burger.classList.remove('active');
+                menu.classList.remove('active');
+
+                const newBurger = burger.cloneNode(true);
+                burger.parentNode.replaceChild(newBurger, burger);
+
+                newBurger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.classList.toggle('active');
+                    menu.classList.toggle('active');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (menu.classList.contains('active') && !menu.contains(e.target) && !newBurger.contains(e.target)) {
+                        menu.classList.remove('active');
+                        newBurger.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
