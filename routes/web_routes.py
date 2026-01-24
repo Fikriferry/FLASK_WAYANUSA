@@ -7,6 +7,8 @@ from models import Video, db, AIModel, Dalang, User, Admin, QuizLevel, QuizQuest
 from ai_manager import reload_model
 from sqlalchemy import func
 from datetime import datetime
+from services.sentiment_service import predict_sentiment
+
 
 web_routes = Blueprint("web", __name__)
 
@@ -973,13 +975,12 @@ def admin_wayanggame_delete(id):
     flash('WayangGame berhasil dihapus!', 'success')
     return redirect(url_for('web.admin_wayanggame_list'))
 
-# ================================
-# ULASAN USER
-# ================================
-
 @web_routes.route('/ulasan', methods=['GET', 'POST'])
 def ulasan():
 
+    # ========================
+    # SUBMIT ULASAN
+    # ========================
     if request.method == 'POST':
         rating = request.form.get('rating')
         komentar = request.form.get('komentar')
@@ -989,21 +990,27 @@ def ulasan():
             return redirect(url_for('web.ulasan'))
 
         rating = int(rating)
+        if rating < 1 or rating > 5:
+            flash('Rating harus antara 1 sampai 5', 'danger')
+            return redirect(url_for('web.ulasan'))
 
-        if rating <= 2:
-            kategori = 'negatif'
-        elif rating == 3:
-            kategori = 'netral'
-        else:
-            kategori = 'positif'
+        # ========================
+        # AI SENTIMENT ANALYSIS
+        # ========================
+        try:
+            kategori, confidence = predict_sentiment(komentar)
+        except Exception as e:
+            print('[SENTIMENT ERROR]', e)
+            kategori, confidence = 'netral', 0.0
 
         ulasan = UlasanAplikasi(
             user_id=session.get('user_id'),
             nama_user=session.get('user_name', 'Guest'),
             email_user=session.get('user_email'),
             rating=rating,
-            kategori=kategori,
-            komentar=komentar
+            kategori=kategori,   # 🔥 DARI AI
+            komentar=komentar,
+            created_at=datetime.utcnow()
         )
 
         db.session.add(ulasan)
@@ -1012,6 +1019,9 @@ def ulasan():
         flash('Terima kasih atas ulasan Anda 🙏', 'success')
         return redirect(url_for('web.ulasan'))
 
+    # ========================
+    # LOAD DATA ULASAN
+    # ========================
     ulasan_list = UlasanAplikasi.query.order_by(
         UlasanAplikasi.created_at.desc()
     ).all()
@@ -1029,20 +1039,39 @@ def ulasan():
         rata_rating=rata_rating
     )
 
+
 # ================================
 # ULASAN ADMIN
 # ================================
 
 @web_routes.route('/admin/ulasan')
+@admin_login_required
 def admin_ulasan():
+
     ulasan_list = UlasanAplikasi.query.order_by(
         UlasanAplikasi.created_at.desc()
     ).all()
 
+    total = UlasanAplikasi.query.count()
+    positif = UlasanAplikasi.query.filter_by(kategori='positif').count()
+    netral  = UlasanAplikasi.query.filter_by(kategori='netral').count()
+    negatif = UlasanAplikasi.query.filter_by(kategori='negatif').count()
+
+    rata_rating = round(
+        db.session.query(func.avg(UlasanAplikasi.rating)).scalar() or 0,
+        1
+    )
+
     return render_template(
         'admin/ulasan_list.html',
-        ulasan_list=ulasan_list
+        ulasan_list=ulasan_list,
+        total=total,
+        positif=positif,
+        netral=netral,
+        negatif=negatif,
+        rata_rating=rata_rating
     )
+
 
 @web_routes.route('/admin/ulasan/statistik')
 def admin_ulasan_statistik():
