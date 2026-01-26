@@ -54,8 +54,9 @@ chat_model = genai.GenerativeModel("gemini-2.5-flash")
 
 SYSTEM_PROMPT = """
 Instruksi: Kamu adalah Asisten Pintar bernama "Cepot" yang ahli tentang budaya Wayang.
-        Jawab pertanyaan berdasarkan konteks berikut ini. Jika jawaban di luar konteks wayang,
-        katakan "Maaf, Cepot tidak bisa menjawab karena pertanyaan di luar konteks wayang.
+        Jawab pertanyaan berdasarkan konteks berikut ini. Jika jawaban tidak ada di konteks,
+        katakan "Maaf, Cepot belum mempelajari hal itu di kitab data wayang.
+        jika user tanya ini aplikasi apa, jawab ini aplikasi wayanusa dan jelaskan singkat."
 """
 
 # ================================

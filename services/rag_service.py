@@ -1,129 +1,115 @@
 import os
+import pickle
 from dotenv import load_dotenv
 
-# --- PERBAIKAN IMPORT ---
-# Gunakan import standar ini (setelah update library, ini yang paling stabil)
-import langchain_classic
-from langchain_classic.chains import RetrievalQA 
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-# Import untuk Model Lokal & Google
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.vectorstores import FAISS
+# --- IMPORT LIBRARY ---
+from langchain.chains import RetrievalQA
 from langchain_community.document_loaders import PyPDFDirectoryLoader, DirectoryLoader, TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.prompts import PromptTemplate
-# ------------------------
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+# --- IMPORT RETRIEVER RINGAN (BM25) ---
+from langchain_community.retrievers import BM25Retriever
 
 load_dotenv()
-# ... (kode selanjutnya tetap sama) ...
 my_api_key = os.getenv("GEMINI_API_KEY")
-if my_api_key:
-    os.environ["GEMINI_API_KEY"] = my_api_key
 
 class RagService:
     def __init__(self):
-        self.vector_store = None
         self.qa_chain = None
+        self.retriever = None
         
-        # 1. MODEL CHAT (Tetap Gemini biar pintar)
+        # 1. SETUP MODEL CHAT (Gemini)
+        # Kita pakai Gemini CUMA buat jawab pertanyaan, bukan buat ngolah database.
+        # JADI SANGAT HEMAT & JARANG KENA LIMIT.
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash", 
             temperature=0.3,
             google_api_key=my_api_key
         )
         
-        # 2. MODEL EMBEDDING (GANTI KE LOKAL / OFFLINE)
-        # Model 'all-MiniLM-L6-v2' itu kecil, cepat, dan akurat untuk standar RAG
-        print("📥 Memuat Model Embedding Lokal (HuggingFace)...")
-        self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        
-        # Cek apakah index vector sudah ada
-        if os.path.exists("faiss_index"):
-            try:
-                self.load_vector_db()
-            except Exception as e:
-                print(f"⚠️ Gagal load index lama: {e}. Silakan build ulang.")
+        # 2. LOAD / BUILD DATABASE (Otomatis & Cepat)
+        # Cek apakah sudah ada file database (format .pkl)
+        if os.path.exists("bm25_db.pkl"):
+            print("📂 Memuat database BM25 dari file lokal...")
+            with open("bm25_db.pkl", "rb") as f:
+                self.retriever = pickle.load(f)
+            self.create_qa_chain()
         else:
-            print("⚠️ Index belum ada. Silakan panggil API build_index.")
+            print("⚙️ Database belum ada. Membangun baru (Cepat)...")
+            self.build_index()
 
     def build_index(self):
-        """Membangun Database Vektor Menggunakan CPU (Cepat & Tanpa Limit)"""
-        print("🔄 Sedang membaca data wayang...")
-        
-        # 1. Load Data
+        """
+        Fungsi ini membangun database TANPA INTERNET (kecuali buat load library).
+        Murni pakai CPU. Sangat cepat.
+        """
+        print("🔄 Membaca data wayang...")
         pdf_loader = PyPDFDirectoryLoader("data_wayang/")
         txt_loader = DirectoryLoader("data_wayang/", glob="*.txt", loader_cls=TextLoader)
         
         documents = []
-        documents.extend(pdf_loader.load())
-        documents.extend(txt_loader.load())
+        try:
+            documents.extend(pdf_loader.load())
+            documents.extend(txt_loader.load())
+        except:
+            pass
 
         if not documents:
-            return "❌ Tidak ada file di folder data_wayang!"
+            print("❌ Data Kosong! Pastikan folder 'data_wayang' terisi.")
+            return
 
-        # 2. Pecah text (Chunks)
-        # Kita bisa perbesar chunk karena local processing kuat
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        # Pecah Data
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
         chunks = text_splitter.split_documents(documents)
-        print(f"📊 Total potongan data: {len(chunks)} chunks")
+        print(f"📊 Total Data: {len(chunks)} chunks.")
 
-        # 3. Buat Vector Store (LANGSUNG GASPOLL - TANPA JEDA/DELAY)
-        print("🚀 Memproses Embedding (Menggunakan CPU Laptop)...")
+        # --- BAGIAN AJAIB (BM25) ---
+        # Membuat pencari data berdasarkan kata kunci. 
+        # Tidak butuh API Key, Tidak butuh Internet.
+        self.retriever = BM25Retriever.from_documents(chunks)
+        self.retriever.k = 3  # Ambil 3 data teratas yang mirip
         
-        # Tidak perlu batching rumit atau time.sleep karena ini OFFLINE
-        self.vector_store = FAISS.from_documents(chunks, self.embeddings)
-        
-        # 4. Simpan ke local storage
-        self.vector_store.save_local("faiss_index")
-        print("✅ Database Wayang berhasil dibuat (Mode Turbo)!")
-        
-        # Reload chain agar langsung siap pakai
-        self.load_vector_db()
-        return True
+        # Simpan ke file biar besok gak perlu build lagi
+        with open("bm25_db.pkl", "wb") as f:
+            pickle.dump(self.retriever, f)
+            
+        print("✅ SUKSES! Database BM25 berhasil dibuat.")
+        self.create_qa_chain()
 
-    def load_vector_db(self):
-        """Memuat index yang sudah disimpan"""
-        # Allow dangerous deserialization karena file kita buat sendiri (Aman)
-        self.vector_store = FAISS.load_local(
-            "faiss_index", 
-            self.embeddings, 
-            allow_dangerous_deserialization=True
-        )
-        retriever = self.vector_store.as_retriever(search_kwargs={"k": 3})
+    def create_qa_chain(self):
         prompt_template = """
         Kamu adalah Asisten Pintar bernama "Cepot" yang ahli tentang budaya Wayang.
         Jawab pertanyaan berdasarkan konteks berikut ini. Jika jawaban tidak ada di konteks,
-        katakan "Maaf, Cepot belum mempelajari hal itu di kitab data wayang."
+        katakan "Maaf, Cepot belum mempelajari hal itu di kitab data wayang.
+        jika user tanya ini aplikasi apa, jawab ini aplikasi wayanusa dan jelaskan singkat."
         
         Konteks:
         {context}
 
         Pertanyaan: {question}
-
-        Jawaban (Bahasa Indonesia yang sopan):
         """
-        PROMPT = PromptTemplate(
-            template=prompt_template, input_variables=["context", "question"]
-        )
+        PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+
         self.qa_chain = RetrievalQA.from_chain_type(
             llm=self.llm,
             chain_type="stuff",
-            retriever=retriever,
+            retriever=self.retriever,
             return_source_documents=False,
             chain_type_kwargs={"prompt": PROMPT}
         )
-        print("✅ Sistem RAG Siap Digunakan!")
+        print("✅ Sistem Chatbot Siap Digunakan!")
 
     def get_answer(self, query):
         if not self.qa_chain:
-            return "⚠️ Database belum siap. Admin harus menjalankan /api/rag/build dulu."
-        
+            return "⚠️ Database error."
         try:
+            # Panggil Gemini cuma pas user nanya
             result = self.qa_chain.invoke({"query": query})
-            return result.get("result", "Maaf, terjadi kesalahan.")
+            return result.get("result", "Error.")
         except Exception as e:
-            return f"Error: {str(e)}"
+            return f"Maaf, error: {str(e)}"
 
-# Singleton Instance
+# Singleton
 rag_service = RagService()

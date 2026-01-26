@@ -52,7 +52,7 @@
                         <div class="quiz-card-content">
                             <h3 class="quiz-level">{{ artikel.title }}</h3>
                             <p class="quiz-name">Artikel Wayang</p>
-                            <p class="quiz-desc">{{ artikel.content[:100] }}...</p>
+                            <p class="quiz-desc">{{ artikel.content | striptags | truncate(100) }}</p>
                         </div>
 
                         <!-- <img src="{% if artikel.thumbnail %}{{ url_for('web.uploaded_file', filename='thumbnails/' + artikel.thumbnail) }}{% else %}{{ url_for('static', filename='images/logo.png') }}{% endif %}" 
