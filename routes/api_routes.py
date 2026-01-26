@@ -1,3 +1,4 @@
+from services.sentiment_service import predict_sentiment
 import os
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
@@ -736,6 +737,7 @@ def get_ulasan():
             } for u in ulasan
         ]
     })
+
 
 # =========================
 # WAYANG GAME API (FLUTTER)

@@ -7,8 +7,8 @@ import re
 # =========================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-MODEL_PATH = os.path.join(BASE_DIR, "ml_models", "sentiment_model.pkl")
-VECT_PATH  = os.path.join(BASE_DIR, "ml_models", "tfidf_vectorizer.pkl")
+MODEL_PATH = os.path.join(BASE_DIR, "ml_models", "sentiment_modelway.pkl")
+VECT_PATH  = os.path.join(BASE_DIR, "ml_models", "tfidf_vectorizerway.pkl")
 
 # =========================
 # LOAD MODEL (ONCE)
