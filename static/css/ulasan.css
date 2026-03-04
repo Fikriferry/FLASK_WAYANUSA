@@ -1,0 +1,145 @@
+:root {
+    --gold: #D4A373;
+    --gold-hover: #b88656;
+    --dark-bg: #050505;
+    --card-bg: rgba(30,30,30,0.6);
+    --text-main: #ffffff;
+    --text-muted: #a0a0a0;
+}
+
+body {
+    background: var(--dark-bg);
+    color: var(--text-main);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+}
+
+.main-content {
+    padding-top: 80px;
+    min-height: 100vh;
+}
+
+.ulasan-section {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px 20px 80px;
+}
+
+.rating-summary {
+    background: linear-gradient(145deg,#151515,#0a0a0a);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.big-rating-number {
+    font-size: 5rem;
+    color: var(--gold);
+    font-weight: 700;
+}
+
+.big-stars {
+    color: var(--gold);
+    font-size: 1.5rem;
+    margin: 10px 0;
+}
+
+.reviews-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 60px;
+}
+
+.review-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 25px;
+    display: flex;
+    gap: 20px;
+}
+
+.avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.review-text {
+    color: #d1d1d1;
+    margin: 10px 0;
+}
+
+.review-date {
+    font-size: 0.8rem;
+    color: #666;
+    text-align: right;
+}
+
+/* ⭐ STAR DISPLAY */
+.star-active {
+    color: var(--gold);
+}
+
+.star-inactive {
+    color: #333;
+}
+
+.form-wrapper {
+    background: #0f0f0f;
+    border-radius: 24px;
+    padding: 40px;
+}
+
+.star-input-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0 30px;
+}
+
+.star-input-group i {
+    font-size: 2.2rem;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.star-input-group i.active,
+.star-input-group i.hovered {
+    color: var(--gold);
+    transform: scale(1.2);
+}
+
+.custom-textarea {
+    width: 100%;
+    min-height: 150px;
+    border-radius: 16px;
+    padding: 20px;
+    background: #111;
+    border: 1px solid #333;
+    color: white;
+    resize: vertical;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 18px;
+    border-radius: 50px;
+    border: none;
+    font-weight: 700;
+    background: linear-gradient(135deg,var(--gold),var(--gold-hover));
+    cursor: pointer;
+}

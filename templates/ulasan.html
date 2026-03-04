@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ulasan Pengguna - WAYANUSA</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ulasan.css') }}">
+</head>
+
+<body>
+
+    {% include 'layouts/navbar.html' %} 
+    <div class="main-content">
+        
+        <div class="blur-blob blob-1"></div>
+        <div class="blur-blob blob-2"></div>
+
+        <section class="ulasan-section">
+
+            <div class="rating-summary" data-aos="fade-down">
+                <h2 style="margin: 0; font-weight: 500; color: #ccc; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px;">Rata-Rata Rating</h2>
+                
+                <div class="big-rating-number">
+                    {{ rata_rating if rata_rating else '0.0' }}
+                </div>
+                
+                <div class="big-stars">
+                    {% set rating_int = rata_rating|int if rata_rating else 0 %}
+                    {% for i in range(1, 6) %}
+                        <i class="{{ 'fas' if i <= rating_int else 'far' }} fa-star"></i>
+                    {% endfor %}
+                </div>
+
+                <p style="margin: 0; color: #888;">
+                    Dari total <strong>{{ total_ulasan }}</strong> ulasan sobat wayang.
+                </p>
+            </div>
+
+            <div class="reviews-container">
+                {% for u in ulasan_list %}
+                    <div class="review-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                        <div class="avatar">
+                            {{ u.nama_user[0] | upper if u.nama_user else 'G' }}
+                        </div>
+
+                        <div class="review-content">
+                            <div class="review-header">
+                                <span class="reviewer-name">{{ u.nama_user or 'Guest' }}</span>
+                                <div class="review-stars-static">
+                                    {% for i in range(1, 6) %}
+                                        <i class="fas fa-star {% if i <= u.rating %}star-active{% else %}star-inactive{% endif %}"></i>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <p class="review-text">"{{ u.komentar }}"</p>
+                            
+                            <span class="review-date">
+                                {{ u.created_at.strftime('%d %b %Y') }} • {{ u.created_at.strftime('%H:%M') }}
+                            </span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-state" data-aos="zoom-in">
+                        <i class="far fa-comment-dots" style="font-size: 3rem; margin-bottom: 20px; color: var(--gold);"></i>
+                        <h3>Belum ada ulasan</h3>
+                        <p>Jadilah yang pertama memberikan pendapatmu tentang Wayanusa!</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-wrapper" data-aos="fade-up">
+                <h3 class="form-title">Bagikan Pengalamanmu</h3>
+                <p style="text-align: center; color: #888; margin-bottom: 20px;">Berikan rating dan komentar terbaik Anda</p>
+                
+                <form method="POST" id="ulasanForm">
+                    <input type="hidden" name="rating" id="ratingValue" required>
+
+                    <div class="star-input-group" id="starGroup">
+                        <i class="fas fa-star" data-value="1" title="Sangat Buruk"></i>
+                        <i class="fas fa-star" data-value="2" title="Buruk"></i>
+                        <i class="fas fa-star" data-value="3" title="Cukup"></i>
+                        <i class="fas fa-star" data-value="4" title="Bagus"></i>
+                        <i class="fas fa-star" data-value="5" title="Sempurna!"></i>
+                    </div>
+                    
+                    <p id="ratingLabel" style="text-align: center; color: var(--gold); height: 20px; margin-top: -20px; margin-bottom: 20px; font-weight: 600;"></p>
+
+                    <textarea name="komentar" class="custom-textarea" placeholder="Apa yang kamu sukai? Ceritakan di sini..." required></textarea>
+
+                    <button type="submit" class="btn-submit">
+                        Kirim Ulasan <i class="fas fa-paper-plane" style="margin-left: 10px;"></i>
+                    </button>
+                </form>
+            </div>
+
+        </section>
+    </div>
+
+    <footer style="background: #000; color: #666; padding: 40px 0; text-align: center; border-top: 1px solid #222;">
+        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+            <p style="margin-bottom: 10px; font-weight: 600; color: #ccc; letter-spacing: 2px;">WAYANUSA</p>
+            <p style="font-size: 0.85rem;">&copy; 2024 Melestarikan Budaya dengan Teknologi.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Init Animation
+        AOS.init({
+            once: true,
+            duration: 800,
+            offset: 50
+        });
+
+        // Navbar Logic (Burger Menu) - Dicopy dari base.html agar jalan di standalone
+        document.addEventListener("DOMContentLoaded", function() {
+            // Logic Bintang
+            const stars = document.querySelectorAll("#starGroup i");
+            const ratingInput = document.getElementById("ratingValue");
+            const ratingLabel = document.getElementById("ratingLabel");
+            const form = document.getElementById("ulasanForm");
+            let currentRating = 0;
+
+            stars.forEach(star => {
+                const value = parseInt(star.getAttribute("data-value"));
+                const title = star.getAttribute("title");
+
+                star.addEventListener("mouseover", function () {
+                    highlightStars(value, 'hovered');
+                    if (currentRating === 0) ratingLabel.innerText = title;
+                });
+
+                star.addEventListener("mouseout", function () {
+                    resetStars();
+                    if (currentRating === 0) ratingLabel.innerText = "";
+                    else {
+                        const selectedStar = document.querySelector(`#starGroup i[data-value="${currentRating}"]`);
+                        if(selectedStar) ratingLabel.innerText = selectedStar.getAttribute("title");
+                    }
+                });
+
+                star.addEventListener("click", function () {
+                    currentRating = value;
+                    ratingInput.value = value;
+                    highlightStars(value, 'active');
+                    ratingLabel.innerText = title;
+                    
+                    this.style.transform = "scale(1.3)";
+                    setTimeout(() => this.style.transform = "scale(1.2)", 150);
+                });
+            });
+
+            function highlightStars(value, className) {
+                stars.forEach(s => {
+                    const sVal = parseInt(s.getAttribute("data-value"));
+                    s.classList.remove('hovered', 'active'); 
+                    if (sVal <= value) s.classList.add(className);
+                    if (className === 'hovered' && sVal <= currentRating) s.classList.add('active'); 
+                });
+            }
+
+            function resetStars() {
+                stars.forEach(s => {
+                    s.classList.remove('hovered');
+                    const sVal = parseInt(s.getAttribute("data-value"));
+                    if (sVal <= currentRating) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+            }
+
+            form.addEventListener("submit", function(e) {
+                if (!ratingInput.value) {
+                    e.preventDefault();
+                    const starGroup = document.getElementById("starGroup");
+                    starGroup.style.transform = "translateX(10px)";
+                    setTimeout(() => starGroup.style.transform = "translateX(-10px)", 100);
+                    setTimeout(() => starGroup.style.transform = "translateX(0)", 200);
+                    alert("Jangan lupa kasih bintang ya! ⭐");
+                }
+            });
+
+            // Logic Burger Menu (Wajib ada di standalone file)
+            const burger = document.getElementById('burgerMenu');
+            const menu = document.getElementById('navbarMenu');
+
+            if(burger && menu) {
+                burger.classList.remove('active');
+                menu.classList.remove('active');
+
+                const newBurger = burger.cloneNode(true);
+                burger.parentNode.replaceChild(newBurger, burger);
+
+                newBurger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.classList.toggle('active');
+                    menu.classList.toggle('active');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (menu.classList.contains('active') && !menu.contains(e.target) && !newBurger.contains(e.target)) {
+                        menu.classList.remove('active');
+                        newBurger.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

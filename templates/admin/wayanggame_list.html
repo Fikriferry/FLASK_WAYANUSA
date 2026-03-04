@@ -1,0 +1,75 @@
+{% extends "admin/layout_admin.html" %}
+{% block title %}Daftar Wayang Game{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex align-items-center">
+        <h3 class="card-title">Daftar Wayang Game</h3>
+        <a href="{{ url_for('web.admin_wayanggame_add') }}" class="btn btn-success ml-auto">Tambah Wayang Game</a>
+    </div>
+
+    <div class="card-body table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nama Wayang</th>
+                    <th>Thumbnail</th>
+                    <th>Badan</th>
+                    <th>Tangan Kanan Atas</th>
+                    <th>Tangan Kanan Bawah</th>
+                    <th>Tangan Kiri Atas</th>
+                    <th>Tangan Kiri Bawah</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in games %}
+                <tr>
+                    <td>{{ g.id }}</td>
+                    <td>{{ g.nama }}</td>
+                    <td>
+                        {% if g.thumbnail %}
+                        <img src="{{ url_for('static', filename=g.thumbnail) }}" width="80">
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if g.badan %}
+                        <img src="{{ url_for('static', filename=g.badan) }}" width="80">
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if g.tangan_kanan_atas %}
+                        <img src="{{ url_for('static', filename=g.tangan_kanan_atas) }}" width="80">
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if g.tangan_kanan_bawah %}
+                        <img src="{{ url_for('static', filename=g.tangan_kanan_bawah) }}" width="80">
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if g.tangan_kiri_atas %}
+                        <img src="{{ url_for('static', filename=g.tangan_kiri_atas) }}" width="80">
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if g.tangan_kiri_bawah %}
+                        <img src="{{ url_for('static', filename=g.tangan_kiri_bawah) }}" width="80">
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('web.admin_wayanggame_edit', id=g.id) }}" class="btn btn-warning btn-sm mb-1">Edit</a>
+                        <a href="{{ url_for('web.admin_wayanggame_delete', id=g.id) }}" class="btn btn-danger btn-sm mb-1" onclick="return confirm('Yakin hapus WayangGame ini?')">Hapus</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center">Belum ada data Wayang Game.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

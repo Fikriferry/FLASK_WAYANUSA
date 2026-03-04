@@ -1,63 +1,172 @@
 {% extends "admin/layout_admin.html" %}
 
-{% block title %}{% if artikel %}Edit{% else %}Tambah{% endif %} Artikel{% endblock %}
+{% block head %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+    }
+
+    .card-header {
+        background-color: white;
+        border-bottom: 1px solid #f0f0f0;
+        padding: 20px 25px;
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+    }
+
+    /* Upload Zone Styling */
+    .upload-zone {
+        border: 2px dashed #ddd;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        background: #fafafa;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+        border-color: #007bff;
+        background: #f0f8ff;
+    }
+
+    .upload-zone input[type="file"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .preview-image {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 8px;
+        margin-top: 15px;
+        display: none;
+        /* Hidden by default */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .upload-icon {
+        font-size: 40px;
+        color: #aaa;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block title %}{% if artikel %}Edit{% else %}Buat{% endif %} Artikel Baru{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
+<div class="row justify-content-center">
+    <div class="col-md-11">
 
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">{% if artikel %}Edit{% else %}Tambah{% endif %} Artikel</h3>
-            </div>
+        <form
+            action="{% if artikel %}{{ url_for('web.artikel_edit', id=artikel.id) }}{% else %}{{ url_for('web.artikel_add') }}{% endif %}"
+            method="post" enctype="multipart/form-data" id="articleForm">
 
-            <div class="card-body">
-
-                <form action="{% if artikel %}{{ url_for('web.artikel_edit', id=artikel.id) }}{% else %}{{ url_for('web.artikel_add') }}{% endif %}" method="post" enctype="multipart/form-data">
-
-                    <div class="form-group">
-                        <label for="title">Judul Artikel</label>
-                        <input type="text" class="form-control" id="title" name="title"
-                               value="{{ artikel.title if artikel else '' }}" required>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title m-0 font-weight-bold text-dark">
+                        <i class="fas fa-newspaper mr-2 text-primary"></i>
+                        {% if artikel %}Edit Artikel{% else %}Tulis Artikel Baru{% endif %}
+                    </h3>
+                    <div>
+                        <a href="{{ url_for('web.artikel_list') }}"
+                            class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                            <i class="fas fa-arrow-left mr-1"></i> Kembali
+                        </a>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <label for="content">Konten Artikel</label>
-                        <textarea class="form-control" id="content" name="content" rows="10" required>
-                            {{ artikel.content if artikel else '' }}
-                        </textarea>
-                    </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="form-group">
+                                <label for="title" class="font-weight-bold">Judul Artikel <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-lg" id="title" name="title"
+                                    value="{{ artikel.title if artikel else '' }}"
+                                    placeholder="Masukkan judul yang menarik..." required>
+                            </div>
 
-                    <div class="form-group">
-                        <label for="source_link">Link Sumber (Opsional)</label>
-                        <input type="url" class="form-control" id="source_link" name="source_link"
-                               value="{{ artikel.source_link if artikel else '' }}"
-                               placeholder="https://example.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="thumbnail">Thumbnail (JPG, JPEG, PNG - Max 2MB)</label>
-                        <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*">
-
-                        {% if artikel and artikel.thumbnail %}
-                        <div class="mt-2">
-                            <small class="text-muted">Thumbnail saat ini:</small><br>
-                            <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}"
-                                 alt="Thumbnail {{ artikel.title }}"
-                                 class="img-circle elevation-2"
-                                 width="80" height="80"
-                                 style="object-fit: cover;">
+                            <div class="form-group mt-4">
+                                <label for="content" class="font-weight-bold">Konten Artikel <span
+                                        class="text-danger">*</span></label>
+                                <textarea id="content" name="content" required>
+                                    {{ artikel.content if artikel else '' }}
+                                </textarea>
+                            </div>
                         </div>
-                        {% endif %}
+
+                        <div class="col-lg-4">
+                            <div class="card bg-light mb-4">
+                                <div class="card-body">
+                                    <label class="font-weight-bold mb-3">Thumbnail Artikel</label>
+
+                                    <div class="upload-zone" id="uploadZone">
+                                        <input type="file" id="thumbnail" name="thumbnail" accept="image/*">
+                                        <div id="uploadPlaceholder">
+                                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                            <p class="mb-0 text-muted">Klik atau seret gambar ke sini</p>
+                                            <small class="text-muted" style="font-size: 10px;">Max Size: Sesuai Config
+                                                Server (Rec: 5MB)</small>
+                                        </div>
+
+                                        <img id="imagePreview" class="preview-image"
+                                            src="{% if artikel and artikel.thumbnail %}{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}{% endif %}"
+                                            style="display: {% if artikel and artikel.thumbnail %}block{% else %}none{% endif %};">
+                                    </div>
+
+                                    <div class="text-center mt-2">
+                                        <small id="fileName" class="text-primary font-weight-bold"></small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="source_link" class="font-weight-bold">Link Sumber <small
+                                        class="text-muted">(Opsional)</small></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0"><i
+                                                class="fas fa-link text-muted"></i></span>
+                                    </div>
+                                    <input type="url" class="form-control border-left-0" id="source_link"
+                                        name="source_link" value="{{ artikel.source_link if artikel else '' }}"
+                                        placeholder="https://sumberberita.com">
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <button type="submit" class="btn btn-primary btn-block btn-lg rounded-pill shadow-sm"
+                                id="btnSubmit">
+                                <i class="fas fa-save mr-2"></i> {% if artikel %}Simpan Perubahan{% else
+                                %}Publikasikan{% endif %}
+                            </button>
+                        </div>
                     </div>
-
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                    <a href="{{ url_for('web.artikel_list') }}" class="btn btn-secondary">Batal</a>
-
-                </form>
-
+                </div>
             </div>
-        </div>
+        </form>
 
     </div>
 </div>
@@ -65,16 +174,123 @@
 
 {% block scripts %}
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
+        // 1. Inisialisasi Summernote dengan Toolbar Lengkap
         $('#content').summernote({
-            height: 300,
+            placeholder: 'Mulai menulis cerita wayang anda di sini...',
+            height: 450,
+            dialogsInBody: true,
             toolbar: [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['fontsize', 'color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['insert', ['link', 'picture']],
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['fontname', ['fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph', 'height']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video', 'hr']],
                 ['view', ['fullscreen', 'codeview', 'help']]
-            ]
+            ],
+            // Callback untuk styling tambahan pada editor
+            callbacks: {
+                onInit: function () {
+                    $('.note-editor').css('border-radius', '8px');
+                    $('.note-toolbar').css('border-radius', '8px 8px 0 0');
+                }
+            }
+        });
+
+        // 2. Logic Upload Gambar (Live Preview & Drag-Drop)
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('thumbnail');
+        const imgPreview = document.getElementById('imagePreview');
+        const placeholder = document.getElementById('uploadPlaceholder');
+        const fileNameDisplay = document.getElementById('fileName');
+
+        // Fungsi baca file
+        // Fungsi baca file dengan "Satpam" 2MB
+        const handleFile = (file) => {
+            if (file) {
+                // --- 1. Validasi Tipe File (Harus Gambar) ---
+                if (!file.type.startsWith('image/')) {
+                    alert('Mohon upload file gambar (JPG, PNG, GIF)');
+                    fileInput.value = ""; // Reset input biar kosong
+                    return;
+                }
+
+                // --- 2. Validasi Ukuran File (Maksimal 2MB) ---
+                // Rumus: 2 MB * 1024 KB * 1024 Bytes
+                const maxBytes = 2 * 1024 * 1024;
+
+                if (file.size > maxBytes) {
+                    // A. Munculkan Alert
+                    alert('Ukuran file terlalu besar! Maksimal 2 MB.\nSilakan pilih foto lain yang lebih kecil.');
+
+                    // B. Reset Input & Tampilan (Hapus file yang barusan dipilih)
+                    fileInput.value = "";             // Kosongkan input file
+                    imgPreview.src = "";              // Hapus source gambar
+                    imgPreview.style.display = 'none';// Sembunyikan gambar
+                    placeholder.style.display = 'block'; // Munculkan lagi icon upload
+                    fileNameDisplay.innerText = "";   // Hapus teks nama file
+
+                    // C. Berhenti di sini (Jangan lanjut baca file)
+                    return;
+                }
+
+                // --- 3. Jika Lolos Validasi (File Aman) ---
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block';
+                    placeholder.style.display = 'none';
+
+                    // Tampilkan ukuran file biar user tahu
+                    let sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                    fileNameDisplay.innerText = "File terpilih: " + file.name + " (" + sizeInMB + " MB)";
+                }
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // Event Listener Input Change
+        fileInput.addEventListener('change', function (e) {
+            handleFile(this.files[0]);
+        });
+
+        // Drag & Drop Effects
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, () => uploadZone.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, () => uploadZone.classList.remove('dragover'), false);
+        });
+
+        uploadZone.addEventListener('drop', function (e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files; // Assign file ke input hidden
+            handleFile(files[0]);
+        }, false);
+
+        // Jika sudah ada gambar (mode edit), sembunyikan placeholder
+        if (imgPreview.getAttribute('src') && imgPreview.getAttribute('src') !== '') {
+            placeholder.style.display = 'none';
+        }
+
+        // 3. Loading State pada Button Submit
+        $('#articleForm').on('submit', function () {
+            const btn = $('#btnSubmit');
+            btn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...');
+            btn.addClass('disabled');
         });
     });
 </script>

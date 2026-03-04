@@ -1,104 +1,253 @@
-from flask import Blueprint, jsonify, request
-from models import db, User, Dalang, Wayang, AIModel
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from services.sentiment_service import predict_sentiment
+import os
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from flask import Blueprint, app, jsonify, request, Flask, url_for, current_app
+from models import db, User, Dalang, Wayang, AIModel, Video, Article, UlasanAplikasi, WayangGame
+from flask_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    get_jwt_identity
+)
 from ai_manager import get_model
+from services.sentiment_service import predict_sentiment
+from datetime import datetime
 import numpy as np
 import io
-from PIL import Image
+from PIL import Image, ImageOps # <--- Pastikan import ImageOps
+from werkzeug.security import generate_password_hash
 import google.generativeai as genai
 from cepot_controller import cepot_system
+from dotenv import load_dotenv
+from functools import wraps
+from sqlalchemy import func
+from services.rag_service import rag_service
+import re # Import Regex untuk parsing link Youtube
+from werkzeug.utils import secure_filename
+import uuid
+from langchain_core.messages import HumanMessage, SystemMessage
+from services.sentiment_service import predict_sentiment
+import json
+from google.auth.transport import requests
+from werkzeug.utils import secure_filename
+
+# UPLOAD_FOLDER = 'static/uploads/profile_pics'
+# ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+# Pastikan folder sudah ada saat server jalan
+# if not os.path.exists(UPLOAD_FOLDER):
+#     os.makedirs(UPLOAD_FOLDER)
+
+def allowed_file(filename):
+    allowed_extensions = {'png', 'jpg', 'jpeg'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+# ================================
+# GEMINI CONFIG
+# ================================
+load_dotenv(override=True)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not GEMINI_API_KEY:
+    print("❌ GEMINI_API_KEY tidak ditemukan")
+
+genai.configure(api_key=GEMINI_API_KEY)
+chat_model = genai.GenerativeModel("gemini-2.5-flash")
+
+SYSTEM_PROMPT = """
+Instruksi: Kamu adalah Asisten Pintar bernama "Cepot" yang ahli tentang budaya Wayang.
+        Jawab pertanyaan berdasarkan konteks berikut ini. Jika jawaban tidak ada di konteks,
+        katakan "Maaf, Cepot belum mempelajari hal itu di kitab data wayang.
+        jika user tanya ini aplikasi apa, jawab ini aplikasi wayanusa dan jelaskan singkat."
+"""
 
 # ================================
-# KONFIGURASI BLUEPRINT & AI
+# BLUEPRINT DEFINITIONS (WAJIB)
 # ================================
 api = Blueprint("api", __name__)
 auth_api = Blueprint("auth_api", __name__)
 
-# --- KONFIGURASI GEMINI AI (CHATBOT) ---
-# Ganti dengan API Key kamu yang valid
-GEMINI_API_KEY = "AIzaSyDmUtu7mZVRVqp88QigLZOra3UUsPkUhJk" 
-genai.configure(api_key=GEMINI_API_KEY)
 
-# Inisialisasi Model Chat
-chat_model = genai.GenerativeModel("gemini-2.5-flash")
-chat_session = chat_model.start_chat(history=[])
 
-# Prompt Kepribadian Cepot Tegal
-SYSTEM_PROMPT = """
-Instruksi: Kamu adalah Cepot, tokoh wayang golek yang lucu dengan dialek Tegal (Ngapak) yang kental.
-Gunakan kata ganti 'Inyong' (Saya) dan 'Rika' atau 'Sampeyan' (Kamu).
-Gaya bicara: Ceplas-ceplos, humoris, tapi tetap sopan, membantu, dan sedikit 'ngegas' yang lucu.
-Jawablah pertanyaan user dengan singkat, padat, dan jelas (maksimal 3-4 kalimat).
-"""
 
 # ================================
-# 1. AUTH API (LOGIN / REGISTER)
+# AUTH API
 # ================================
-
 @auth_api.route("/register", methods=["POST"])
 def register():
-    """Mendaftarkan user baru."""
     data = request.get_json()
-    name = data.get("name")
-    email = data.get("email")
-    password = data.get("password")
 
-    if User.query.filter_by(email=email).first():
-        return jsonify({"message": "Email already exists"}), 400
+    if User.query.filter_by(email=data["email"]).first():
+        return jsonify({"message": "Email sudah terdaftar"}), 400
 
-    new_user = User(name=name, email=email)
-    new_user.set_password(password)
-    
-    try:
-        db.session.add(new_user)
-        db.session.commit()
-        token = create_access_token(identity=new_user.id)
-        return jsonify({
-            "access_token": token,
-            "user": {"id": new_user.id, "name": new_user.name, "email": new_user.email}
-        }), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+    user = User(name=data["name"], email=data["email"])
+    user.set_password(data["password"])
+
+    db.session.add(user)
+    db.session.commit()
+
+    token = create_access_token(identity=str(user.id))
+    return jsonify({
+        "access_token": token,
+        "user": {"id": user.id, "name": user.name, "email": user.email}
+    }), 201
+
 
 @auth_api.route("/login", methods=["POST"])
 def login():
-    """Autentikasi user dan memberikan JWT Token."""
     data = request.get_json()
-    email = data.get("email")
-    password = data.get("password")
+    user = User.query.filter_by(email=data["email"]).first()
 
-    user = User.query.filter_by(email=email).first()
-    
-    if user and user.check_password(password):
-        token = create_access_token(identity=user.id)
+    if not user or not user.check_password(data["password"]):
+        return jsonify({"message": "Login gagal"}), 401
+
+    token = create_access_token(identity=str(user.id))
+    return jsonify({
+        "access_token": token,
+        "user": {"id": user.id, "name": user.name, "email": user.email}
+    })
+
+@auth_api.route("/google/android", methods=["POST"])
+def google_login_android():
+    print(">>> SERVER SUDAH PAKAI KODE TERBARU! <<<")
+    data = request.get_json()
+    token = data.get("idToken") 
+
+    if not token:
+        return jsonify({"success": False, "message": "Token is missing"}), 400
+
+    try:
+        # PENTING: Isi ini harus WEB CLIENT ID
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
+        print(f"DEBUG: Client ID yang dimuat adalah {client_id}")
+
+        idinfo = id_token.verify_oauth2_token(
+            token,
+            requests.Request(),
+            client_id,
+            clock_skew_in_seconds=60 # Toleransi 60 detik
+        )
+
+        email = idinfo["email"]
+        name = idinfo.get("name")
+        google_id = idinfo["sub"] # ID Unik dari Google
+
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            # Jika user baru, buat akun otomatis
+            user = User(
+                name=name,
+                email=email,
+                google_id=google_id,
+                password_hash="-" # Penanda user Google
+            )
+            db.session.add(user)
+            db.session.commit()
+        elif not user.google_id:
+            # Jika user sudah ada (daftar via email), hubungkan dengan Google ID
+            user.google_id = google_id
+            db.session.commit()
+
+        # Gunakan str(user.id) agar konsisten dengan login email
+        access_token = create_access_token(identity=str(user.id))
+
         return jsonify({
-            "access_token": token,
-            "user": {"id": user.id, "name": user.name, "email": user.email}
-        }), 200
+            "success": True,
+            "access_token": access_token,
+            "user": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "profile_pic": user.profile_pic # <--- TAMBAHKAN JUGA DI SINI
+            }
+        })
 
-    return jsonify({"message": "Invalid credentials"}), 401
+    except Exception as e:
+        # Log di terminal Flask tetap ada
+        print(f"❌ Verifikasi Gagal: {str(e)}") 
+        
+        # Kirim error aslinya ke Flutter agar kamu tidak menebak-nebak
+        return jsonify({
+            "success": False, 
+            "message": f"Server Error: {str(e)}" 
+        }), 500 # Gunakan 500 untuk error internal server
+
 
 @auth_api.route("/profile", methods=["GET"])
 @jwt_required()
 def profile():
-    """Mengambil profil user yang sedang login."""
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    if user:
-        return jsonify({"id": user.id, "name": user.name, "email": user.email}), 200
-    return jsonify({"message": "User not found"}), 404
+    uid = int(get_jwt_identity())
+    user = User.query.get(uid)
+
+    if not user:
+        return jsonify({"message": "User tidak ditemukan"}), 404
+
+    return jsonify({
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "profile_pic": user.profile_pic  # <--- WAJIB TAMBAHKAN INI
+    }), 200
+
+@auth_api.route("/profile", methods=["PUT"])
+@jwt_required()
+def update_profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    
+    if not user:
+        return jsonify({"success": False, "message": "User tidak ditemukan"}), 404
+
+    # 1. AMBIL PASSWORD LAMA DARI REQUEST
+    old_password = request.form.get("old_password")
+    
+    if not old_password:
+        return jsonify({"success": False, "message": "Password lama wajib diisi untuk verifikasi"}), 400
+
+    # 2. VALIDASI PASSWORD LAMA
+    # Pastikan model User kamu punya fungsi check_password
+    if not user.check_password(old_password):
+        return jsonify({"success": False, "message": "Password lama salah!"}), 401
+
+    # 3. JIKA LULUS VALIDASI, BARU PROSES UPDATE SEPERTI BIASA
+    name = request.form.get("name")
+    email = request.form.get("email")
+    new_password = request.form.get("password") # Ini password baru
+
+    if name: user.name = name
+    if email: user.email = email
+    if new_password: user.password_hash = generate_password_hash(new_password)
+
+    # Update Foto Profil
+    if 'profile_pic' in request.files:
+        file = request.files['profile_pic']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(f"user_{user.id}_{file.filename}")
+            filepath = os.path.join(current_app.config['UPLOAD_FOTO'], filename)
+            file.save(filepath)
+            user.profile_pic = f"uploads/profile_pics/{filename}"
+
+    try:
+        db.session.commit()
+        return jsonify({
+            "success": True, 
+            "message": "Profil berhasil diperbarui",
+            "profile_pic": user.profile_pic
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
 
 # ================================
-# 2. DATA API (DALANG)
+# DATA API
 # ================================
-
 @api.route("/dalang", methods=["GET"])
 def get_dalang():
-    """Mengambil semua data dalang dari database."""
-    try:
-        dalangs = Dalang.query.all()
-        data = [{
+    dalangs = Dalang.query.all()
+    return jsonify({
+        "data": [{
             "id": d.id,
             "nama": d.nama,
             "alamat": d.alamat,
@@ -106,152 +255,565 @@ def get_dalang():
             "longitude": d.longitude,
             "foto": d.foto
         } for d in dalangs]
-        return jsonify({"dalangs": data}), 200
+    })
+
+
+@api.route("/wayang", methods=["GET"])
+def get_wayang():
+    wayangs = Wayang.query.all()
+    return jsonify({
+        "data": [{
+            "id": w.id,
+            "nama": w.nama,
+            "file": w.file_path
+        } for w in wayangs]
+    })
+
+
+# ================================
+# AI VISION
+# ================================
+@api.route("/predict-wayang", methods=["POST"])
+def predict_wayang():
+    print("\n📸 [API] Menerima Request Predict Wayang...")
+    
+    active_model = AIModel.query.filter_by(is_active=True).first()
+    if not active_model:
+        return jsonify({"error": "Model AI belum diaktifkan"}), 503
+
+    model = get_model()
+    if model is None:
+        return jsonify({"error": "Model gagal dimuat di server"}), 500
+
+    if "image" not in request.files:
+        return jsonify({"error": "File gambar tidak dikirim"}), 400
+
+    try:
+        # 1. Buka Gambar
+        file = request.files["image"]
+        img = Image.open(file).convert("RGB")
+        
+        # 2. FIX ROTASI OTOMATIS (Penting buat Kamera HP)
+        # Kamera HP sering nyimpen rotasi di metadata, harus di-apply biar tegak
+        img = ImageOps.exif_transpose(img) 
+
+        # 3. Preprocessing (Samakan persis dengan Training)
+        target_size = (150, 150)  # Pastikan ini sama dengan training Anda! (150 atau 224?)
+        img = img.resize(target_size)
+        
+        x = np.array(img)
+        x = np.expand_dims(x, axis=0)
+        
+        # Normalisasi (Cek saat training pakai /255.0 atau mobilenet_preprocess?)
+        # Asumsi pakai rescale 1./255
+        x = x / 255.0 
+
+        # 4. Prediksi
+        prediction = model.predict(x)
+        idx = int(np.argmax(prediction))
+        confidence = float(np.max(prediction))
+        
+        # Ambil Label
+        labels_raw = active_model.labels
+        labels = [l.strip() for l in labels_raw.split(",") if l.strip()]
+        
+        predicted_label = labels[idx] if idx < len(labels) else "Unknown"
+
+        # 5. DEBUGGING DI TERMINAL (Lihat ini saat test)
+        print(f"🔍 [AI DEBUG] Prediksi: {predicted_label}")
+        print(f"📊 [AI DEBUG] Confidence: {confidence:.4f} ({confidence*100:.2f}%)")
+        print(f"Labels tersedia: {labels}")
+
+        # 6. LOGIC THRESHOLD (Kita turunkan jadi 55% biar lebih toleran)
+        THRESHOLD = 0.65
+        
+        if confidence < THRESHOLD:
+            print("⚠️ [AI DEBUG] Confidence terlalu rendah, dianggap Unknown.")
+            return jsonify({
+                "prediksi": "Objek Tidak Dikenali",
+                "confidence": f"{confidence*100:.2f}% (Kurang Yakin)",
+                "deskripsi": "Gambar kurang jelas atau mirip dengan beberapa tokoh sekaligus. Coba foto lebih dekat dengan cahaya yang cukup."
+            })
+
+        # Ambil data deskripsi dari Database Wayang
+        wayang_db = Wayang.query.filter(func.lower(Wayang.nama) == func.lower(predicted_label)).first()
+        deskripsi_text = wayang_db.deskripsi if wayang_db else "Deskripsi belum tersedia di database."
+
+        return jsonify({
+            "prediksi": predicted_label,
+            "confidence": f"{confidence*100:.1f}%",
+            "deskripsi": deskripsi_text
+        })
+
     except Exception as e:
+        print(f"❌ [API ERROR] {e}")
         return jsonify({"error": str(e)}), 500
 
 # ================================
-# 3. AI VISION API (PREDIKSI WAYANG)
+# CHATBOT CEPOT (SAFE MODE)
 # ================================
+@api.route('/chat-smart', methods=['POST'])
+def chat_smart():
+    if rag_service is None:
+        return jsonify({
+            "response": "🤖 Fitur chatbot sedang dinonaktifkan sementara."
+        }), 503
 
-@api.route('/predict-wayang', methods=['POST'])
-def predict_wayang():
-    """
-    Menerima gambar -> Resize -> Prediksi Model -> Ambil Info Database.
-    """
-    # 1. Cek Model Aktif
-    active_model_db = AIModel.query.filter_by(is_active=True).first()
-    if not active_model_db:
-        return jsonify({'error': 'Belum ada model AI yang diaktifkan Admin.'}), 503
-        
-    model = get_model() # Load dari RAM
-    if model is None:
-        return jsonify({'error': 'Model gagal dimuat di server.'}), 500
+    data = request.get_json()
+    message = data.get("message")
+    mode = data.get("mode", "rag")
 
-    # 2. Validasi File
-    if 'image' not in request.files:
-        return jsonify({'error': 'File gambar tidak ditemukan'}), 400
-    
-    file = request.files['image']
-    if file.filename == '':
-        return jsonify({'error': 'Nama file kosong'}), 400
+    if not message:
+        return jsonify({"response": "Waduh, kok meneng bae? (Pesan kosong)"}), 400
 
     try:
-        # 3. Pre-processing Gambar
-        image_bytes = file.read()
-        img = Image.open(io.BytesIO(image_bytes)).convert('RGB')
-        
-        # Resize sesuai input shape model (150x150)
-        target_size = (150, 150) 
-        img = img.resize(target_size)
-        
-        # Normalisasi Array
-        x = np.array(img)
-        x = x / 255.0  
-        processed_img = np.expand_dims(x, axis=0)
+        if mode == 'gemini':
+            from langchain.schema import SystemMessage, HumanMessage
 
-        # 4. Prediksi
-        prediction = model.predict(processed_img)
-        predicted_index = np.argmax(prediction, axis=1)[0]
-        confidence = float(np.max(prediction))
+            messages = [
+                SystemMessage(content=SYSTEM_PROMPT),
+                HumanMessage(content=message)
+            ]
 
-        # 5. Mapping Label dari Database
-        if active_model_db.labels:
-            class_names = [label.strip() for label in active_model_db.labels.split(',')]
+            ai_response = rag_service.llm.invoke(messages)
+            reply_text = ai_response.content
         else:
-            return jsonify({'error': 'Model aktif tidak memiliki data label!'}), 500
+            reply_text = rag_service.get_answer(message)
 
-        if predicted_index < len(class_names):
-            predicted_label = class_names[predicted_index]
-        else:
-            predicted_label = "Unknown"
+        clean_reply = reply_text.replace("*", "")
+        return jsonify({"response": clean_reply})
 
-        # 6. Ambil Deskripsi dari Tabel Wayang
-        deskripsi_text = "Deskripsi belum tersedia di database."
-        if predicted_label != "Unknown":
-            wayang_db = Wayang.query.filter_by(nama=predicted_label).first()
-            if wayang_db:
-                deskripsi_text = wayang_db.deskripsi
+    except Exception as e:
+        print(f"Error Chat Smart: {e}")
+        return jsonify({"response": "Cepot lagi pusing euy 😵"}), 500
+
+
+@api.route("/rag/build", methods=["GET"])
+def build_rag():
+    return jsonify({
+        "message": "Fitur RAG sedang dinonaktifkan sementara."
+    }), 503
+
+@api.route("/chat-rag", methods=["POST"])
+def chat_rag_api():
+    return jsonify({
+        "response": "Fitur AI sedang nonaktif."
+    }), 503
+
+
+
+# ================================
+# SMART WAYANG (SIAP ADMIN)
+# ================================
+@api.route("/cepot/ports")
+def cepot_ports():
+    return jsonify({"ports": cepot_system.get_ports()})
+
+
+@api.route("/cepot/connect", methods=["POST"])
+def cepot_connect():
+    port = request.json.get("port")
+    success, msg = cepot_system.connect(port)
+    return jsonify({"success": success, "message": msg})
+
+
+@api.route("/cepot/disconnect", methods=["POST"])
+def cepot_disconnect():
+    return jsonify({"message": cepot_system.disconnect()})
+
+
+@api.route("/cepot/talk", methods=["POST"])
+def cepot_talk():
+    msg = request.json.get("message")
+    if not msg:
+        return jsonify({"response": "Ora krungu..."})
+
+    reply = cepot_system.process_physical_interaction(msg)
+    return jsonify({"response": reply})
+
+# ================================
+# VIDEO WAYANG
+# ================================
+
+# --- HELPER: Fungsi Ekstrak ID Youtube ---
+def extract_youtube_id(url):
+    """
+    Mengambil ID unik (misal: J_t9G2bWqYA) dari link Youtube panjang/pendek.
+    """
+    if not url: return None
+    # Regex untuk menangani berbagai format link youtube
+    regex = r'(?:v=|\/)([0-9A-Za-z_-]{11}).*'
+    match = re.search(regex, url)
+    if match:
+        return match.group(1)
+    return None
+
+# 1. GET ALL VIDEOS (Untuk ditampilkan di Flutter)
+@api.route('/videos', methods=['GET'])
+def get_videos():
+    try:
+        videos = db.session.query(Video).order_by(Video.id.desc()).all()
+        output = []
+        
+        for vid in videos:
+            video_id = extract_youtube_id(vid.youtube_link)
+            
+            # Kita format datanya biar Flutter tinggal pakai
+            video_data = {
+                'id': vid.id,
+                'title': vid.judul,
+                'youtube_link': vid.youtube_link,
+                'youtube_id': video_id, # ID ini penting buat player Flutter
+                'thumbnail': f"https://img.youtube.com/vi/{video_id}/0.jpg" if video_id else None,
+                'channel': "Wayanusa Official" # Default channel name (karena di DB ga ada kolom channel)
+            }
+            output.append(video_data)
 
         return jsonify({
-            'prediksi': predicted_label,
-            'confidence': f"{confidence * 100:.2f}%",
-            'deskripsi': deskripsi_text,
+            'status': 'success', 
+            'total': len(output),
+            'data': output
         }), 200
 
     except Exception as e:
-        print(f"Error Vision: {e}")
-        return jsonify({'error': 'Gagal memproses gambar', 'details': str(e)}), 500
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
-# ================================
-# 4. AI CHATBOT API (CEPOT)
-# ================================
+# ==========================================
+# HELPER: SAVE THUMBNAIL (API VERSION)
+# ==========================================
+def save_thumbnail_api(file):
+    """
+    Simpan file gambar dari request API ke folder static.
+    Mengembalikan nama file unik atau None jika gagal.
+    """
+    if not file or file.filename == '':
+        return None
+    
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+    
+    # Cek ekstensi
+    if '.' not in file.filename or \
+       file.filename.rsplit('.', 1)[1].lower() not in ALLOWED_EXTENSIONS:
+        return None
 
-@api.route('/chat', methods=['POST'])
-def chat_api():
-    """
-    Menerima pesan teks -> Kirim ke Gemini (dengan persona Cepot) -> Balas.
-    """
+    # Buat nama file unik (UUID + Secure Filename)
+    filename = secure_filename(file.filename)
+    unique_filename = f"{uuid.uuid4().hex}_{filename}"
+    
+    # Path folder upload (Absolute Path lebih aman)
+    # Sesuaikan base_dir dengan lokasi app.py kamu
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
+    upload_folder = os.path.join(base_dir, 'static', 'uploads', 'thumbnails')
+    
+    os.makedirs(upload_folder, exist_ok=True)
+    
+    # Simpan File
+    file_path = os.path.join(upload_folder, unique_filename)
+    file.save(file_path)
+    
+    return unique_filename
+
+# ==========================================
+# API ENDPOINTS: ARTIKEL
+# ==========================================
+
+# 1. GET ALL ARTICLES (List Berita)
+@api.route('/articles', methods=['GET'])
+def get_articles():
     try:
-        data = request.get_json()
-        user_message = data.get('message')
+        # Urutkan artikel terbaru paling atas
+        articles = Article.query.order_by(Article.created_at.desc()).all()
+        output = []
 
-        if not user_message:
-            return jsonify({'response': "Waduh, kok meneng bae? Ngomong apa kye?"}), 400
+        for art in articles:
+            # Generate URL Gambar Lengkap (http://ip-server:port/static/...)
+            thumbnail_url = None
+            if art.thumbnail:
+                # request.host_url otomatis mendeteksi IP/Domain server
+                thumbnail_url = f"{request.host_url}static/uploads/thumbnails/{art.thumbnail}"
+            else:
+                # Gambar Default jika tidak ada thumbnail
+                thumbnail_url = "https://via.placeholder.com/300x200?text=No+Image"
 
-        # Gabungkan System Prompt dengan Pesan User
-        final_prompt = f"{SYSTEM_PROMPT}\n\nUser bertanya: {user_message}"
+            # Bersihkan tag HTML dari content untuk preview (misal dari Summernote)
+            import re
+            clean_text = re.sub('<[^<]+?>', '', art.content or '')
 
-        # Kirim ke Gemini
-        response = chat_session.send_message(final_prompt)
-        bot_reply = response.text
+            data = {
+                'id': art.id,
+                'title': art.title,
+                'content_preview': clean_text[:100] + '...' if len(clean_text) > 100 else clean_text,
+                'source_link': art.source_link,
+                'thumbnail': thumbnail_url,
+                'created_at': art.created_at.strftime('%d %B %Y'), # Contoh: 10 Januari 2026
+                'created_at_iso': art.created_at.isoformat() # Format ISO untuk parsing di Flutter
+            }
+            output.append(data)
 
-        # Bersihkan Markdown (* atau **) agar tampilan rapi
-        bot_reply = bot_reply.replace("**", "").replace("*", "")
-
-        return jsonify({'response': bot_reply}), 200
+        return jsonify({
+            'status': 'success',
+            'total': len(output),
+            'data': output
+        }), 200
 
     except Exception as e:
-        print(f"Error Chatbot: {e}")
-        return jsonify({'response': "Waduh, sinyal inyong lagi laka (Error Server). Coba maning ya!"}), 500
-    
-# ================================
-# 5. SMART WAYANG CONTROL API
-# ================================
+        print(f"Error Get Articles: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
-@api.route('/cepot/ports', methods=['GET'])
-def get_ports():
-    ports = cepot_system.get_ports()
-    return jsonify({'ports': ports})
 
-@api.route('/cepot/connect', methods=['POST'])
-def connect_cepot():
+# 2. GET SINGLE ARTICLE (Detail Berita)
+@api.route('/articles/<int:id>', methods=['GET'])
+def get_article_detail(id):
+    try:
+        art = Article.query.get(id)
+        if not art:
+            return jsonify({'status': 'error', 'message': 'Artikel tidak ditemukan'}), 404
+
+        thumbnail_url = None
+        if art.thumbnail:
+            thumbnail_url = f"{request.host_url}static/uploads/thumbnails/{art.thumbnail}"
+        else:
+            thumbnail_url = "https://via.placeholder.com/600x400?text=No+Image"
+
+        data = {
+            'id': art.id,
+            'title': art.title,
+            'content': art.content, # Kirim HTML mentah biar Flutter render pake WebView/HtmlWidget
+            'source_link': art.source_link,
+            'thumbnail': thumbnail_url,
+            'created_at': art.created_at.strftime('%d %B %Y, %H:%M WIB')
+        }
+
+        return jsonify({'status': 'success', 'data': data}), 200
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+# 3. CREATE ARTICLE (Tambah Berita via API)
+@api.route('/articles', methods=['POST'])
+def create_article():
+    try:
+        # Ambil data form-data
+        title = request.form.get('title')
+        content = request.form.get('content')
+        source_link = request.form.get('source_link')
+        file = request.files.get('thumbnail') # Key di postman/flutter: 'thumbnail'
+
+        # Validasi Input
+        if not title or not content:
+            return jsonify({'status': 'error', 'message': 'Judul dan Konten wajib diisi!'}), 400
+
+        # Upload Gambar (Opsional)
+        thumbnail_filename = None
+        if file:
+            thumbnail_filename = save_thumbnail_api(file)
+            if not thumbnail_filename:
+                return jsonify({'status': 'error', 'message': 'Format gambar tidak didukung!'}), 400
+
+        # Simpan ke Database
+        new_article = Article(
+            title=title,
+            content=content,
+            source_link=source_link,
+            thumbnail=thumbnail_filename
+        )
+
+        db.session.add(new_article)
+        db.session.commit()
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Artikel berhasil diterbitkan!',
+            'data': {
+                'id': new_article.id,
+                'title': new_article.title,
+                'thumbnail': thumbnail_filename
+            }
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error Create Article: {e}")
+        return jsonify({'status': 'error', 'message': "Gagal menyimpan artikel."}), 500
+
+
+# 4. DELETE ARTICLE (Hapus Berita)
+@api.route('/articles/<int:id>', methods=['DELETE'])
+def delete_article(id):
+    try:
+        art = Article.query.get(id)
+        if not art:
+            return jsonify({'status': 'error', 'message': 'Artikel tidak ditemukan'}), 404
+
+        # Hapus File Gambar Fisik (Bersih-bersih storage)
+        if art.thumbnail:
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            file_path = os.path.join(base_dir, 'static', 'uploads', 'thumbnails', art.thumbnail)
+            
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except:
+                    pass # Abaikan jika gagal hapus file, yg penting data db hilang
+
+        db.session.delete(art)
+        db.session.commit()
+
+        return jsonify({'status': 'success', 'message': 'Artikel berhasil dihapus permanen'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# ==========================================
+# API ENDPOINTS: ULASAN APLIKASI
+# ==========================================
+
+@api.route('/ulasan', methods=['POST'])
+def post_ulasan():
     data = request.get_json()
-    port = data.get('port')
-    if not port:
-        return jsonify({'status': 'error', 'message': 'Pilih port dulu!'})
+
+    if not data or 'komentar' not in data or 'rating' not in data:
+        return jsonify({'message': 'Data tidak lengkap'}), 400
+
+    komentar = data['komentar']
+    rating = int(data['rating'])
+
+    if not (1 <= rating <= 5):
+        return jsonify({'message': 'Rating harus 1-5'}), 400
+
+    try:
+        kategori, confidence = predict_sentiment(komentar)
+    except Exception:
+        kategori, confidence = 'netral', 0.0
+
+    ulasan = UlasanAplikasi(
+        user_id=None,
+        nama_user=data.get('nama_user', 'Guest'),
+        email_user=None,
+        rating=rating,
+        kategori=kategori,
+        komentar=komentar,
+        created_at=datetime.utcnow()
+    )
+
+    db.session.add(ulasan)
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Ulasan berhasil dikirim',
+        'kategori_ai': kategori,
+        'confidence': confidence
+    }), 201
+
+
+# =========================
+# GET ULASAN (OPTIONAL)
+# =========================
+@api.route('/ulasan', methods=['GET'])
+def get_ulasan():
+    ulasan = UlasanAplikasi.query.order_by(
+        UlasanAplikasi.created_at.desc()
+    ).all()
+
+    total = len(ulasan)
+    rata = round(
+        db.session.query(func.avg(UlasanAplikasi.rating)).scalar() or 0,
+        1
+    )
+
+    return jsonify({
+        'total_ulasan': total,
+        'rata_rating': rata,
+        'data': [
+            {
+                'nama_user': u.nama_user,
+                'rating': u.rating,
+                'kategori': u.kategori,
+                'komentar': u.komentar,
+                'created_at': u.created_at.strftime('%d %b %Y')
+            } for u in ulasan
+        ]
+    })
+
+
+# =========================
+# WAYANG GAME API (FLUTTER)
+# =========================
+# Helper function biar tidak koding ulang
+def get_asset_url(filename_or_path):
+    if not filename_or_path:
+        return None
     
-    success, msg = cepot_system.connect(port)
-    if success:
-        return jsonify({'status': 'success', 'message': msg})
+    # 1. Normalisasi slash (ubah backslash Windows \ jadi /)
+    clean_path = filename_or_path.replace('\\', '/')
+
+    # 2. LOGIKA CERDAS:
+    # Jika di database sudah ada tanda garis miring (/), berarti itu path lengkap
+    # Contoh DB: "images/wayang/arjuna.png" -> Langsung tempel ke static
+    if "/" in clean_path:
+        # Hapus slash di depan jika ada biar gak double slash
+        if clean_path.startswith('/'):
+            clean_path = clean_path[1:]
+        return f"{request.host_url}static/{clean_path}"
+    
+    # 3. JIKA CUMA NAMA FILE:
+    # Contoh DB: "arjuna.png" -> Masukkan ke folder default
     else:
-        return jsonify({'status': 'error', 'message': msg})
+        # Pastikan folder default ini benar-benar ada di komputer kamu!
+        # Opsinya biasanya: 'static/uploads/wayanggame/' atau 'static/uploads/wayang/'
+        return f"{request.host_url}static/uploads/wayanggame/{clean_path}"
 
-@api.route('/cepot/disconnect', methods=['POST'])
-def disconnect_cepot():
-    msg = cepot_system.disconnect()
-    return jsonify({'status': 'success', 'message': msg})
+@api.route("/wayang-game", methods=["GET"])
+def get_wayang_game():
+    # Sortir berdasarkan nama biar rapi di list
+    data = WayangGame.query.order_by(WayangGame.nama.asc()).all()
 
-@api.route('/cepot/talk', methods=['POST'])
-def cepot_talk():
-    # Endpoint ini dipanggil setelah Browser mendengar perintah suara
-    data = request.get_json()
-    user_message = data.get('message')
-    
-    if not user_message:
-        return jsonify({'response': 'Hah? Ora krungu... (Pesan kosong)'})
+    return jsonify({
+        "status": "success",
+        "total": len(data),
+        "data": [
+            {
+                "id": w.id,
+                "nama": w.nama,
+                # "deskripsi": w.deskripsi, # Tambahkan deskripsi jika ada
+                
+                # --- SEMUA ASET JADI FULL URL ---
+                "thumbnail": get_asset_url(w.thumbnail),
+                "badan": get_asset_url(w.badan),
+                "tangan_kanan_atas": get_asset_url(w.tangan_kanan_atas),
+                "tangan_kanan_bawah": get_asset_url(w.tangan_kanan_bawah),
+                "tangan_kiri_atas": get_asset_url(w.tangan_kiri_atas),
+                "tangan_kiri_bawah": get_asset_url(w.tangan_kiri_bawah),
+            } for w in data
+        ]
+    }), 200
 
-    # Panggil Controller Fisik (Gemini + Gerak + Suara)
-    reply = cepot_system.process_physical_interaction(user_message)
-    
-    return jsonify({'response': reply})
+@api.route("/wayang-game/<int:id>", methods=["GET"])
+def get_wayang_game_detail(id):
+    w = WayangGame.query.get(id)
+
+    if not w:
+        return jsonify({
+            "status": "error",
+            "message": "Wayang tidak ditemukan"
+        }), 404
+
+    return jsonify({
+        "status": "success",
+        "data": {
+            "id": w.id,
+            "nama": w.nama,
+            # "deskripsi": w.deskripsi,
+            
+            # --- SEMUA ASET JADI FULL URL ---
+            "thumbnail": get_asset_url(w.thumbnail),
+            "badan": get_asset_url(w.badan),
+            "tangan_kanan_atas": get_asset_url(w.tangan_kanan_atas),
+            "tangan_kanan_bawah": get_asset_url(w.tangan_kanan_bawah),
+            "tangan_kiri_atas": get_asset_url(w.tangan_kiri_atas),
+            "tangan_kiri_bawah": get_asset_url(w.tangan_kiri_bawah),
+        }
+    }), 200

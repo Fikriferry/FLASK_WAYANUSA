@@ -1,19 +1,65 @@
 {% extends "admin/layout_admin.html" %}
 
-{% block title %}Artikel - WAYANUSA Admin{% endblock %}
+{% block head %}
+<style>
+    /* Styling Tambahan */
+    .article-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .card-img-top {
+        height: 180px;
+        object-fit: cover;
+    }
+    .table-avatar {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    .search-box {
+        position: relative;
+    }
+    .search-box i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+    }
+    .search-box input {
+        padding-left: 40px;
+        border-radius: 20px;
+    }
+    /* Toggle View Buttons */
+    .btn-group-toggle .btn.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+</style>
+{% endblock %}
+
+{% block title %}Kelola Artikel - WAYANUSA Admin{% endblock %}
 
 {% block content %}
 <div class="content-header">
     <div class="container-fluid">
-        <div class="row mb-2">
+        <div class="row mb-2 align-items-center">
             <div class="col-sm-6">
-                <h1 class="m-0">
-                    <i class="fas fa-newspaper mr-2"></i>
-                    Artikel
+                <h1 class="m-0 font-weight-bold text-dark">
+                    <i class="fas fa-newspaper mr-2 text-primary"></i> Kelola Artikel
                 </h1>
+                <p class="text-muted m-0">Buat, edit, dan kelola konten berita wayang anda.</p>
             </div>
             <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
+                <ol class="breadcrumb float-sm-right bg-transparent p-0">
                     <li class="breadcrumb-item"><a href="{{ url_for('web.admin_dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item active">Artikel</li>
                 </ol>
@@ -24,95 +70,211 @@
 
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list mr-2"></i> Daftar Artikel
-                        </h3>
-                        <div class="card-tools">
-                            <a href="{{ url_for('web.artikel_add') }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus"></i> Tambah Artikel Baru
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th style="width: 50px;">#</th>
-                                    <th style="width: 80px;">Thumbnail</th>
-                                    <th>Title</th>
-                                    <th>Created At</th>
-                                    <th style="width: 150px;">Aksi</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {% for artikel in artikels %}
-                                <tr>
-                                    <td>{{ artikel.id }}</td>
-                                    <td>
-                                        {% if artikel.thumbnail %}
-                                            <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}"
-                                                 alt="Thumbnail {{ artikel.title }}"
-                                                 class="img-circle elevation-2"
-                                                 width="80" height="80"
-                                                 style="object-fit: cover;">
-                                        {% else %}
-                                            <div class="text-center">
-                                                <i class="fas fa-image text-secondary" style="font-size: 50px;"></i>
-                                            </div>
-                                        {% endif %}
-                                    </td>
-
-                                    <td><strong>{{ artikel.title }}</strong></td>
-                                    <td>{{ artikel.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
-
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ url_for('web.artikel_edit', id=artikel.id) }}" class="btn btn-warning btn-sm" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-
-                                            <a href="{{ url_for('web.artikel_delete', id=artikel.id) }}"
-                                               class="btn btn-danger btn-sm"
-                                               onclick="return confirm('Yakin ingin menghapus artikel {{ artikel.title }}?')"
-                                               title="Hapus">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-
-                                {% if not artikels %}
-                                <tr>
-                                    <td colspan="5" class="text-center py-4">
-                                        <i class="fas fa-newspaper text-muted" style="font-size: 48px;"></i>
-                                        <p class="mt-2 text-muted">Belum ada artikel yang dibuat</p>
-                                        <a href="{{ url_for('web.artikel_add') }}" class="btn btn-primary">
-                                            <i class="fas fa-plus"></i> Tambah Artikel Pertama
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {% if artikels %}
-                    <div class="card-footer">
-                        <div class="dataTables_info">Menampilkan {{ artikels|length }} artikel</div>
-                    </div>
-                    {% endif %}
+        
+        <div class="row mb-4">
+            <div class="col-md-8 d-flex align-items-center">
+                <a href="{{ url_for('web.artikel_add') }}" class="btn btn-primary rounded-pill shadow-sm px-4 mr-3">
+                    <i class="fas fa-plus mr-2"></i> Tulis Artikel Baru
+                </a>
+                
+                <div class="search-box flex-grow-1" style="max-width: 300px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Cari judul artikel...">
                 </div>
-
+            </div>
+            
+            <div class="col-md-4 text-right">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-outline-secondary active" onclick="switchView('list')">
+                        <input type="radio" name="options" id="option1" checked> <i class="fas fa-list"></i> List
+                    </label>
+                    <label class="btn btn-outline-secondary" onclick="switchView('grid')">
+                        <input type="radio" name="options" id="option2"> <i class="fas fa-th-large"></i> Grid
+                    </label>
+                </div>
             </div>
         </div>
+
+        {% if not artikels %}
+        <div class="row">
+            <div class="col-12 text-center py-5">
+                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="150" class="mb-3 opacity-50">
+                <h3 class="text-muted">Belum ada artikel</h3>
+                <p class="text-muted mb-4">Mulai bagikan cerita wayang menarik kepada pengguna anda.</p>
+                <a href="{{ url_for('web.artikel_add') }}" class="btn btn-primary btn-lg rounded-pill">
+                    <i class="fas fa-plus mr-2"></i> Buat Artikel Pertama
+                </a>
+            </div>
+        </div>
+        {% else %}
+
+        <div id="listView" class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="articleTable">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="pl-4" style="width: 50px;">#</th>
+                                <th style="width: 100px;">Cover</th>
+                                <th>Judul & Cuplikan</th>
+                                <th style="width: 150px;">Tanggal</th>
+                                <th style="width: 150px;" class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for art in artikels %}
+                            <tr>
+                                <td class="pl-4 text-muted">{{ loop.index }}</td>
+                                <td>
+                                    {% if art.thumbnail %}
+                                    <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ art.thumbnail) }}" 
+                                         class="table-avatar shadow-sm" alt="Thumb">
+                                    {% else %}
+                                    <div class="table-avatar bg-light d-flex align-items-center justify-content-center text-muted border">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <h6 class="mb-1 font-weight-bold text-dark">{{ art.title }}</h6>
+                                    <small class="text-muted d-block text-truncate" style="max-width: 400px;">
+                                        {{ art.content | striptags | truncate(80) }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge badge-light border px-2 py-1">
+                                        <i class="far fa-calendar-alt mr-1"></i> 
+                                        {{ art.created_at.strftime('%d %b %Y') }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('web.artikel_edit', id=art.id) }}" 
+                                           class="btn btn-outline-primary btn-sm rounded-left" 
+                                           data-toggle="tooltip" title="Edit">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                        <button onclick="confirmDelete('{{ url_for('web.artikel_delete', id=art.id) }}', '{{ art.title }}')" 
+                                                class="btn btn-outline-danger btn-sm rounded-right" 
+                                                data-toggle="tooltip" title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="gridView" class="row d-none">
+            {% for art in artikels %}
+            <div class="col-md-4 col-lg-3 mb-4 article-item">
+                <div class="card article-card h-100 shadow-sm">
+                    <div class="position-relative">
+                        {% if art.thumbnail %}
+                        <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ art.thumbnail) }}" 
+                             class="card-img-top" alt="Cover">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted">
+                            <i class="fas fa-image fa-3x opacity-25"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="position-absolute" style="top: 10px; right: 10px;">
+                            <span class="badge badge-light shadow-sm">
+                                {{ art.created_at.strftime('%d %b') }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title font-weight-bold mb-2 text-truncate">{{ art.title }}</h5>
+                        <p class="card-text text-muted small mb-3 flex-grow-1">
+                            {{ art.content | striptags | truncate(60) }}
+                        </p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <small class="text-muted"><i class="fas fa-user-circle mr-1"></i> Admin</small>
+                            <div>
+                                <a href="{{ url_for('web.artikel_edit', id=art.id) }}" class="text-primary mr-3" title="Edit">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <a href="#" onclick="confirmDelete('{{ url_for('web.artikel_delete', id=art.id) }}', '{{ art.title }}')" class="text-danger" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% endif %}
+
     </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // 1. Logic Switch View (List vs Grid)
+    function switchView(view) {
+        if (view === 'list') {
+            $('#listView').removeClass('d-none');
+            $('#gridView').addClass('d-none');
+        } else {
+            $('#listView').addClass('d-none');
+            $('#gridView').removeClass('d-none');
+        }
+    }
+
+    // 2. Logic Live Search
+    $('#searchInput').on('keyup', function() {
+        var value = $(this).val().toLowerCase();
+        
+        // Filter Table Rows
+        $("#articleTable tbody tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+
+        // Filter Grid Cards
+        $(".article-item").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    // 3. Konfirmasi Hapus Modern
+    function confirmDelete(url, title) {
+        Swal.fire({
+            title: 'Hapus Artikel?',
+            text: `Anda akan menghapus "${title}". Tindakan ini tidak dapat dibatalkan.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+        
+        // Fallback jika SweetAlert tidak diload
+        if (typeof Swal === 'undefined') {
+            if(confirm(`Hapus "${title}"?`)) window.location.href = url;
+        }
+    }
+
+    // Initialize Tooltips
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
 {% endblock %}

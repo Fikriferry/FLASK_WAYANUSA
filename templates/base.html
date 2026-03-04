@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}WAYANUSA{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/wayang.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/video.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz-play.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard_wayang.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/artikeldetail.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ulasan.css') }}">
+
+    {% block head_extra %}{% endblock %} 
+</head>
+
+<body>
+    {% include 'layouts/navbar.html' %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer style="background: #000; color: #888; padding: 40px 0; text-align: center; border-top: 1px solid #333;">
+        <div class="container">
+            <p>&copy; 2024 WAYANUSA. Melestarikan Budaya dengan Teknologi.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const burger = document.getElementById('burgerMenu');
+            const menu = document.getElementById('navbarMenu');
+            const profileToggle = document.getElementById('profileToggle');
+            const profileMenu = document.getElementById('profileMenu');
+            
+            if (burger && menu) {
+                burger.addEventListener('click', () => {
+                    menu.classList.toggle('active');
+                    burger.classList.toggle('open');
+                });
+            }
+
+            if (profileToggle && profileMenu) {
+                profileToggle.addEventListener('click', () => {
+                    profileMenu.classList.toggle('active');
+                });
+                document.addEventListener('click', function(event) {
+                    if (!profileToggle.contains(event.target) && !profileMenu.contains(event.target)) {
+                        profileMenu.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
+    
+    {% block scripts_extra %}{% endblock %}
+</body>
+</html>

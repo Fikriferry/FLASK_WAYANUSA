@@ -10,15 +10,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard_wayang.css') }}">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+
 </head>
 <body>
-    {% include "partials/navbar.html" %}
+    {% include 'layouts/navbar.html' %}
 
     <section class="leaderboard-section">
         <div class="container">
             <div class="leaderboard-content">
                 <p class="leaderboard-tag">🏆 LEADERBOARD</p>
-                <h2 class="leaderboard-title">Leaderboard <span class="highlight">Wayang</span></h2>
+                <h2 class="leaderboard-title">Leaderboard <span class="highlight">Quiz</span></h2>
                 <p class="leaderboard-description">
                     Lihat peringkat pemain terbaik dalam quiz wayang kulit. Pilih level untuk melihat leaderboard spesifik.
                 </p>

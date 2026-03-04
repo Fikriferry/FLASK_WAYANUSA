@@ -29,15 +29,17 @@
                 <td>{{ v.judul }}</td>
                 <td>{{ v.youtube_link }}</td>
                 <td>
-                    <iframe width="200" height="100"
-                        src="https://www.youtube.com/embed/{{ v.youtube_id }}">
+                    <iframe width="200" height="100" src="https://www.youtube.com/embed/{{ v.youtube_id }}">
                     </iframe>
                 </td>
                 <td>
-                    <a href="{{ url_for('web.video_delete', id=v.id) }}"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('Hapus video?')">
-                       <i class="fas fa-trash"></i>  
+                    <a href="{{ url_for('web.video_edit', id=v.id) }}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <a href="{{ url_for('web.video_delete', id=v.id) }}" class="btn btn-danger btn-sm"
+                        onclick="return confirm('Hapus video?')">
+                        <i class="fas fa-trash"></i>
                     </a>
                 </td>
             </tr>

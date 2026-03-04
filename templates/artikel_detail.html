@@ -4,35 +4,236 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ artikel.title }} - WAYANUSA</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/artikeldetail.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 
-    <!-- AOS -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <style>
+        /* --- TEMA GELAP (DARK MODE) --- */
+        :root {
+            --primary-color: #D4A373; /* Warna Emas Wayang */
+            --bg-body: #050505;       /* Hitam Hampir Pekat (Latar Belakang) */
+            --bg-card: #121212;       /* Hitam Abu (Latar Kontainer) */
+            --text-main: #e0e0e0;     /* Putih Tulang (Teks Utama) */
+            --text-muted: #a0a0a0;    /* Abu-abu (Teks Sekunder) */
+            --border-color: #2a2a2a;  /* Garis Pemisah Tipis */
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        .article-detail-section {
+            padding: 120px 20px 80px;
+            min-height: 100vh;
+            /* Efek Glow halus di background (opsional) */
+            background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, var(--bg-body) 60%);
+        }
+
+        /* Container Artikel */
+        .article-detail-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            padding: 50px;
+            border-radius: 20px;
+            /* Border halus biar batasnya kelihatan */
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); /* Bayangan gelap */
+        }
+
+        /* Tombol Kembali */
+        .article-back-btn {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+        .article-back-btn:hover {
+            color: var(--primary-color);
+            transform: translateX(-5px); /* Efek geser dikit pas di-hover */
+        }
+
+        /* Judul Artikel */
+        .article-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #ffffff; /* Putih bersih untuk judul */
+            line-height: 1.25;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        /* Meta Data (Tanggal) */
+        .article-meta {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 35px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Gambar Utama */
+        .article-thumbnail {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 45px;
+            /* Border tipis di sekeliling gambar */
+            border: 1px solid #333;
+        }
+
+        /* --- KONTEN ARTIKEL (Typography Dark Mode) --- */
+        .article-content {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.125rem; /* 18px */
+            line-height: 1.85;   /* Spasi baris lega */
+            color: #d1d1d1;      /* Putih agak redup (biar mata gak sakit) */
+        }
+
+        .article-content p {
+            margin-bottom: 1.8em;
+        }
+
+        /* Heading di dalam konten */
+        .article-content h2, .article-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--primary-color); /* Heading dikasih warna Emas */
+            margin-top: 2em;
+            margin-bottom: 0.8em;
+        }
+        
+        .article-content ul, .article-content ol {
+            margin-bottom: 1.8em;
+            padding-left: 20px;
+            color: #e0e0e0;
+        }
+        
+        .article-content li {
+            margin-bottom: 0.8em;
+        }
+        
+        .article-content strong {
+            color: #fff; /* Teks bold jadi putih terang */
+        }
+
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 30px 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Blockquote di Dark Mode */
+        .article-content blockquote {
+            border-left: 4px solid var(--primary-color);
+            margin: 30px 0;
+            padding: 20px 30px;
+            font-style: italic;
+            color: #b0b0b0;
+            background: #1a1a1a; /* Background kutipan lebih terang dikit */
+            border-radius: 0 12px 12px 0;
+        }
+
+        /* Sumber Link */
+        .article-source {
+            margin-top: 60px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            background: #181818;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .article-source a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .article-source a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        /* Scrollbar Kustom (Biar gak putih nyolok) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-body);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        /* Responsif HP */
+        @media (max-width: 768px) {
+            .article-detail-container {
+                padding: 25px;
+                border: none; /* Hilangkan border di HP biar full */
+                background: transparent; /* Atau background body */
+            }
+            .article-title {
+                font-size: 2.2rem;
+            }
+            .article-content {
+                font-size: 1.05rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    {% include "partials/navbar.html" %}
+    {% include "layouts/navbar.html" %}
 
-    <!-- ARTICLE DETAIL -->
     <section class="article-detail-section">
-        <div class="article-detail-container">
-            <a href="{{ url_for('web.artikel') }}" class="article-back-btn">← Kembali ke Daftar Artikel</a>
+        <div class="article-detail-container" data-aos="fade-up">
+            
+            <a href="{{ url_for('web.artikel') }}" class="article-back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+                Kembali ke Artikel
+            </a>
+
             <h1 class="article-title">{{ artikel.title }}</h1>
-            <p class="article-meta">Diterbitkan pada {{ artikel.created_at.strftime('%d %B %Y') }}</p>
+            
+            <div class="article-meta">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span>{{ artikel.created_at.strftime('%d %B %Y') }}</span>
+            </div>
 
             {% if artikel.thumbnail %}
             <img src="{{ url_for('static', filename='uploads/thumbnails/' ~ artikel.thumbnail) }}"
-                alt="{{ artikel.title }}"
-                class="article-thumbnail">
+                 alt="{{ artikel.title }}"
+                 class="article-thumbnail">
             {% endif %}
 
             <div class="article-content">
@@ -41,17 +242,20 @@
 
             {% if artikel.source_link %}
             <div class="article-source">
-                <strong>Sumber:</strong> <a href="{{ artikel.source_link }}" target="_blank">{{ artikel.source_link }}</a>
+                <span>Sumber Referensi:</span> 
+                <a href="{{ artikel.source_link }}" target="_blank">Baca artikel asli ↗</a>
             </div>
             {% endif %}
+            
         </div>
     </section>
 
-    <!-- Scripts -->
-    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-        AOS.init();
+        AOS.init({
+            duration: 800,
+            once: true
+        });
     </script>
 
 </body>

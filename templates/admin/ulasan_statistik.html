@@ -1,0 +1,105 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block title %}Statistik Ulasan{% endblock %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+
+        <!-- Header -->
+        <div class="row mb-3">
+            <div class="col-sm-6">
+                <h4 class="font-weight-bold">Statistik Ulasan</h4>
+                <p class="text-muted">Ringkasan penilaian dari pengguna</p>
+            </div>
+            <div class="col-sm-6 text-right">
+                <a href="{{ url_for('web.admin_ulasan') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left mr-1"></i> Kembali
+                </a>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="row">
+            <div class="col-md-3 col-6">
+                <div class="info-box shadow-sm">
+                    <span class="info-box-icon bg-primary"><i class="fas fa-comments"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Ulasan</span>
+                        <span class="info-box-number">{{ total }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="info-box shadow-sm">
+                    <span class="info-box-icon bg-success"><i class="fas fa-smile"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Positif</span>
+                        <span class="info-box-number">{{ positif }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="info-box shadow-sm">
+                    <span class="info-box-icon bg-warning"><i class="fas fa-meh"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Netral</span>
+                        <span class="info-box-number">{{ netral }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="info-box shadow-sm">
+                    <span class="info-box-icon bg-danger"><i class="fas fa-frown"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Negatif</span>
+                        <span class="info-box-number">{{ negatif }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="card-title font-weight-bold">
+                    <i class="fas fa-chart-pie mr-1"></i> Diagram Ulasan
+                </h3>
+            </div>
+            <div class="card-body">
+                <canvas id="ulasanChart" height="120"></canvas>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('ulasanChart').getContext('2d');
+
+new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ['Positif', 'Netral', 'Negatif'],
+        datasets: [{
+            data: [{{ positif }}, {{ netral }}, {{ negatif }}],
+            backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

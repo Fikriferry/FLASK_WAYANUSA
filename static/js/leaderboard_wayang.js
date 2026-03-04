@@ -27,7 +27,7 @@ function renderLeaderboard(data) {
     const leaderboard = data.leaderboard;
     const yourRank = data.your_rank;
     const yourScore = data.your_score;
-
+ 
     // Render podium
     const podiumContainer = document.getElementById('podium');
     podiumContainer.innerHTML = '';

@@ -1,0 +1,387 @@
+<nav class="navbar">
+    <div class="container">
+        <div class="navbar-content">
+            
+            <div class="navbar-logo">
+                <a href="{{ url_for('web.home') }}" class="logo-link">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WAYANUSA Logo" class="logo-image">
+                </a>
+            </div>
+
+            <div class="desktop-menu">
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('web.smart_wayang') }}">Smart Wayang</a></li>
+                    <li><a href="{{ url_for('web.pengenalan_wayang') }}">Scan AI</a></li>
+                    <li><a href="{{ url_for('web.quiz') }}">Quiz</a></li>
+                    <li><a href="{{ url_for('web.mencari_dalang') }}">Dalang</a></li>
+                    <li><a href="{{ url_for('web.pertunjukan_wayang') }}">Tonton</a></li>
+                    <li><a href="{{ url_for('web.artikel') }}">Artikel</a></li>
+                    <li><a href="{{ url_for('web.simulasi_dalang') }}">Simulasi</a></li>
+                    <li><a href="{{ url_for('web.ulasan') }}">Ulasan</a></li>
+                </ul>
+            </div>
+
+            <div class="navbar-right-side">
+                <div class="auth-desktop">
+                    {% if session.get('user_logged_in') %}
+                        <span class="user-greeting">Hi, {{ session.get('user_name', 'User').split(' ')[0] }}</span>
+                        <a href="{{ url_for('web.logout_user') }}" class="btn-logout-icon" title="Logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('web.login_user') }}" class="btn-login-modern">Login</a>
+                    {% endif %}
+                </div>
+
+                <button class="burger-menu-modern" id="burgerMenu" aria-label="Toggle menu">
+                    <div class="bar bar1"></div>
+                    <div class="bar bar2"></div>
+                    <div class="bar bar3"></div>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<div class="mobile-menu-overlay" id="mobileOverlay"></div>
+<div class="mobile-menu-drawer" id="mobileMenu">
+    <div class="mobile-menu-header">
+        <span class="menu-title">Menu Utama</span>
+        <button class="close-menu-btn" id="closeMenuBtn">&times;</button>
+    </div>
+    
+    <div class="mobile-menu-content">
+        <a href="{{ url_for('web.smart_wayang') }}" class="mobile-link"><i class="fas fa-microchip"></i> Smart Wayang</a>
+        <a href="{{ url_for('web.pengenalan_wayang') }}" class="mobile-link"><i class="fas fa-camera"></i> Scan AI</a>
+        <a href="{{ url_for('web.quiz') }}" class="mobile-link"><i class="fas fa-gamepad"></i> Quiz Seru</a>
+        <a href="{{ url_for('web.mencari_dalang') }}" class="mobile-link"><i class="fas fa-users"></i> Cari Dalang</a>
+        <a href="{{ url_for('web.pertunjukan_wayang') }}" class="mobile-link"><i class="fas fa-theater-masks"></i> Pertunjukan</a>
+        <a href="{{ url_for('web.artikel') }}" class="mobile-link"><i class="fas fa-book-open"></i> Artikel</a>
+        <a href="{{ url_for('web.simulasi_dalang') }}" class="mobile-link"><i class="fas fa-vr-cardboard"></i> Simulasi</a>
+        <a href="{{ url_for('web.ulasan') }}" class="mobile-link"><i class="fas fa-star"></i> Ulasan</a>
+
+        <div class="mobile-auth-section">
+            {% if session.get('user_logged_in') %}
+                <div class="user-info-mobile">
+                    <div class="avatar-circle">{{ session.get('user_name', 'U')[0] }}</div>
+                    <span>{{ session.get('user_name', 'User') }}</span>
+                </div>
+                <a href="{{ url_for('web.logout_user') }}" class="btn-mobile-logout">Logout</a>
+            {% else %}
+                <a href="{{ url_for('web.login_user') }}" class="btn-mobile-login">Masuk Akun</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* --- NAVBAR UTAMA --- */
+    .navbar {
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px 0;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .navbar-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo-image {
+        height: 40px;
+        width: auto;
+    }
+
+    /* --- DESKTOP MENU --- */
+    .desktop-menu {
+        display: none; /* Default hidden di mobile */
+    }
+
+    .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 25px;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav-links a {
+        color: #ccc;
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: 0.3s;
+    }
+
+    .nav-links a:hover {
+        color: #D4A373; /* Primary Gold */
+    }
+
+    /* --- RIGHT SIDE & AUTH --- */
+    .navbar-right-side {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .auth-desktop {
+        display: none; /* Hidden di mobile */
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-greeting {
+        color: #fff;
+        font-size: 0.9rem;
+    }
+
+    .btn-login-modern {
+        background: linear-gradient(135deg, #D4A373, #B88656);
+        color: #000;
+        padding: 8px 20px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: 0.3s;
+    }
+
+    .btn-login-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212, 163, 115, 0.3);
+    }
+
+    .btn-logout-icon {
+        color: #ff4d4d;
+        font-size: 1.2rem;
+    }
+
+    /* --- MODERN BURGER BUTTON --- */
+    .burger-menu-modern {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30px;
+        height: 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 1002;
+        padding: 0;
+    }
+
+    .bar {
+        width: 100%;
+        height: 2px;
+        background-color: #D4A373;
+        border-radius: 2px;
+        transition: 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+    }
+
+    /* Animasi Burger jadi X */
+    .burger-menu-modern.active .bar1 {
+        transform: rotate(45deg) translate(5px, 6px);
+        background-color: #fff;
+    }
+
+    .burger-menu-modern.active .bar2 {
+        opacity: 0;
+    }
+
+    .burger-menu-modern.active .bar3 {
+        transform: rotate(-45deg) translate(5px, -6px);
+        background-color: #fff;
+    }
+
+    /* --- MOBILE DRAWER (SLIDE-IN MENU) --- */
+    .mobile-menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(3px);
+        z-index: 1001;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s;
+    }
+
+    .mobile-menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .mobile-menu-drawer {
+        position: fixed;
+        top: 0;
+        right: -300px; /* Sembunyi di kanan */
+        width: 280px;
+        height: 100%;
+        background: #111;
+        z-index: 1002;
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+        border-left: 1px solid #333;
+    }
+
+    .mobile-menu-drawer.active {
+        right: 0; /* Muncul */
+    }
+
+    .mobile-menu-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #222;
+    }
+
+    .menu-title {
+        color: #D4A373;
+        font-weight: bold;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+    }
+
+    .close-menu-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 2rem;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .mobile-menu-content {
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .mobile-link {
+        color: #ccc;
+        text-decoration: none;
+        font-size: 1rem;
+        padding: 12px;
+        border-radius: 8px;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .mobile-link i {
+        width: 25px;
+        text-align: center;
+        color: #555;
+        transition: 0.2s;
+    }
+
+    .mobile-link:hover, .mobile-link:active {
+        background: rgba(212, 163, 115, 0.1);
+        color: #fff;
+    }
+
+    .mobile-link:hover i {
+        color: #D4A373;
+    }
+
+    /* Mobile Auth Section */
+    .mobile-auth-section {
+        margin-top: 20px;
+        border-top: 1px solid #222;
+        padding-top: 20px;
+    }
+
+    .btn-mobile-login {
+        display: block;
+        text-align: center;
+        background: #D4A373;
+        color: #000;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .user-info-mobile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        color: #fff;
+    }
+
+    .avatar-circle {
+        width: 35px;
+        height: 35px;
+        background: #D4A373;
+        color: #000;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .btn-mobile-logout {
+        display: block;
+        text-align: center;
+        border: 1px solid #ff4d4d;
+        color: #ff4d4d;
+        padding: 10px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+    /* --- RESPONSIVE MEDIA QUERIES --- */
+    @media (min-width: 992px) {
+        .desktop-menu { display: block; }
+        .auth-desktop { display: flex; }
+        .burger-menu-modern { display: none; } /* Sembunyikan burger di desktop */
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const burger = document.getElementById('burgerMenu');
+        const drawer = document.getElementById('mobileMenu');
+        const overlay = document.getElementById('mobileOverlay');
+        const closeBtn = document.getElementById('closeMenuBtn');
+
+        function toggleMenu() {
+            burger.classList.toggle('active');
+            drawer.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Cegah scroll body saat menu terbuka
+            document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : '';
+        }
+
+        if(burger) {
+            burger.addEventListener('click', toggleMenu);
+        }
+
+        if(closeBtn) {
+            closeBtn.addEventListener('click', toggleMenu);
+        }
+
+        if(overlay) {
+            overlay.addEventListener('click', toggleMenu); // Tutup saat klik background gelap
+        }
+    });
+</script>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Panggung Dalang</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            font-family: sans-serif;
+            overflow: hidden;
+        }
+
+        .panggung {
+            position: absolute;
+            inset: 0;
+            background: url("{{ url_for('static', filename='images/panggung.jpg') }}") center/cover no-repeat;
+            filter: brightness(0.85);
+            z-index: 1;
+        }
+
+        .stage-area {
+            position: absolute;
+            top: 12vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70vw;
+            height: 55vh;
+            background: rgba(255, 240, 200, 0.7);
+            border: 4px solid #b88a33;
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 3;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6) inset,
+                0 0 25px rgba(255, 200, 150, 0.4);
+        }
+
+        .tirai-area {
+            position: absolute;
+            inset: 0;
+            background: url("{{ url_for('static', filename='images/tirai2.png') }}") center/cover no-repeat;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .btn-add {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 22px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #000;
+            font-weight: bold;
+            z-index: 60;
+        }
+
+        .wayang-list {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 50;
+        }
+
+        .wayang-list.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .wayang-slot {
+            width: 80px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #d4a23a;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: grab;
+        }
+
+        .wayang-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .trash-bin {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            width: 60px;
+            height: 60px;
+            background: rgba(200, 0, 0, 0.7);
+            border: 3px solid #ffaaaa;
+            border-radius: 12px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            pointer-events: auto;
+            transition: background 0.3s, transform 0.2s;
+            user-select: none;
+        }
+
+        .trash-bin.active {
+            background: rgba(255, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        /* Wayang styling */
+        .wayang {
+            position: absolute;
+            width: 260px;
+            height: 420px;
+            cursor: grab;
+        }
+
+        .wayang .badan {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .wayang .tangan {
+            position: absolute;
+        }
+
+        .wayang .tangan.kanan { left: 170px; top: 97px; }
+        .wayang .tangan.kiri { left: 25px; top: 130px; }
+
+        .wayang .lengan-atas {
+            position: relative;
+            width: 60px;
+            height: 120px;
+            transform-origin: 37px 7px;
+            cursor: grab;
+        }
+
+        .wayang .lengan-atas img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+
+        .wayang .lengan-bawah {
+            position: absolute;
+            top: 105px;
+            left: 0;
+            width: 80px;
+            height: 130px;
+            transform-origin: 30px 4px;
+            cursor: grab;
+        }
+
+        .wayang .lengan-bawah img {
+            position: absolute;
+            left: -40px;
+            top: -5px;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'layouts/navbar.html' %}
+
+    <div class="panggung"></div>
+
+    <div class="stage-area" id="stageArea">
+        <div class="tirai-area"></div>
+        <div class="trash-bin" id="trashBin">🗑️</div>
+    </div>
+
+    <div class="wayang-list" id="wayangList">
+        {% for w in wayangs %}
+        <div class="wayang-slot"
+            draggable="true"
+            data-badan="{{ url_for('static', filename=w.badan) }}"
+            data-tka="{{ url_for('static', filename=w.tangan_kanan_atas) }}"
+            data-tkb="{{ url_for('static', filename=w.tangan_kanan_bawah) }}"
+            data-tla="{{ url_for('static', filename=w.tangan_kiri_atas) }}"
+            data-tlb="{{ url_for('static', filename=w.tangan_kiri_bawah) }}">
+            <img src="{{ url_for('static', filename=w.thumbnail) }}">
+        </div>
+        {% endfor %}
+    </div>
+
+    <button class="btn-add" id="btnAdd">+</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const stage = document.getElementById("stageArea");
+            const trash = document.getElementById("trashBin");
+            const btnAdd = document.getElementById("btnAdd");
+            const wayangList = document.getElementById("wayangList");
+
+            let draggedSlot = null;
+
+            btnAdd.onclick = () => {
+                wayangList.classList.toggle("show");
+            };
+
+            document.querySelectorAll(".wayang-slot").forEach(slot => {
+                slot.addEventListener("dragstart", () => { draggedSlot = slot; });
+            });
+
+            stage.addEventListener("dragover", e => e.preventDefault());
+
+            stage.addEventListener("drop", e => {
+                e.preventDefault();
+                if (!draggedSlot) return;
+                const rect = stage.getBoundingClientRect();
+
+                const wayang = document.createElement("div");
+                wayang.className = "wayang";
+                wayang.style.left = (e.clientX - rect.left - 45) + "px";
+                wayang.style.top = (e.clientY - rect.top - 70) + "px";
+                wayang.flipped = false;
+
+                wayang.innerHTML = `
+                <img class="badan" src="${draggedSlot.dataset.badan}">
+                <div class="tangan kanan">
+                    <div class="lengan-atas">
+                        <img src="${draggedSlot.dataset.tka}">
+                        <div class="lengan-bawah">
+                            <img src="${draggedSlot.dataset.tkb}">
+                        </div>
+                    </div>
+                </div>
+                <div class="tangan kiri">
+                    <div class="lengan-atas">
+                        <img src="${draggedSlot.dataset.tla}">
+                        <div class="lengan-bawah">
+                            <img src="${draggedSlot.dataset.tlb}">
+                        </div>
+                    </div>
+                </div>
+                `;
+
+                stage.appendChild(wayang);
+                enableStageDrag(wayang);
+                aktifkanRotasiTangan(wayang);
+                fallDown(wayang);
+                enableDoubleClickFlip(wayang);
+
+                draggedSlot = null;
+
+                // pose awal
+                const tKA = wayang.querySelector('.tangan.kanan .lengan-atas');
+                const tKB = wayang.querySelector('.tangan.kanan .lengan-bawah');
+                const tLA = wayang.querySelector('.tangan.kiri .lengan-atas');
+                const tLB = wayang.querySelector('.tangan.kiri .lengan-bawah');
+
+                tKA.style.transform  = 'rotate(-35deg)';
+                tKB.style.transform = 'rotate(-55deg)';
+                tLA.style.transform  = 'rotate(25deg)';
+                tLB.style.transform  = 'rotate(35deg)';
+            });
+
+            function enableStageDrag(el) {
+                let isDrag = false, offsetX = 0, offsetY = 0;
+                el.addEventListener("mousedown", e => {
+                    isDrag = true;
+                    offsetX = e.offsetX;
+                    offsetY = e.offsetY;
+                    el.falling = false;
+                    document.addEventListener("mousemove", move);
+                    document.addEventListener("mouseup", up);
+                });
+                function move(e) {
+                    if (!isDrag) return;
+                    const r = stage.getBoundingClientRect();
+                    let x = e.clientX - r.left - offsetX;
+                    let y = e.clientY - r.top - offsetY;
+                    x = Math.max(0, Math.min(r.width - el.clientWidth, x));
+                    y = Math.max(0, Math.min(r.height - el.clientHeight, y));
+                    el.style.left = x + "px";
+                    el.style.top = y + "px";
+                    trash.classList.toggle("active", isOverTrash(el));
+                }
+                function up() {
+                    isDrag = false;
+                    if (isOverTrash(el)) el.remove();
+                    else fallDown(el);
+                    trash.classList.remove("active");
+                    document.removeEventListener("mousemove", move);
+                    document.removeEventListener("mouseup", up);
+                }
+            }
+
+            function aktifkanRotasiTangan(wayang) {
+                wayang.querySelectorAll('.lengan-atas').forEach(atas => {
+                    const bawah = atas.querySelector('.lengan-bawah');
+                    aktifkanSendi(atas, bawah);
+                });
+            }
+
+            function aktifkanSendi(atas, bawah) {
+                let startY=0, startAtas=0, startBawah=0, mode=null;
+                atas.addEventListener('mousedown', e=>{ e.stopPropagation(); mode='atas'; startY=e.clientY; startAtas=getRotation(atas); startBawah=getRotation(bawah); bind(); });
+                bawah.addEventListener('mousedown', e=>{ e.stopPropagation(); mode='bawah'; startY=e.clientY; startAtas=getRotation(atas); startBawah=getRotation(bawah); bind(); });
+                function bind(){ document.addEventListener('mousemove', move); document.addEventListener('mouseup', unbind); }
+                function move(e){
+                    const delta = startY - e.clientY;
+                    if(mode==='atas'){ atas.style.transform = `rotate(${startAtas + delta*0.6}deg)`; bawah.style.transform = `rotate(${startBawah + delta*0.85}deg)`; }
+                    if(mode==='bawah'){ bawah.style.transform = `rotate(${startBawah + delta}deg)`; atas.style.transform = `rotate(${startAtas + delta*0.4}deg)`; }
+                }
+                function unbind(){ document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', unbind); }
+            }
+
+            function getRotation(el){
+                const st = window.getComputedStyle(el).transform;
+                if(st==='none') return 0;
+                const m=st.match(/matrix\(([^)]+)\)/); if(!m) return 0;
+                const v=m[1].split(','); return Math.round(Math.atan2(v[1],v[0])*180/Math.PI);
+            }
+
+            function isOverTrash(el){
+                const w=el.getBoundingClientRect(), t=trash.getBoundingClientRect();
+                return !(w.right<t.left||w.left>t.right||w.bottom<t.top||w.top>t.bottom);
+            }
+
+            function fallDown(el){
+                if(el.falling) return; el.falling=true;
+                const rect=stage.getBoundingClientRect();
+                const bottom = rect.height - el.clientHeight;
+                let y = parseInt(el.style.top)||0;
+                const fall=setInterval(()=>{
+                    y+=4;
+                    if(y>=bottom){ y=bottom; clearInterval(fall); el.falling=false; }
+                    el.style.top = y + "px";
+                },10);
+            }
+
+            function enableDoubleClickFlip(wayang){
+                wayang.addEventListener('dblclick', ()=>{
+                    wayang.flipped = !wayang.flipped;
+                    if(wayang.flipped) wayang.style.transform += ' scaleX(-1)';
+                    else wayang.style.transform = wayang.style.transform.replace(' scaleX(-1)','');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,202 +1,187 @@
 {% extends "admin/layout_admin.html" %}
 
-{% block title %}Dashboard Admin - WAYANUSA{% endblock %}
+{% block title %}Dashboard - WAYANUSA Admin{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .info-box-modern {
+        border-radius: 15px;
+        position: relative;
+        overflow: hidden;
+        color: white;
+        transition: transform 0.3s;
+    }
+    .info-box-modern:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    .info-box-modern .icon-bg {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        font-size: 4rem;
+        opacity: 0.2;
+    }
+    .welcome-card {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        border-radius: 15px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 
-<!-- Content Header -->
 <div class="content-header">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0">Dashboard</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Dashboard</li>
-                </ol>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card welcome-card shadow-lg border-0">
+                    <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h2 class="font- -bold mb-1">Selamat Datang, Admin! 👋</h2>
+                            <p class="mb-0 opacity-75">Ini ringkasan aktivitas WAYANUSA hari ini.</p>
+                        </div>
+                        <div class="d-none d-md-block text-right">
+                            <h4 id="clock" class="font-weight-bold mb-0"></h4>
+                            <small id="date" class="opacity-75"></small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Main Content -->
 <section class="content">
     <div class="container-fluid">
 
-        <!-- Info Boxes -->
         <div class="row">
-            <!-- Total Dalang -->
-            <div class="col-12 col-sm-6 col-md-2">
-                <div class="info-box">
-                    <span class="info-box-icon bg-info elevation-1">
-                        <i class="fas fa-users"></i>
-                    </span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Total Dalang</span>
-                        <span class="info-box-number">{{ dalang_count }}</span>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="small-box bg-gradient-info rounded-lg shadow-sm">
+                    <div class="inner p-3">
+                        <h3 class="font-weight-bold">{{ dalang_count }}</h3>
+                        <p class="mb-0">Total Dalang</p>
                     </div>
+                    <div class="icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <a href="{{ url_for('web.dalang_list') }}" class="small-box-footer">
+                        Lihat Detail <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
             </div>
 
-            <!-- Lokasi -->
-            <div class="col-12 col-sm-6 col-md-2">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-success elevation-1">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Lokasi Terdaftar</span>
-                        <span class="info-box-number">{{ dalang_count }}</span>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="small-box bg-gradient-success rounded-lg shadow-sm">
+                    <div class="inner p-3">
+                        <h3 class="font-weight-bold">{{ artikel_count }}</h3>
+                        <p class="mb-0">Artikel Terbit</p>
                     </div>
-                </div>
-            </div>
-
-            <!-- Pertunjukan -->
-            <div class="col-12 col-sm-6 col-md-2">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-warning elevation-1">
-                        <i class="fas fa-theater-masks"></i>
-                    </span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Pertunjukan Wayang</span>
-                        <span class="info-box-number">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Admin -->
-            <div class="col-12 col-sm-6 col-md-2">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-danger elevation-1">
-                        <i class="fas fa-users-cog"></i>
-                    </span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Admin Aktif</span>
-                        <span class="info-box-number">1</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Artikel -->
-            <div class="col-12 col-sm-6 col-md-2">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-secondary elevation-1">
+                    <div class="icon">
                         <i class="fas fa-newspaper"></i>
-                    </span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Total Artikel</span>
-                        <span class="info-box-number">{{ artikel_count }}</span>
                     </div>
+                    <a href="{{ url_for('web.artikel_list') }}" class="small-box-footer">
+                        Lihat Detail <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="small-box bg-gradient-warning rounded-lg shadow-sm">
+                    <div class="inner p-3">
+                        <h3 class="font-weight-bold text-white">{{ quiz_count }}</h3>
+                        <p class="mb-0 text-white">Quiz Aktif</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <a href="{{ url_for('web.quiz_list') }}" class="small-box-footer" style="color: white !important;">
+                        Lihat Detail <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="small-box bg-gradient-danger rounded-lg shadow-sm">
+                    <div class="inner p-3">
+                        <h3 class="font-weight-bold">{{ video_count }}</h3>
+                        <p class="mb-0">Video Edukasi</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fab fa-youtube"></i>
+                    </div>
+                    <a href="{{ url_for('web.video_list') }}" class="small-box-footer">
+                        Lihat Detail <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="small-box bg-gradient-primary rounded-lg shadow-sm">
+                    <div class="inner p-3">
+                        <h3 class="font-weight-bold">{{ ulasan_count }}</h3>
+                        <p class="mb-0">Ulasan Masuk</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <a href="{{ url_for('web.admin_ulasan') }}" class="small-box-footer">
+                        Lihat Detail <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Actions + Statistik -->
-        <div class="row">
-
-            <!-- Quick Actions -->
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-bolt mr-2"></i> Quick Actions
+        <div class="row mt-3">
+            
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header border-0 bg-white">
+                        <h3 class="card-title font-weight-bold text-dark">
+                            <i class="fas fa-map-marked-alt text-primary mr-2"></i> Peta Persebaran Dalang
                         </h3>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-6">
-                                <a href="{{ url_for('web.artikel_add') }}" class="btn btn-primary btn-block mb-2">
-                                    <i class="fas fa-plus"></i> Tambah Artikel
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('web.artikel_list') }}" class="btn btn-info btn-block mb-2">
-                                    <i class="fas fa-list"></i> Lihat Semua
-                                </a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <a href="{{ url_for('web.dalang_add') }}" class="btn btn-success btn-block mb-2">
-                                    <i class="fas fa-plus"></i> Tambah Dalang
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('web.dalang_list') }}" class="btn btn-warning btn-block mb-2">
-                                    <i class="fas fa-list"></i> Lihat Semua
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('web.quiz_list') }}" class="btn btn-success btn-block mb-2">
-                                    <i class="fas fa-question-circle"></i> Kelola Quiz
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ url_for('web.quiz_add') }}" class="btn btn-warning btn-block mb-2">
-                                    <i class="fas fa-plus-circle"></i> Tambah Soal
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistik -->
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-chart-line mr-2"></i> Statistik Platform
-                        </h3>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="progress-group">
-                            <span class="float-right">
-                                <b>{{ dalang_count }}</b>/100
-                            </span>
-
-                            <div class="progress progress-sm">
-                                <div class="progress-bar bg-primary"
-                                     style="width: {{ (dalang_count / 100) * 100 }}%;">
-                                </div>
-                            </div>
-
-                            <p class="text-sm mb-0">Persentase Dalang Terdaftar</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Maps -->
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-map-marked-alt mr-2"></i>
-                            Peta Lokasi Dalang WAYANUSA
-                        </h3>
-
                         <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
+                            <button type="button" class="btn btn-tool btn-sm" data-card-widget="maximize">
+                                <i class="fas fa-expand"></i>
                             </button>
                         </div>
                     </div>
-
-                    <div class="card-body">
-                        <div id="map" style="height: 500px; width: 100%; border-radius: 8px;"></div>
+                    <div class="card-body p-0">
+                        <div id="map" style="height: 400px; width: 100%;"></div>
                     </div>
-
                 </div>
             </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header bg-white border-0">
+                        <h3 class="card-title font-weight-bold">Aksi Cepat</h3>
+                    </div>
+                    <div class="card-body">
+                        <a href="{{ url_for('web.artikel_add') }}" class="btn btn-primary btn-block mb-2 text-left rounded-pill">
+                            <i class="fas fa-pen mr-2"></i> Tulis Artikel Baru
+                        </a>
+                        <a href="{{ url_for('web.dalang_add') }}" class="btn btn-outline-info btn-block mb-2 text-left rounded-pill">
+                            <i class="fas fa-user-plus mr-2"></i> Daftarkan Dalang
+                        </a>
+                        <a href="{{ url_for('web.quiz_add') }}" class="btn btn-outline-warning btn-block mb-2 text-left rounded-pill">
+                            <i class="fas fa-plus-circle mr-2"></i> Buat Kuis Baru
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-0">
+                        <h3 class="card-title font-weight-bold">Pengunjung Web</h3>
+                    </div>
+                    <div class="card-body pt-0">
+                        <canvas id="visitorChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -206,31 +191,77 @@
 
 {% block scripts %}
 <script>
-    // Init map default Jakarta
-    var map = L.map('map').setView([-6.2, 106.816666], 10);
+    // --- 1. WIDGET JAM & TANGGAL ---
+    function updateClock() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('date').innerText = now.toLocaleDateString('id-ID', options);
+        document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    // Load tiles
+    // --- 2. MAPS LOGIC ---
+    var map = L.map('map').setView([-6.2, 106.816666], 8); // Default Zoom lebih jauh dikit
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
     var markers = [];
+    
+    // Custom Icon Wayang (Opsional - Bisa pakai default dulu)
+    var wayangIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', // Ikon Pin Lokasi
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+    });
 
-    // Add Dalang markers
     {% for dalang in dalangs %}
         {% if dalang.latitude and dalang.longitude %}
-            var marker = L.marker([{{ dalang.latitude }}, {{ dalang.longitude }}])
+            var marker = L.marker([{{ dalang.latitude }}, {{ dalang.longitude }}], {icon: wayangIcon})
                 .addTo(map)
-                .bindPopup("<b>{{ dalang.nama|escape }}</b><br>{{ dalang.alamat|escape }}");
-
+                .bindPopup(`
+                    <div style="text-align:center;">
+                        <b>{{ dalang.nama|escape }}</b><br>
+                        <small>{{ dalang.alamat|escape }}</small><br>
+                        <a href="{{ url_for('web.dalang_edit', id=dalang.id) }}" class="btn btn-xs btn-primary mt-2">Lihat Profil</a>
+                    </div>
+                `);
             markers.push(marker);
         {% endif %}
     {% endfor %}
 
-    // Auto zoom to fit markers
     if (markers.length > 0) {
         var group = L.featureGroup(markers);
-        map.fitBounds(group.getBounds());
+        map.fitBounds(group.getBounds().pad(0.1));
     }
+
+    // --- 3. CHART JS (DUMMY DATA) ---
+    var ctx = document.getElementById('visitorChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+            datasets: [{
+                label: 'Visitors',
+                data: [12, 19, 3, 5, 2, 3, 10], // Data palsu buat contoh
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { display: false }, beginAtZero: true }
+            }
+        }
+    });
 </script>
 {% endblock %}
