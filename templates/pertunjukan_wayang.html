@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
-
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo_2.png') }}">
     <!-- AOS -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 </head>
@@ -92,6 +92,71 @@
                 card.style.display = title.includes(input) ? "" : "none";
             });
         }
+    </script>
+    {% include 'components/chatbot.html' %}
+
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+    <script>
+        AOS.init({ once: true, offset: 100, duration: 800 });
+
+        // Counter Animation
+        const statsSection = document.getElementById('statsSection');
+        const counters = document.querySelectorAll('.counter');
+        let started = false;
+
+        function startCounting() {
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const duration = 2000;
+                const increment = target / (duration / 16);
+                let current = 0;
+                const updateCounter = () => {
+                    current += increment;
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current);
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCounter();
+            });
+        }
+
+        if (statsSection) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !started) {
+                        startCounting(); started = true;
+                    }
+                });
+            }, { threshold: 0.5 });
+            observer.observe(statsSection);
+        }
+
+        // SCROLL SPY LOGIC
+        const sections = document.querySelectorAll('section, main');
+        const navLinks = document.querySelectorAll('.taskbar-item');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 300)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
     </script>
 
 </body>

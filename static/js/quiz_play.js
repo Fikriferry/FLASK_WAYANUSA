@@ -149,8 +149,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helper function to get answer text
     function getAnswerText(answerKey) {
+        if (!answerKey) return '';
+        const key = answerKey.toUpperCase();
         const question = quizData[currentQuestion];
-        switch(answerKey) {
+        switch(key) {
             case 'A': return question.a;
             case 'B': return question.b;
             case 'C': return question.c;
@@ -161,9 +163,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helper function to get answer text for any question
     function getAnswerTextForQuestion(questionId, answerKey) {
+        if (!answerKey) return '';
+        const key = answerKey.toUpperCase();
         const question = quizData.find(q => q.id === questionId);
         if (!question) return '';
-        switch(answerKey) {
+        switch(key) {
             case 'A': return question.a;
             case 'B': return question.b;
             case 'C': return question.c;
@@ -258,8 +262,8 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.background = '#D4A373';
             this.style.color = 'white';
 
-            // Check if correct
-            const isCorrect = selectedAnswer === quizData[currentQuestion].correct_answer;
+            // Check if correct (case-insensitive to prevent uppercase 'A' vs lowercase 'a' database mismatch)
+            const isCorrect = selectedAnswer.toUpperCase() === quizData[currentQuestion].correct_answer.toUpperCase();
             setTimeout(() => {
                 showResult(isCorrect, selectedAnswer);
             }, 500);

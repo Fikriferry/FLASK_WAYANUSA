@@ -7,6 +7,9 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 
+# 1. LOAD ENV (Must be loaded before importing models or routes that rely on env)
+load_dotenv()
+
 # Import Models
 from models import db, User 
 from ai_manager import init_ai_model
@@ -17,9 +20,6 @@ from routes.api_routes import api, auth_api
 from routes.auth_routes import auth_routes, init_oauth
 from routes.quiz_routes import quiz_routes
 from routes.leaderboard_wayang_routes import leaderboard_wayang_bp
-
-# 1. LOAD ENV
-load_dotenv()
 
 app = Flask(__name__)
 

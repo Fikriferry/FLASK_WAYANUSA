@@ -8,10 +8,6 @@ from ai_manager import reload_model
 from sqlalchemy import func
 from datetime import datetime
 from services.sentiment_service import predict_sentiment
-<<<<<<< HEAD
-
-=======
->>>>>>> 52ea08b (baruniht)
 
 web_routes = Blueprint("web", __name__)
 

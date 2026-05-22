@@ -426,10 +426,22 @@ def cepot_disconnect():
 def cepot_talk():
     msg = request.json.get("message")
     if not msg:
-        return jsonify({"response": "Ora krungu..."})
+        return jsonify({"response": "Ora krungu...", "audio_url": None})
 
-    reply = cepot_system.process_physical_interaction(msg)
-    return jsonify({"response": reply})
+    result = cepot_system.process_physical_interaction(msg)
+    return jsonify(result)
+
+
+@api.route("/cepot/arduino/start", methods=["POST"])
+def cepot_arduino_start():
+    success = cepot_system.start_movement()
+    return jsonify({"success": success})
+
+
+@api.route("/cepot/arduino/stop", methods=["POST"])
+def cepot_arduino_stop():
+    success = cepot_system.stop_movement()
+    return jsonify({"success": success})
 
 # ================================
 # VIDEO WAYANG

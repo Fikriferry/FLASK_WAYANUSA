@@ -321,6 +321,17 @@
                     </div>
                 </div>
 
+                <!-- Premium Chat Input Fallback -->
+                <div class="input-group" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <input type="text" id="chatInput" placeholder="Ketik pesan ke Cepot di sini..." 
+                           style="flex: 1; background: #151515; color: #eee; border: 1px solid #333; padding: 12px; border-radius: 8px; outline: none; font-family: 'Inter', sans-serif; transition: border 0.3s;"
+                           onfocus="this.style.borderColor='#D4A373'" onblur="this.style.borderColor='#333'"
+                           onkeypress="if(event.key === 'Enter') sendManualMessage()">
+                    <button onclick="sendManualMessage()" class="btn-connect" style="padding: 0 20px; font-size: 0.8rem; background: linear-gradient(135deg, #D4A373, #A3704C);">
+                        KIRIM
+                    </button>
+                </div>
+
                 <div class="controls-group">
                     <select id="portSelect" class="port-select">
                         <option value="">-- Mencari Port USB... --</option>
@@ -350,7 +361,12 @@
         let recognition = null;
         let isListening = false;
         let wakeWordActive = false;
-        const WAKE_WORDS = ["cepot", "halo cepot", "he cepot", "si cepot", "pot", "wayang"];
+        let isProcessing = false;
+        let wakeWordTimeout = null; // Timeout untuk memberikan batas waktu user berbicara setelah wake word
+        const WAKE_WORDS = [
+            "halo cepot", "hallo cepot", "he cepot", "eh cepot", "si cepot", 
+            "halo copot", "halo sepot", "halo spot", "wayang", "cepot", "copot", "sepot", "pot"
+        ];
 
         // DOM Elements
         const statusText = document.getElementById('statusText');
@@ -367,66 +383,269 @@
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
             recognition.lang = 'id-ID';
-            recognition.continuous = true;
+            recognition.continuous = false; // Single utterance mode is more responsive and reliable
             recognition.interimResults = false;
 
-            recognition.onstart = () => { isListening = true; micDot.classList.add('listening'); };
-            recognition.onend = () => { isListening = false; micDot.classList.remove('listening'); if (!wakeWordActive) setTimeout(() => { try { recognition.start(); } catch (e) { } }, 1000); };
-            recognition.onresult = (event) => {
-                const text = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-                processVoiceInput(text);
+            let lastSpeechError = null;
+
+            recognition.onstart = () => { 
+                isListening = true; 
+                micDot.classList.add('listening'); 
+                // lastSpeechError TIDAK direset di sini agar error persisten di browser (seperti network block)
+                // tidak membanjiri log berulang kali saat auto-restart dijalankan.
+                if (wakeWordActive) {
+                    statusText.innerText = "Mendengarkan... 🎤";
+                    statusText.style.color = "#D4A373";
+                } else {
+                    resetMicUIStateOnly();
+                }
             };
+            
+            recognition.onend = () => { 
+                isListening = false; 
+                micDot.classList.remove('listening'); 
+                // Always restart listening if we're not actively processing/thinking/talking
+                if (!isProcessing) { 
+                    setTimeout(() => { try { recognition.start(); } catch (e) { } }, 1000); 
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech Recognition Error:", event.error);
+                
+                if (event.error === 'no-speech') {
+                    console.log("No speech detected.");
+                    return; // Jangan update lastSpeechError untuk no-speech agar tidak mereset error sebelumnya
+                }
+
+                // Jangan membanjiri log dengan error yang sama berulang-ulang
+                if (event.error === lastSpeechError) {
+                    return;
+                }
+                lastSpeechError = event.error;
+
+                if (event.error === 'not-allowed') {
+                    addLog("⚠️ ERROR: Izin mikrofon ditolak! Izinkan akses mikrofon di browser Anda (klik ikon gembok di sebelah URL / address bar).", "log-sys");
+                } else if (event.error === 'network') {
+                    addLog("⚠️ ERROR: Layanan Web Speech browser mendeteksi masalah koneksi/offline. Pastikan internet lancar, coba gunakan Microsoft Edge (sangat disarankan jika Chrome bermasalah), atau ketik langsung pesan Anda.", "log-sys");
+                } else {
+                    addLog(`⚠️ ERROR Suara: ${event.error}`, "log-sys");
+                }
+            };
+            
+            recognition.onresult = (event) => {
+                if (!event.results || event.results.length === 0) return;
+                const result = event.results[event.results.length - 1];
+                if (!result || result.length === 0) return;
+                const text = result[0].transcript;
+                if (text) {
+                    // Reset error ketika suara berhasil ditangkap
+                    lastSpeechError = null;
+                    // Tampilkan apa yang didengar (berguna untuk debugging jika sistem terasa tidak menangkap suara)
+                    addLog(`[Mendengar: "${text.trim()}"]`, "log-sys");
+                    processVoiceInput(text);
+                }
+            };
+            
             setTimeout(() => { try { recognition.start(); } catch (e) { } }, 1000);
         } else {
             addLog("Browser tidak support suara.", "log-sys");
         }
 
         // 2. PROSES SUARA
-        function processVoiceInput(text) {
+        function processVoiceInput(rawText) {
+            // Clean punctuation and convert to lowercase for highly robust matching
+            const text = rawText.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").replace(/\s+/g, " ").trim();
+            console.log("Voice input (cleaned):", text);
+            
             if (!wakeWordActive) {
-                if (WAKE_WORDS.some(word => text.includes(word))) {
-                    wakeWordActive = true;
+                // Find matching wake word (checks longest wake words first to avoid substring mismatch)
+                let matchedWord = null;
+                for (const word of WAKE_WORDS) {
+                    if (text.includes(word)) {
+                        matchedWord = word;
+                        break;
+                    }
+                }
+
+                if (matchedWord) {
                     playBeep();
-                    statusText.innerText = "Mendengarkan... 🎤";
-                    statusText.style.color = "#D4A373";
-                    micDot.classList.add('listening');
                     addLog("[Wake Word Terdeteksi]", "log-user");
+                    
+                    // Extract query that comes after the wake word (single-breath query)
+                    const index = text.indexOf(matchedWord);
+                    const queryPart = text.slice(index + matchedWord.length).trim();
+                    
+                    if (queryPart.length > 0) {
+                        // User spoke the query in the same breath!
+                        // e.g. "halo cepot siapa penemu wayang"
+                        clearTimeout(wakeWordTimeout);
+                        addLog(`User: "${queryPart}"`, "log-user");
+                        statusText.innerText = "Sedang Berpikir...";
+                        micDot.classList.remove('listening');
+                        micDot.classList.add('processing');
+                        isProcessing = true;
+                        try { recognition.stop(); } catch (e) {}
+                        sendToBackend(queryPart);
+                    } else {
+                        // Just the wake word, start waiting for the actual query
+                        wakeWordActive = true;
+                        statusText.innerText = "Mendengarkan... 🎤";
+                        statusText.style.color = "#D4A373";
+                        micDot.classList.add('listening');
+
+                        // Set 10 seconds timeout to wait for user's question
+                        clearTimeout(wakeWordTimeout);
+                        wakeWordTimeout = setTimeout(() => {
+                            if (wakeWordActive) {
+                                addLog("[Waktu habis: Tidak ada pertanyaan selama 10 detik]", "log-sys");
+                                resetMicUI();
+                            }
+                        }, 10000);
+                    }
                 }
             } else {
+                // Clear active timeout since user spoke
+                clearTimeout(wakeWordTimeout);
+                
                 if (text.includes("batal") || text.includes("stop")) {
-                    wakeWordActive = false; resetMicUI(); return;
+                    wakeWordActive = false; 
+                    resetMicUI(); 
+                    return;
                 }
                 addLog(`User: "${text}"`, "log-user");
                 statusText.innerText = "Sedang Berpikir...";
                 micDot.classList.remove('listening');
                 micDot.classList.add('processing');
-                sendToBackend(text);
+                isProcessing = true;
                 wakeWordActive = false;
+                try { recognition.stop(); } catch (e) {}
+                sendToBackend(text);
             }
         }
 
         function resetMicUI() {
+            clearTimeout(wakeWordTimeout); // Bersihkan timeout yang berjalan
+            isProcessing = false;
+            wakeWordActive = false;
             statusText.innerText = 'Standby (Panggil "Halo Cepot")';
             statusText.style.color = "#ccc";
             micDot.classList.remove('processing');
             micDot.classList.remove('listening');
+            try { recognition.start(); } catch (e) {}
         }
+
+        function resetMicUIStateOnly() {
+            statusText.innerText = 'Standby (Panggil "Halo Cepot")';
+            statusText.style.color = "#ccc";
+            micDot.classList.remove('processing');
+        }
+
+        // Audio element global
+        let cepotAudio = null;
 
         // 3. KOMUNIKASI API
         async function sendToBackend(message) {
-            avatar.classList.add('talking');
+            statusText.innerText = "Sedang Berpikir...";
+            statusText.style.color = "#ffc107";
+            micDot.classList.remove('listening');
+            micDot.classList.add('processing');
+            
             try {
                 const response = await fetch('/api/cepot/talk', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: message })
                 });
                 const data = await response.json();
-                if (data.response) addLog(`Cepot: "${data.response}"`, "log-bot");
-            } catch (error) { addLog("Error server.", "log-sys"); }
-            finally {
-                setTimeout(() => { avatar.classList.remove('talking'); resetMicUI(); }, 3000);
+                
+                if (data.response) {
+                    // 1. Tampilkan tulisan jawaban SEGERA/INSTANT
+                    addLog(`Cepot: "${data.response}"`, "log-bot");
+                    
+                    // 2. Play audio di frontend jika ada audio_url
+                    if (data.audio_url) {
+                        avatar.classList.add('talking');
+                        statusText.innerText = "Cepot sedang berbicara... 🗣️";
+                        statusText.style.color = "#D4A373";
+                        
+                        // Buat/reset audio element
+                        if (cepotAudio) {
+                            try { cepotAudio.pause(); } catch(e){}
+                        }
+                        
+                        // Tambahkan cache breaker timestamp agar browser selalu mengambil audio terbaru
+                        cepotAudio = new Audio(data.audio_url + "?t=" + new Date().getTime());
+                        
+                        // Ketika audio mulai diputar, perintahkan Arduino untuk bergerak
+                        cepotAudio.onplay = async () => {
+                            try {
+                                await fetch('/api/cepot/arduino/start', { method: 'POST' });
+                            } catch(e) {}
+                        };
+                        
+                        // Ketika audio selesai, berhentikan Arduino dan reset UI
+                        cepotAudio.onended = async () => {
+                            try {
+                                await fetch('/api/cepot/arduino/stop', { method: 'POST' });
+                            } catch(e) {}
+                            avatar.classList.remove('talking');
+                            resetMicUI();
+                        };
+                        
+                        // Jika terjadi error pada audio, berhentikan Arduino dan reset UI
+                        cepotAudio.onerror = async () => {
+                            try {
+                                await fetch('/api/cepot/arduino/stop', { method: 'POST' });
+                            } catch(e) {}
+                            avatar.classList.remove('talking');
+                            resetMicUI();
+                        };
+                        
+                        // Mulai pemutaran
+                        cepotAudio.play().catch(async (e) => {
+                            console.error("Audio playback error:", e);
+                            // Fallback jika browser memblokir autoplay
+                            try {
+                                await fetch('/api/cepot/arduino/stop', { method: 'POST' });
+                            } catch(err) {}
+                            avatar.classList.remove('talking');
+                            resetMicUI();
+                        });
+                    } else {
+                        resetMicUI();
+                    }
+                } else {
+                    resetMicUI();
+                }
+            } catch (error) { 
+                addLog("Error server.", "log-sys"); 
+                resetMicUI();
             }
         }
+
+        window.sendManualMessage = function () {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // Log user message
+            addLog(`User (Ketik): "${message}"`, "log-user");
+            
+            // Set UI to thinking
+            statusText.innerText = "Sedang Berpikir...";
+            micDot.classList.remove('listening');
+            micDot.classList.add('processing');
+            isProcessing = true;
+            
+            // Stop voice recognition temporarily
+            try { recognition.stop(); } catch (e) {}
+            
+            // Clear input
+            input.value = "";
+            
+            // Send to backend
+            sendToBackend(message);
+        };
 
         // 4. KONEKSI HARDWARE
         window.refreshPorts = async function () {
@@ -450,7 +669,7 @@
                         body: JSON.stringify({ port: port })
                     });
                     const data = await res.json();
-                    if (data.status === 'success') {
+                    if (data.success) {
                         isConnected = true;
                         setHardwareConnected(true);
                         addLog(`Terhubung: ${port}`, "log-sys");

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
@@ -11,9 +11,24 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/wayang.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/wayang.css') }}"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <meta name="description"
+        content="Wayanusa adalah aplikasi edukasi interaktif untuk mengenal budaya Wayang Kulit, mencari profil Dalang, menonton pertunjukan, hingga ngobrol langsung dengan AI Cepot.">
+    <meta name="keywords"
+        content="Wayang Kulit, Belajar Wayang, Profil Dalang, Kesenian Tradisional, Budaya Indonesia, Wayanusa, AI Cepot">
+    <meta name="author" content="Wayanusa Team">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Wayanusa - Lestarikan Budaya Wayang Kulit">
+    <meta property="og:description"
+        content="Mari belajar dan kenali kesenian Wayang Kulit secara interaktif bersama AI.">
+    <meta property="og:image" content="{{ url_for('static', filename='images/banner_wayang.png') }}">
+    <meta name="google-site-verification" content="qXBeu3m7BwkIhzu4ADCZ1Mn5Hch9kjPpDKQuoTK2P5U" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo_2.png') }}">
 </head>
 
 <body>
@@ -31,7 +46,6 @@
             --border-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* 🔥 FIX: Scroll Smooth ditaruh di sini agar jalan di semua layar 🔥 */
         html {
             scroll-behavior: smooth !important;
         }
@@ -411,12 +425,12 @@
             }
         }
 
-        .mobile-content {
+        .mobile-content,
+        .mobile-image {
             z-index: 2;
         }
 
         .mobile-image {
-            z-index: 2;
             text-align: center;
         }
 
@@ -737,7 +751,9 @@
             border-radius: 50%;
         }
 
-        /* RESPONSIVE */
+        /* =========================================
+           RESPONSIVE MOBILE 
+           ========================================= */
         @media (max-width: 992px) {
             .hero-content {
                 grid-template-columns: 1fr;
@@ -791,6 +807,65 @@
             .footer-bottom {
                 flex-direction: column;
                 gap: 10px;
+            }
+        }
+
+        /* 🔥 FIX: KHUSUS LAYAR HP (Smartphone) 🔥 */
+        @media (max-width: 768px) {
+            section {
+                padding: 50px 0;
+            }
+
+            /* Jarak antar section diperkecil */
+            .hero {
+                padding-top: 100px;
+                min-height: auto;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .stat-item h3 {
+                font-size: 2rem;
+            }
+
+            /* Ubah Grid menjadi 1 kolom sejajar ke bawah */
+            .features-grid,
+            .testi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mobile-card {
+                padding: 30px 20px;
+            }
+
+            .cta-footer {
+                padding: 60px 0;
+            }
+
+            .cta-footer h2 {
+                font-size: 1.8rem !important;
+            }
+
+            /* Taskbar bawah dirapikan biar gak numpuk di HP */
+            .taskbar-container {
+                width: 90%;
+            }
+
+            .taskbar {
+                padding: 10px 15px;
+                gap: 10px;
+                justify-content: space-between;
+                /* Menyebar rata */
+            }
+
+            .taskbar-item span {
+                font-size: 0.65rem;
+            }
+
+            .taskbar-item i {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -862,7 +937,8 @@
                         style="display: inline-block; padding: 5px 15px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; color: #fff; font-size: 0.8rem; margin-bottom: 15px;"><i
                             class="fab fa-android"></i> Tersedia di Android</span>
                     <h2 style="font-size: 2.5rem; color: #fff; margin-bottom: 20px;">Bawa Budaya Wayang <br> ke dalam
-                        <span class="text-gradient">Saku Anda</span></h2>
+                        <span class="text-gradient">Saku Anda</span>
+                    </h2>
                     <p>Download aplikasi <strong>Wayanusa Mobile</strong> untuk pengalaman yang lebih lancar. Scan
                         wayang langsung dari kamera HP, notifikasi kuis terbaru, dan fitur AR (Augmented Reality).</p>
                     <div class="app-badges"><a href="https://appdistribution.firebase.dev/i/2b3d9b469074fc10"
@@ -948,7 +1024,7 @@
                     </div>
                 </div>
                 <div data-aos="fade-left" style="display: flex; justify-content: center;">
-                    <img src="{{ url_for('static', filename='images/gunungan_Wayang.png') }}" alt="Gunungan Wayang"
+                    <img src="{{ url_for('static', filename='images/gunungan_wayang.png') }}" alt="Gunungan Wayang"
                         style="border-radius: 20px; box-shadow: 0 0 30px rgba(212, 163, 115, 0.2); max-width: 100%; height: fit-content;">
                 </div>
             </div>
@@ -959,8 +1035,8 @@
         <div class="container">
             <div class="showcase-header" data-aos="fade-right">
                 <div>
-                    <h2 style="color: white; font-size: 2rem;">Mitra <span class="text-gradient">Seniman</span></h2>
-                    <p style="margin: 0;">Para penjaga tradisi yang bekerjasama dengan kami.</p>
+                    <h2 style="color: white; font-size: 2rem;">Para <span class="text-gradient">Seniman</span></h2>
+                    <p style="margin: 0;">Para penjaga tradisi nusantara</p>
                 </div>
                 <a href="{{ url_for('web.mencari_dalang') }}" class="btn-outline">Lihat Semua</a>
             </div>
@@ -993,43 +1069,41 @@
 
     <section class="testimonials">
         <div class="container">
-            <div class="section-header" data-aos="fade-up"><span class="section-subtitle">APA KATA MEREKA</span>
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-subtitle">APA KATA MEREKA</span>
                 <h2 style="font-size: 2.5rem; color: white;">Suara <span class="text-gradient">Sobat Wayang</span></h2>
             </div>
+
             <div class="testi-grid">
-                <div class="testi-card" data-aos="fade-up" data-aos-delay="100">
+                {% if ulasan_list %}
+                {% for u in ulasan_list %}
+                <div class="testi-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
                     <div class="testi-user">
-                        <div class="testi-avatar"><i class="fas fa-user"></i></div>
+                        <div class="testi-avatar" style="font-weight: bold; font-size: 1.2rem;">
+                            {{ u.nama_user[0] | upper if u.nama_user else 'G' }}
+                        </div>
                         <div>
-                            <h4 style="margin: 0; font-size: 1rem;">Budi Santoso</h4><span
-                                style="color: #666; font-size: 0.8rem;">Mahasiswa Sastra</span>
+                            <h4 style="margin: 0; font-size: 1rem;">{{ u.nama_user or 'Guest' }}</h4>
+                            <div style="color: var(--primary-gold); font-size: 0.8rem; margin-top: 3px;">
+                                {% for i in range(1, 6) %}
+                                <i class="fas fa-star" style="{% if i > u.rating %}color: #444;{% endif %}"></i>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
-                    <p style="font-size: 0.9rem;">"Fitur Scan Wayang AI-nya keren banget! Membantu saya mengenali tokoh
-                        wayang yang jarang diketahui."</p>
+                    <p style="font-size: 0.9rem; font-style: italic; color: #ccc;">"{{ u.komentar }}"</p>
                 </div>
-                <div class="testi-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="testi-user">
-                        <div class="testi-avatar"><i class="fas fa-user"></i></div>
-                        <div>
-                            <h4 style="margin: 0; font-size: 1rem;">Siti Aminah</h4><span
-                                style="color: #666; font-size: 0.8rem;">Guru Sejarah</span>
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem;">"Sangat edukatif. Kuisnya seru dan membuat murid-murid saya lebih
-                        tertarik belajar budaya lokal."</p>
+                {% endfor %}
+                {% else %}
+                <div style="grid-column: 1 / -1; text-align: center; color: #666; padding: 40px;">
+                    <i class="far fa-comment-dots" style="font-size: 2.5rem; margin-bottom: 15px; color: #444;"></i>
+                    <p>Belum ada ulasan yang ditampilkan.</p>
                 </div>
-                <div class="testi-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="testi-user">
-                        <div class="testi-avatar"><i class="fas fa-user"></i></div>
-                        <div>
-                            <h4 style="margin: 0; font-size: 1rem;">Dimas Anggara</h4><span
-                                style="color: #666; font-size: 0.8rem;">Penggemar Wayang</span>
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem;">"Akhirnya ada platform yang menghubungkan kita dengan dalang lokal.
-                        Fitur cari dalang sangat bermanfaat."</p>
-                </div>
+                {% endif %}
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;" data-aos="zoom-in">
+                <a href="{{ url_for('web.ulasan') }}" class="btn-outline">Lihat Semua Ulasan / Beri Penilaian</a>
             </div>
         </div>
     </section>
@@ -1085,7 +1159,8 @@
                     <p>Melestarikan warisan budaya Indonesia melalui inovasi teknologi kecerdasan buatan dan IoT.</p>
                     <div class="social-links"><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i
                                 class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-facebook-f"></i></a><a
-                            href="#"><i class="fab fa-youtube"></i></a></div>
+                            href="https://www.youtube.com/channel/UCnjxIz_ky-lX3E9Aa7kZqRg"><i
+                                class="fab fa-youtube"></i></a></div>
                 </div>
                 <div class="footer-links">
                     <h4>Jelajahi</h4>
@@ -1107,8 +1182,8 @@
                 </div>
                 <div class="footer-contact">
                     <h4>Hubungi Kami</h4>
-                    <p><i class="fas fa-envelope"></i> hello@wayanusa.com</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Jakarta, Indonesia</p>
+                    <p><i class="fas fa-envelope"></i> wayanusaaa@gmail.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Tegal, Jawa Tengah, Indonesia</p>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -1134,24 +1209,33 @@
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 
     <script>
-        AOS.init({ once: true, offset: 100, duration: 800 });
+        // 🔥 INI KUNCINYA: once diubah jadi false 🔥
+        AOS.init({
+            once: false,
+            offset: 50, // Offset diperkecil agar di HP lebih responsif munculnya
+            duration: 800
+        });
 
-        // Counter Animation
+        // Counter Animation Berulang (Mulai dari 0 setiap di-scroll)
         const statsSection = document.getElementById('statsSection');
         const counters = document.querySelectorAll('.counter');
-        let started = false;
+        let isAnimating = false;
 
         function startCounting() {
             counters.forEach(counter => {
                 const target = +counter.getAttribute('data-target');
-                const duration = 2000;
+                const duration = 2000; // Durasi animasi 2 detik
                 const increment = target / (duration / 16);
                 let current = 0;
+
+                // Hapus animasi sebelumnya jika masih berjalan (mencegah bug angka loncat-loncat)
+                cancelAnimationFrame(counter.animationFrame);
+
                 const updateCounter = () => {
                     current += increment;
                     if (current < target) {
                         counter.innerText = Math.ceil(current);
-                        requestAnimationFrame(updateCounter);
+                        counter.animationFrame = requestAnimationFrame(updateCounter);
                     } else {
                         counter.innerText = target;
                     }
@@ -1163,11 +1247,20 @@
         if (statsSection) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting && !started) {
-                        startCounting(); started = true;
+                    if (entry.isIntersecting) {
+                        // Saat muncul di layar, mulai menghitung jika belum jalan
+                        if (!isAnimating) {
+                            isAnimating = true;
+                            // Kembalikan ke 0 dulu sebelum mulai
+                            counters.forEach(c => c.innerText = '0');
+                            startCounting();
+                        }
+                    } else {
+                        // Saat keluar dari layar, reset status agar nanti bisa menghitung lagi
+                        isAnimating = false;
                     }
                 });
-            }, { threshold: 0.5 });
+            }, { threshold: 0.2 }); // Akan memicu animasi saat 20% bagiannya terlihat
             observer.observe(statsSection);
         }
 

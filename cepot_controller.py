@@ -8,7 +8,10 @@ import edge_tts
 import google.generativeai as genai
 import re
 import serial.tools.list_ports
+from dotenv import load_dotenv
 
+# Load env variables immediately
+load_dotenv()
 
 # ==============================
 # KONFIGURASI (DIAMBIL DARI FILE KAMU)
@@ -44,8 +47,9 @@ class CepotController:
 
         try:
             pygame.mixer.quit()
-            pygame.mixer.init(frequency=24000)
-            print("✅ Audio System Ready")
+            # Gunakan standard CD quality (44100Hz) dan buffer 4096 untuk menghilangkan kresek & ketidakstabilan di Windows
+            pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=4096)
+            print("✅ Audio System Ready (44100Hz, Buffer 4096)")
         except Exception as e:
             print("⚠️ Audio init error:", e)
 
@@ -73,7 +77,7 @@ class CepotController:
     # EDGE TTS (SESUAI FILE ASLI)
     # ==========================
 
-    async def bicara_async(self, teks):
+    async def bicara_async(self, teks, filepath):
         communicate = edge_tts.Communicate(
             teks,
             VOICE,
@@ -82,35 +86,35 @@ class CepotController:
         )
 
         # MODE STREAM (LEBIH TAHAN FIREWALL)
-        with open(AUDIO_FILE, "wb") as f:
+        with open(filepath, "wb") as f:
             async for chunk in communicate.stream():
                 if chunk["type"] == "audio":
                     f.write(chunk["data"])
 
-        return os.path.exists(AUDIO_FILE) and os.path.getsize(AUDIO_FILE) > 1000
+        return os.path.exists(filepath) and os.path.getsize(filepath) > 1000
 
     # ==========================
-    # SUARA + GERAK
+    # SUARA + GERAK (FALLBACK/SINKRON)
     # ==========================
 
     def bicara_dan_gerak(self, teks):
         teks = clean_tts_text(teks)
         print(f"🤖 Wayang: {teks}")
 
+        filepath = AUDIO_FILE
         try:
-            if pygame.mixer.music.get_busy():
-                pygame.mixer.music.stop()
-            pygame.mixer.music.unload()
+            # Hentikan semua audio yang sedang berjalan agar tidak tumpang tindih
+            pygame.mixer.stop()
 
-            if os.path.exists(AUDIO_FILE):
-                os.remove(AUDIO_FILE)
+            if os.path.exists(filepath):
+                os.remove(filepath)
                 time.sleep(0.1)
-        except:
-            pass
+        except Exception as e:
+            print("⚠️ Clean audio file warning:", e)
 
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        sukses = loop.run_until_complete(self.bicara_async(teks))
+        sukses = loop.run_until_complete(self.bicara_async(teks, filepath))
         loop.close()
 
         if not sukses:
@@ -121,13 +125,14 @@ class CepotController:
             if self.is_connected and self.ser:
                 self.ser.write(b'T')
 
-            pygame.mixer.music.load(AUDIO_FILE)
-            pygame.mixer.music.play()
+            suara = pygame.mixer.Sound(filepath)
+            channel = suara.play()
 
-            while pygame.mixer.music.get_busy():
-                time.sleep(0.1)
-
-            pygame.mixer.music.unload()
+            if channel:
+                while channel.get_busy():
+                    time.sleep(0.1)
+            else:
+                time.sleep(3)
 
             if self.is_connected and self.ser:
                 self.ser.write(b'S')
@@ -136,6 +141,30 @@ class CepotController:
             print("❌ Audio error:", e)
             if self.ser:
                 self.ser.write(b'S')
+
+    # ==========================
+    # MOVEMENT CONTROL (FOR FRONTEND PLAYER)
+    # ==========================
+
+    def start_movement(self):
+        if self.is_connected and self.ser:
+            try:
+                self.ser.write(b'T')
+                print("🔌 Arduino Mouth Movement: STARTED")
+                return True
+            except Exception as e:
+                print("❌ Arduino write error:", e)
+        return False
+
+    def stop_movement(self):
+        if self.is_connected and self.ser:
+            try:
+                self.ser.write(b'S')
+                print("🔌 Arduino Mouth Movement: STOPPED")
+                return True
+            except Exception as e:
+                print("❌ Arduino write error:", e)
+        return False
 
     # ==========================
     # API TALK (FLASK)
@@ -159,17 +188,27 @@ class CepotController:
 
             reply = response.text.strip() if response and response.text else "Inyong ora mudeng, Rika."
 
-            threading.Thread(
-                target=self.bicara_dan_gerak,
-                args=(reply,),
-                daemon=True
-            ).start()
+            # Hasilkan file suara di static folder agar dapat diputar langsung oleh browser
+            filepath = os.path.join("static", "voice_tegal.mp3")
+            try:
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+            except Exception as e:
+                print("⚠️ Clean static audio warning:", e)
 
-            return reply
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            sukses = loop.run_until_complete(self.bicara_async(reply, filepath))
+            loop.close()
+
+            if sukses:
+                return {"response": reply, "audio_url": "/static/voice_tegal.mp3"}
+            else:
+                return {"response": reply, "audio_url": None}
 
         except Exception as e:
-            print("❌ Gemini error:", e)
-            return "Aduh sinyal e laka, Rika."
+            print("❌ Gemini/TTS error:", e)
+            return {"response": "Aduh sinyal e laka, Rika.", "audio_url": None}
     
     def get_ports(self):
         ports = serial.tools.list_ports.comports()

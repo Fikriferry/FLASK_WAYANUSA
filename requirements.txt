@@ -6,3 +6,4 @@ langchain-google-genai
 langchain-text-splitters
 rank_bm25
 pymysql
+psycopg2-binary
